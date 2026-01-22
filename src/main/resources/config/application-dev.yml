@@ -21,6 +21,7 @@ logging:
     org.apache.kafka: INFO
     org.springframework.kafka: INFO
     com.atparui.rmsservice: DEBUG
+    com.atparui.rmsservice.broker: INFO
 
 management:
   endpoints:
