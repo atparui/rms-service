@@ -145,8 +145,22 @@ public class GatewayTenantService {
      */
     private Mono<String> getAccessToken() {
         MultiTenantProperties.Gateway.Auth auth = properties.getGateway().getAuth();
-        if (auth == null || isBlank(auth.getClientId()) || isBlank(auth.getClientSecret()) || isBlank(auth.getTokenUri())) {
-            LOG.debug("Gateway auth not configured; calling without Authorization header");
+        if (auth == null) {
+            LOG.debug("Gateway auth block is null; calling without Authorization header");
+            return Mono.empty();
+        }
+
+        boolean missingClientId = isBlank(auth.getClientId());
+        boolean missingSecret = isBlank(auth.getClientSecret());
+        boolean missingTokenUri = isBlank(auth.getTokenUri());
+
+        if (missingClientId || missingSecret || missingTokenUri) {
+            LOG.debug(
+                "Gateway auth not configured; calling without Authorization header (clientIdPresent={}, secretPresent={}, tokenUriPresent={})",
+                !missingClientId,
+                !missingSecret,
+                !missingTokenUri
+            );
             return Mono.empty();
         }
 
@@ -156,7 +170,7 @@ public class GatewayTenantService {
             return Mono.just(cached.token);
         }
 
-        LOG.debug("Fetching new access token for clientId {}", auth.getClientId());
+        LOG.debug("Fetching new access token for clientId {} via {}", auth.getClientId(), auth.getTokenUri());
 
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "client_credentials");
@@ -173,6 +187,14 @@ public class GatewayTenantService {
             .bodyValue(form)
             .retrieve()
             .bodyToMono(TokenResponse.class)
+            .doOnError(error ->
+                LOG.error(
+                    "Failed to fetch access token for clientId {} from {}: {}",
+                    auth.getClientId(),
+                    auth.getTokenUri(),
+                    error.getMessage()
+                )
+            )
             .map(response -> {
                 long expiresIn = response.getExpiresIn() != null ? response.getExpiresIn() : 300L;
                 // Buffer expiry by 30 seconds to avoid using an about-to-expire token
