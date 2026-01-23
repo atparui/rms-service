@@ -55,13 +55,15 @@ public class TenantConnectionProviderImpl implements TenantConnectionProvider {
             return handleMissingTenantR2dbc();
         }
 
-        // Check if tenant uses JDBC
-        if (isJdbc(tenantId)) {
-            LOG.debug("Tenant {} uses JDBC, returning empty for R2DBC connection", tenantId);
-            return Mono.empty();
-        }
-
-        return r2dbcConnectionManager.getConnectionFactory(tenantId);
+        // Decide reactively to avoid blocking on event-loop threads
+        return isJdbcReactive(tenantId)
+            .flatMap(isJdbc -> {
+                if (isJdbc) {
+                    LOG.debug("Tenant {} uses JDBC, returning empty for R2DBC connection", tenantId);
+                    return Mono.empty();
+                }
+                return r2dbcConnectionManager.getConnectionFactory(tenantId);
+            });
     }
 
     @Override
@@ -102,7 +104,6 @@ public class TenantConnectionProviderImpl implements TenantConnectionProvider {
         try {
             TenantDatabaseConfig config = gatewayTenantService
                 .getTenantDatabaseConfig(tenantId)
-                // Avoid blocking on event-loop / parallel workers
                 .subscribeOn(Schedulers.boundedElastic())
                 .block();
             return config != null && config.isJdbc();
@@ -134,5 +135,23 @@ public class TenantConnectionProviderImpl implements TenantConnectionProvider {
             LOG.error("Tenant ID not found in context and fallback is disabled");
             return null;
         }
+    }
+
+    /**
+     * Reactive helper to decide if a tenant uses JDBC without blocking event-loop threads.
+     */
+    private Mono<Boolean> isJdbcReactive(String tenantId) {
+        if (tenantId == null || tenantId.isBlank()) {
+            return Mono.just(false);
+        }
+
+        return gatewayTenantService
+            .getTenantDatabaseConfig(tenantId)
+            .subscribeOn(Schedulers.boundedElastic())
+            .map(config -> config != null && config.isJdbc())
+            .onErrorResume(e -> {
+                LOG.warn("Failed to get tenant config for {}: {}", tenantId, e.getMessage());
+                return Mono.just(false);
+            });
     }
 }
