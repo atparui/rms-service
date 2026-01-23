@@ -80,7 +80,7 @@
         <insert tableName="app_menu">
             <column name="id" valueComputed="GEN_RANDOM_UUID()"/>
             <column name="menu_key" value="billing"/>
-            <column name="label" value="Billing & Payments"/>
+            <column name="label" value="Billing &amp; Payments"/>
             <column name="type" value="route"/>
             <column name="route_path" value="/billing"/>
             <column name="sort_order" valueNumeric="8"/>
