@@ -1,11 +1,11 @@
 id;customer_code;phone;email;first_name;last_name;date_of_birth;address_line_1;address_line_2;city;state;country;postal_code;is_active
-0c0b9978-755d-42a5-8222-354b337c7f47;often;866-642-5780 x860;Modesto_Olson81@yahoo.com;Guadalupe;Schimmel;2025-12-27;yet extension;bookcase;Arvelport;within;Canada;regarding drag cross;true
-5f2a81ce-5b71-4bb9-821e-0f8bdd29d34f;unnaturally whether;(881) 290-4122 x761;Laurel_Schamberger27@hotmail.com;Kylie;Carter;2025-12-27;ha till;micromanage serene;Pittsburgh;airport awkwardly;Guinea-Bissau;unto kinase mmm;true
-dc1f35e9-4327-47d5-b5c9-dabce840003b;agile ignite;301.952.5694 x37853;Percy.Parisian10@hotmail.com;Elmore;Auer;2025-12-27;sedately;quiet;South Bufordbury;stoop waver representation;North Macedonia;superb bare;false
-41e7ec2b-1a31-495e-99b4-ae74bdb06818;metabolise cripple barring;1-784-262-8477 x2757;Jeanette_Parker@gmail.com;Jessyca;Bode;2025-12-27;incidentally when;evenly;Lake Ronny;ick procurement phooey;French Southern Territories;aboard curiously ouc;true
-d1abddf1-b340-44bb-8d6e-2271882a473b;woot;741.330.4000 x4997;Jeanette47@yahoo.com;Dee;Wilderman;2025-12-27;a;unfortunately canter window;Maple Grove;when cap gadzooks;Maldives;bracelet monthly upo;true
-59c62f71-efc2-4be3-8810-9a3ec679eb5a;spellcheck;1-268-256-4579 x192;Julius_Halvorson@yahoo.com;Aniya;Watsica;2025-12-27;grouchy packaging;times under glossy;North Rowenastead;fooey wherever gah;Mayotte;variable;false
-bccb9209-edc2-4caa-a301-b187ba8da9d2;eek equate;678.354.2600;Kyra_McLaughlin@yahoo.com;Jeanne;Rippin-Franey;2025-12-28;turret officially beside;sympathetically sedately yuck;Warwick;ah profuse;Australia;indeed whoa masterpi;true
-e08bd386-1a9f-426d-84b0-758319eb0730;where;(352) 363-3135 x2223;Cristina.Pouros77@hotmail.com;Flo;Bradtke;2025-12-27;when;joy eventually well-groomed;Hodkiewiczton;appropriate;Sint Maarten;legitimize sadly hm;true
-a8b685ab-c654-48d5-ae06-51b4d71ada0d;woot despite etch;(543) 339-8585;Twila_McGlynn64@gmail.com;Lenny;Watsica;2025-12-27;including than;exalt cutlet dishearten;Lake Eliane;upbeat ugh uh-huh;New Caledonia;whenever;false
-cd123a85-1d9a-48bb-b75d-9bf16256229a;preclude calculating reorient;(658) 370-5689 x1510;Anastacio_Thiel@gmail.com;Vickie;Prosacco;2025-12-27;wherever spook furthermore;before;New Jaceymouth;trash jacket where;Hong Kong;popularity poppy but;false
+0c0b9978-755d-42a5-8222-354b337c7f47;CUST-0001;+1-415-555-1010;alex.martin@example.com;Alex;Martin;1990-05-12;245 Pine St;Apt 3C;San Francisco;CA;USA;94108;true
+5f2a81ce-5b71-4bb9-821e-0f8bdd29d34f;CUST-0002;+1-917-555-2234;rachel.lee@example.com;Rachel;Lee;1988-09-23;18 Broadway;;New York;NY;USA;10004;true
+dc1f35e9-4327-47d5-b5c9-dabce840003b;CUST-0003;+1-512-555-7789;samir.khan@example.com;Samir;Khan;1995-03-02;55 Barton Ave;;Austin;TX;USA;78704;true
+41e7ec2b-1a31-495e-99b4-ae74bdb06818;CUST-0004;+1-617-555-6677;meera.nair@example.com;Meera;Nair;1992-11-18;90 Beacon St;Unit 5;Boston;MA;USA;02108;true
+d1abddf1-b340-44bb-8d6e-2271882a473b;CUST-0005;+1-206-555-3344;carlos.rivera@example.com;Carlos;Rivera;1986-07-29;120 Lake View Dr;;Seattle;WA;USA;98109;true
+59c62f71-efc2-4be3-8810-9a3ec679eb5a;CUST-0006;+1-702-555-9900;priya.shah@example.com;Priya;Shah;1998-02-17;15 Desert Rose Ct;;Las Vegas;NV;USA;89101;true
+bccb9209-edc2-4caa-a301-b187ba8da9d2;CUST-0007;+1-650-555-7654;lucy.nguyen@example.com;Lucy;Nguyen;1993-06-30;600 Bayshore Rd;;San Mateo;CA;USA;94404;true
+e08bd386-1a9f-426d-84b0-758319eb0730;CUST-0008;+1-305-555-8833;david.hernandez@example.com;David;Hernandez;1984-12-05;88 Harbor Dr;;Miami;FL;USA;33101;true
+a8b685ab-c654-48d5-ae06-51b4d71ada0d;CUST-0009;+1-971-555-4411;sophia.ross@example.com;Sophia;Ross;1991-04-08;22 Pearl St;;Portland;OR;USA;97205;true
+cd123a85-1d9a-48bb-b75d-9bf16256229a;CUST-0010;+1-213-555-6400;marcus.elliott@example.com;Marcus;Elliott;1989-10-15;430 Sunset Blvd;Apt 9;Los Angeles;CA;USA;90028;true

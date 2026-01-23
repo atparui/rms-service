@@ -1,11 +1,11 @@
 id;previous_status;new_status;changed_at;changed_by;notes
-0a6e6242-e756-4942-ad13-4df7d8cca5a5;sew stunt but;gazebo phooey;2025-12-28T04:24:43;monthly ad er;../fake-data/blob/hipster.txt
-df77ce2e-0fd7-4e70-a093-37af0fc83c37;unfortunately compromise nifty;shoulder furlough;2025-12-27T10:39:29;spark before pink;../fake-data/blob/hipster.txt
-5b7ee743-a741-4899-9860-efec89735c46;afore chainstay;ouch unit once;2025-12-27T06:05:05;massage deflect doing;../fake-data/blob/hipster.txt
-4ea118e1-7a51-475e-9807-fa87ac955baf;eek dismal;fast incidentally knit;2025-12-27T23:53:26;snappy;../fake-data/blob/hipster.txt
-b55bb348-b7b1-4d60-ae62-06c5a069f611;elevation;till narrowcast vein;2025-12-27T18:36:09;status;../fake-data/blob/hipster.txt
-e0ec1b2d-f33b-4c6b-83d6-38d7e75100c6;hearten ick;unto;2025-12-27T22:41:11;intent display silky;../fake-data/blob/hipster.txt
-60b142d7-b466-401d-ab8a-ce8999ec1a6a;throughout questioningly;boo above innocently;2025-12-27T06:39:01;on;../fake-data/blob/hipster.txt
-c6bcdea7-cfa0-4ee1-87a6-059e6fc5a411;whenever starch;ew overheard round;2025-12-27T08:28:20;whereas;../fake-data/blob/hipster.txt
-7b4a004c-2c62-4646-b50f-e61dca207aed;overspend congregate;mallard gosh fledgling;2025-12-27T23:14:20;upliftingly;../fake-data/blob/hipster.txt
-b022db0a-e57b-4eee-8cca-745cf2a42b1a;fishery;ew sans;2025-12-27T12:50:38;weep hm;../fake-data/blob/hipster.txt
+0a6e6242-e756-4942-ad13-4df7d8cca5a5;CREATED;PREP;2025-12-27T12:32:00;cashier_jane;Order sent to kitchen
+df77ce2e-0fd7-4e70-a093-37af0fc83c37;PREP;READY;2025-12-27T12:48:00;chef_omar;Packed and awaiting pickup
+5b7ee743-a741-4899-9860-efec89735c46;READY;COMPLETED;2025-12-27T12:52:00;runner_sam;Handed to customer
+4ea118e1-7a51-475e-9807-fa87ac955baf;CREATED;CANCELLED;2025-12-27T14:25:00;host_matt;Customer left before ordering
+b55bb348-b7b1-4d60-ae62-06c5a069f611;CREATED;PREP;2025-12-27T19:42:00;server_nina;Send drinks first
+e0ec1b2d-f33b-4c6b-83d6-38d7e75100c6;PREP;READY;2025-12-27T19:58:00;bar_lead;Cocktails ready
+60b142d7-b466-401d-ab8a-ce8999ec1a6a;READY;COMPLETED;2025-12-27T20:05:00;server_nina;Served table 12
+c6bcdea7-cfa0-4ee1-87a6-059e6fc5a411;CREATED;PREP;2025-12-27T21:12:00;online_system;Auto-accepted delivery
+7b4a004c-2c62-4646-b50f-e61dca207aed;PREP;ON_THE_WAY;2025-12-27T21:32:00;delivery_rider;Picked up by rider
+b022db0a-e57b-4eee-8cca-745cf2a42b1a;ON_THE_WAY;DELIVERED;2025-12-27T22:05:00;delivery_rider;Delivered with doorstep photo

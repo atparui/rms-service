@@ -1,11 +1,11 @@
 id;method_code;method_name;description;is_active
-0195d669-49f7-4c18-bfce-93f80d2009ed;once sleepily immaculate;viciously plain;../fake-data/blob/hipster.txt;false
-1f1366fc-c009-4b12-bf89-219e04ee1f78;stiffen duh;yearningly;../fake-data/blob/hipster.txt;false
-9e26ace1-1281-4650-9a39-3acc11bce06b;once;innovation;../fake-data/blob/hipster.txt;true
-005f0b4e-8211-4fd7-9693-9bdf3da5e60a;untimely silk harmful;developmental electric decision;../fake-data/blob/hipster.txt;false
-a5eec28c-f713-46ad-852a-457f7a62c296;replacement self-reliant jacket;besides ferociously;../fake-data/blob/hipster.txt;false
-bfdbb486-1172-4263-84b9-c0c0919b8522;elegantly;briefly worthy;../fake-data/blob/hipster.txt;true
-9a291131-6d03-402d-8f38-2789efcab64c;hamburger along;um vivaciously;../fake-data/blob/hipster.txt;false
-79eee510-37db-49e9-b681-eae7a4b6bdd3;taut;chasuble drat nearly;../fake-data/blob/hipster.txt;true
-0d2cda2b-78f4-497e-8b03-78ece35ecb53;supposing;up obnoxiously;../fake-data/blob/hipster.txt;false
-8bfb463d-73cc-473c-81fc-b53670db644b;guilt;sympathetically deceivingly;../fake-data/blob/hipster.txt;true
+0195d669-49f7-4c18-bfce-93f80d2009ed;CASH;Cash;Payment settled in cash;true
+1f1366fc-c009-4b12-bf89-219e04ee1f78;CARD_VISA;Visa Credit/Debit Card;Processed via POS terminal;true
+9e26ace1-1281-4650-9a39-3acc11bce06b;CARD_MASTER;Mastercard Credit/Debit Card;Processed via POS terminal;true
+005f0b4e-8211-4fd7-9693-9bdf3da5e60a;UPI;UPI/Wallet;Contactless wallet or QR payments;true
+a5eec28c-f713-46ad-852a-457f7a62c296;NET_BANK;Net Banking;Online banking transfer;true
+bfdbb486-1172-4263-84b9-c0c0919b8522;APPLE_PAY;Apple Pay;Tap to pay using Apple Pay;true
+9a291131-6d03-402d-8f38-2789efcab64c;GOOGLE_PAY;Google Pay;Tap to pay using Google Pay;true
+79eee510-37db-49e9-b681-eae7a4b6bdd3;GIFT_CARD;Gift Card;Redeemable restaurant gift card;true
+0d2cda2b-78f4-497e-8b03-78ece35ecb53;MEAL_VOUCHER;Meal Voucher;Company issued meal voucher;true
+8bfb463d-73cc-473c-81fc-b53670db644b;BANK_TRANSFER;Bank Transfer;Manual bank transfer on invoice;true

@@ -1,11 +1,11 @@
 id;variant_name;variant_code;price_modifier;is_default;display_order;is_active
-55c22112-9ee3-4723-b00a-a27b60a6262d;sediment pace;intent birdcage;19392.56;true;8991;false
-65b5ad18-c85b-468b-b572-b8699653083f;phooey times revitalise;phooey;20948.93;false;31919;false
-e6f110d4-6147-4c35-8f77-b9b16658cfb2;during;vicinity vague;28165.1;false;21514;false
-ddb589d6-3aa8-4d7f-9775-91f97dee5d4d;but plain;strictly singing;22776.5;true;25721;true
-be3c2275-b802-4f62-a378-61c3a9d3e22b;ick list rationalise;anneal;5643.93;false;23382;false
-09a68914-c585-4bfe-a2d0-66967e98570f;ah worth;recklessly ah;22755.36;true;24202;false
-f70928b2-0f86-485a-ab80-f50754290574;which snoopy deform;papa bus;24972.64;false;17596;true
-e5ae5e69-13fe-46ca-92a1-10be8f8cb696;where since decent;fireplace ignorance postbox;88.05;false;4883;false
-1dd7e276-4d60-4030-a86f-41822c40288b;er instance longingly;footrest emulsify;26941.8;false;10189;true
-15dc4036-8c07-44e8-9fc3-b120405b5046;demob dowse unwelcome;feminize after;13299.61;true;26815;false
+55c22112-9ee3-4723-b00a-a27b60a6262d;Regular;REG;0.00;true;1;true
+65b5ad18-c85b-468b-b572-b8699653083f;Large;LARGE;2.00;false;2;true
+e6f110d4-6147-4c35-8f77-b9b16658cfb2;Gluten Free Base;GF_BASE;1.50;false;3;true
+ddb589d6-3aa8-4d7f-9775-91f97dee5d4d;Extra Cheese;X_CHEESE;1.25;false;4;true
+be3c2275-b802-4f62-a378-61c3a9d3e22b;Double Patty;DOUBLE;3.00;false;5;true
+09a68914-c585-4bfe-a2d0-66967e98570f;Spicy Level Up;SPICY_UP;0.50;false;6;true
+f70928b2-0f86-485a-ab80-f50754290574;Oat Milk;OAT_MILK;0.75;false;7;true
+e5ae5e69-13fe-46ca-92a1-10be8f8cb696;Iced;ICED;0.25;false;8;true
+1dd7e276-4d60-4030-a86f-41822c40288b;Single Scoop;SCOOP1;0.00;true;9;true
+15dc4036-8c07-44e8-9fc3-b120405b5046;Double Scoop;SCOOP2;1.50;false;10;true

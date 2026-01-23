@@ -1,11 +1,11 @@
 id;payment_number;amount;payment_date;transaction_id;payment_gateway_response;status;processed_by;notes;refunded_at;refunded_by;refund_reason
-7b640e5a-7778-43b2-83a5-7445d879f5f6;that;8682.89;2025-12-27T19:13:52;deploy before;../fake-data/blob/hipster.txt;guidance lava charter;blah;../fake-data/blob/hipster.txt;2025-12-28T00:43:23;energetically;../fake-data/blob/hipster.txt
-b6828fe6-090f-41ac-a106-d35de65534c7;um next;3794.59;2025-12-27T16:12:32;drat rout;../fake-data/blob/hipster.txt;outstanding though;tooth uh-huh as;../fake-data/blob/hipster.txt;2025-12-27T20:42:22;rightfully;../fake-data/blob/hipster.txt
-a61e40e4-9718-452c-bbe7-7048d2d0f7f3;hurtful phew redound;21989.16;2025-12-28T00:27:40;typeface;../fake-data/blob/hipster.txt;grok;during;../fake-data/blob/hipster.txt;2025-12-27T10:05:40;duh;../fake-data/blob/hipster.txt
-570b4a78-4947-4313-a3fe-ce1dcd551994;cheese ouch;5572.62;2025-12-27T20:54:02;kowtow;../fake-data/blob/hipster.txt;vague instead;beyond deeply though;../fake-data/blob/hipster.txt;2025-12-28T04:43:13;rout;../fake-data/blob/hipster.txt
-1f10f365-7580-4b1d-80aa-d3998396ad1d;fooey unearth cruelly;9912.63;2025-12-27T11:10:24;ew ravage tensely;../fake-data/blob/hipster.txt;deep kindly;phooey;../fake-data/blob/hipster.txt;2025-12-27T17:35:28;energetically;../fake-data/blob/hipster.txt
-23d4098f-ed4b-47d1-810e-0ea135a4c09d;upwardly zowie kookily;11834.94;2025-12-28T03:28:02;put yum wherever;../fake-data/blob/hipster.txt;trusting;expostulate amongst how;../fake-data/blob/hipster.txt;2025-12-28T00:00:56;pearl nearly gee;../fake-data/blob/hipster.txt
-c480ce4d-a20d-4d44-b9c6-d8cd7154422e;flint below;30922.39;2025-12-27T18:46:07;or mash but;../fake-data/blob/hipster.txt;outset reassemble joyously;ill sup irritably;../fake-data/blob/hipster.txt;2025-12-27T10:03:18;questioningly next knitting;../fake-data/blob/hipster.txt
-ad6eb812-b4ee-4f48-b298-b02990a401b9;psst;32553.87;2025-12-27T16:51:23;pfft toothbrush any;../fake-data/blob/hipster.txt;unlike;defrag;../fake-data/blob/hipster.txt;2025-12-28T02:42:26;acidly;../fake-data/blob/hipster.txt
-c0f2f617-aa90-408c-997b-96e4e295d4db;investigate equate;1301.09;2025-12-27T23:22:43;indeed;../fake-data/blob/hipster.txt;without soulful to;adaptation;../fake-data/blob/hipster.txt;2025-12-27T14:01:54;unruly bootleg;../fake-data/blob/hipster.txt
-a32b8732-1ca4-42ff-a6a5-20ddd7dfb6df;clamp jellyfish;23.96;2025-12-27T10:09:35;cheetah dreamily inasmuch;../fake-data/blob/hipster.txt;inasmuch and;familiarize consequently;../fake-data/blob/hipster.txt;2025-12-27T06:59:22;now brightly;../fake-data/blob/hipster.txt
+7b640e5a-7778-43b2-83a5-7445d879f5f6;PAY-1001;72.78;2025-12-27T12:56:00;TXN-001;Approved;SUCCESS;pos_jane;Paid with Visa;;;
+b6828fe6-090f-41ac-a106-d35de65534c7;PAY-1002;52.38;2025-12-27T13:21:00;TXN-002;Approved;SUCCESS;pos_ryan;Card tap;;;
+a61e40e4-9718-452c-bbe7-7048d2d0f7f3;PAY-1003;43.84;2025-12-27T18:52:00;TXN-003;Approved;SUCCESS;app_gateway;Online payment;;;
+570b4a78-4947-4313-a3fe-ce1dcd551994;PAY-1004;27.30;2025-12-27T19:16:00;TXN-004;Approved;SUCCESS;pos_jane;Cash received;;;
+1f10f365-7580-4b1d-80aa-d3998396ad1d;PAY-1005;53.47;2025-12-27T20:06:00;TXN-005;Approved;SUCCESS;pos_sam;Split bill not required;;;
+23d4098f-ed4b-47d1-810e-0ea135a4c09d;PAY-1006;21.38;2025-12-27T21:26:00;TXN-006;Approved;SUCCESS;pos_nina;Tap to pay;;;
+c480ce4d-a20d-4d44-b9c6-d8cd7154422e;PAY-1007;10.50;2025-12-27T22:12:00;TXN-007;Approved;SUCCESS;web_gateway;Online dessert add-on;;;
+ad6eb812-b4ee-4f48-b298-b02990a401b9;PAY-1008;28.20;2025-12-28T09:21:00;TXN-008;Approved;SUCCESS;app_gateway;Prepaid breakfast;;;
+c0f2f617-aa90-408c-997b-96e4e295d4db;PAY-1009;72.32;2025-12-28T12:45:00;TXN-009;Pending;PENDING;pos_jane;Awaiting swipe;;;
+a32b8732-1ca4-42ff-a6a5-20ddd7dfb6df;PAY-1010;72.32;2025-12-28T13:10:00;TXN-009-R;Refunded;REFUNDED;pos_jane;Refund after cancellation;2025-12-28T13:15:00;manager_kay;Order cancelled

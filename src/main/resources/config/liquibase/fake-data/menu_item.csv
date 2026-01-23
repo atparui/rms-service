@@ -1,11 +1,11 @@
 id;name;code;description;item_type;cuisine_type;is_vegetarian;is_vegan;is_alcoholic;spice_level;preparation_time;base_price;image_url;is_available;is_active;display_order
-b2f4978b-1fc1-424a-9d3e-15821051bbad;bah ack indeed;provided given;../fake-data/blob/hipster.txt;pfft not unused;mmm lest;true;true;true;14339;12642;28237.31;diligently cook;true;false;19468
-591d54d9-653a-413d-8be5-4c8e329a5709;whenever tributary versus;aw quicker;../fake-data/blob/hipster.txt;worthy;publicize immediate that;false;false;false;27840;15856;20282.11;who content;true;false;20813
-d8f37722-b8ed-41a8-9ce0-1c994f072e70;frivolous inasmuch;wherever circulate;../fake-data/blob/hipster.txt;but yowza enthusiastically;rout;true;true;false;32758;4026;23436.78;easily whether formal;false;true;20731
-90f06950-405b-491a-99ab-052da9ef65c7;hm importance what;the;../fake-data/blob/hipster.txt;magnificent;between pulp or;true;true;true;10430;290;20313.12;given enfold who;false;false;7848
-ced02581-22eb-4ac8-b35e-42ae547c8ba5;concerning stint before;insert very colossal;../fake-data/blob/hipster.txt;considering afore incline;marimba;false;true;true;6450;15661;6315.39;utilized pastel exterior;true;false;14624
-35fac4b0-b9af-4176-af9f-f08921bfaf83;gadzooks rebuff snappy;well-worn;../fake-data/blob/hipster.txt;smug;out courtroom;true;true;true;20811;2678;11086.53;puppet gosh;true;true;22008
-f4ee7873-a8f3-485b-81a3-d94fc784dbdb;slime suspension;miserly;../fake-data/blob/hipster.txt;slink;eek gleefully aha;true;false;false;13512;9628;7937.97;dreamily;true;false;13380
-2e20236c-93b2-4540-a979-540e5be15f4a;hm fooey dependable;valley;../fake-data/blob/hipster.txt;casement after officially;function instantly shocked;false;true;true;3048;13556;16592.02;with consequently pfft;false;false;3363
-a0b32e03-e4e0-4d1f-9e96-03acf415b0ce;utilization wildly sport;probate;../fake-data/blob/hipster.txt;surprisingly;certify quinoa toothbrush;true;false;false;19315;1381;14634.21;mean during suffice;false;true;32043
-19cd426f-aa18-4024-941e-fb830af07328;spark range unselfish;hydrant;../fake-data/blob/hipster.txt;off psst yowza;lest haul;true;true;true;12608;4130;28703.16;hm;false;true;24178
+b2f4978b-1fc1-424a-9d3e-15821051bbad;Margherita Pizza;PIZZA_MARG;Classic pizza with tomato, basil and mozzarella;MAIN;Italian;true;false;false;1;12;9.50;/images/menu/margherita.jpg;true;true;1
+591d54d9-653a-413d-8be5-4c8e329a5709;Butter Chicken;CURRY_BC;Creamy tomato-based curry with tender chicken;MAIN;Indian;false;false;false;3;20;13.00;/images/menu/butter-chicken.jpg;true;true;2
+d8f37722-b8ed-41a8-9ce0-1c994f072e70;Grilled Paneer Tikka;SNACK_PTK;Skewers of marinated paneer with peppers;STARTER;Indian;true;false;false;2;15;8.00;/images/menu/paneer-tikka.jpg;true;true;3
+90f06950-405b-491a-99ab-052da9ef65c7;Caesar Salad;SALAD_CSR;Crisp romaine with parmesan and house dressing;STARTER;Continental;true;false;false;1;10;7.50;/images/menu/caesar-salad.jpg;true;true;4
+ced02581-22eb-4ac8-b35e-42ae547c8ba5;Vegan Buddha Bowl;BOWL_VEG;Quinoa, roasted veggies, chickpeas and tahini;MAIN;Fusion;true;true;false;1;12;10.00;/images/menu/buddha-bowl.jpg;true;true;5
+35fac4b0-b9af-4176-af9f-f08921bfaf83;Fish and Chips;MAINS_FC;Beer-battered fish with fries and tartar sauce;MAIN;British;false;false;false;1;18;12.00;/images/menu/fish-and-chips.jpg;true;true;6
+f4ee7873-a8f3-485b-81a3-d94fc784dbdb;Cold Brew Coffee;DRINK_CB;Slow steeped cold brew over ice;BEVERAGE;Cafe;true;true;false;0;3;3.50;/images/menu/cold-brew.jpg;true;true;7
+2e20236c-93b2-4540-a979-540e5be15f4a;Mango Lassi;DRINK_ML;Yogurt-based mango smoothie;BEVERAGE;Indian;true;false;false;0;5;4.00;/images/menu/mango-lassi.jpg;true;true;8
+a0b32e03-e4e0-4d1f-9e96-03acf415b0ce;Craft IPA;DRINK_IPA;Hoppy India Pale Ale pint;BEVERAGE;Bar;false;false;true;0;2;6.50;/images/menu/craft-ipa.jpg;true;true;9
+19cd426f-aa18-4024-941e-fb830af07328;Chocolate Lava Cake;DESSERT_LAVA;Warm chocolate cake with molten center;DESSERT;Bakery;true;true;false;1;12;6.00;/images/menu/lava-cake.jpg;true;true;10

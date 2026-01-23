@@ -1,11 +1,11 @@
 id;name;code;description;display_order;image_url;is_active
-35f0a900-50ec-4643-903f-1d976c15ef7c;guacamole merrily amongst;clamor;../fake-data/blob/hipster.txt;8851;abaft hmph via;false
-767326dd-1faf-4222-bccd-c5734c0d07bf;glimmer major sleepily;under ugh braid;../fake-data/blob/hipster.txt;641;more;true
-b7e29a90-03fe-4f49-9022-9b4151d685f0;noisily often;within amend hence;../fake-data/blob/hipster.txt;29160;oh where exalt;true
-1cb75b70-e902-44a3-988d-c4ca6a43c9be;psst;cultivated sleepy hold;../fake-data/blob/hipster.txt;11712;abnormally;false
-a4ade319-ad64-42c5-a721-5f41790c98aa;accidentally;rightfully hmph provided;../fake-data/blob/hipster.txt;29948;circa meal even;false
-e3bd8c47-50cc-465a-aece-e0e5204f374f;intensely carp exhausted;veto;../fake-data/blob/hipster.txt;29077;brr colorful loaf;false
-425d6798-447a-425c-a839-29818b0e29a4;wing as but;astride;../fake-data/blob/hipster.txt;22889;steel than though;true
-c8d617e0-efac-4dfa-ac19-46e70ff81ab7;burgeon;about openly memorable;../fake-data/blob/hipster.txt;31240;whether claw;true
-b6b80e6b-24c1-4ad0-b88e-24a50ca46b8d;failing pace;ugh how;../fake-data/blob/hipster.txt;2372;except which aching;false
-c7b0e9db-c620-4c8e-a84d-89ce422c88ef;overproduce miscalculate whoever;even outdo fiercely;../fake-data/blob/hipster.txt;32562;roasted pillow brr;true
+35f0a900-50ec-4643-903f-1d976c15ef7c;Veg;VEG;Vegetarian mains and sides;1;/images/category/veg.png;true
+767326dd-1faf-4222-bccd-c5734c0d07bf;Non Veg;NON_VEG;Meat and seafood dishes;2;/images/category/non-veg.png;true
+b7e29a90-03fe-4f49-9022-9b4151d685f0;Vegan;VEGAN;Plant-based options without dairy;3;/images/category/vegan.png;true
+1cb75b70-e902-44a3-988d-c4ca6a43c9be;Non Alcoholic Beverages;BEV_NON_ALC;Juices, sodas and mocktails;4;/images/category/bev-non-alc.png;true
+a4ade319-ad64-42c5-a721-5f41790c98aa;Alcoholic Beverages;BEV_ALC;Beer, wine and cocktails;5;/images/category/bev-alc.png;true
+e3bd8c47-50cc-465a-aece-e0e5204f374f;Desserts;DESSERTS;Cakes, pastries and sweets;6;/images/category/desserts.png;true
+425d6798-447a-425c-a839-29818b0e29a4;Starters;STARTERS;Appetizers and small plates;7;/images/category/starters.png;true
+c8d617e0-efac-4dfa-ac19-46e70ff81ab7;Main Course;MAINS;Hearty main dishes;8;/images/category/mains.png;true
+b6b80e6b-24c1-4ad0-b88e-24a50ca46b8d;Sides;SIDES;Side dishes and add-ons;9;/images/category/sides.png;true
+c7b0e9db-c620-4c8e-a84d-89ce422c88ef;Kids Menu;KIDS;Child-friendly portions and combos;10;/images/category/kids.png;true

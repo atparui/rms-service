@@ -1,11 +1,11 @@
 id;menu_code;menu_name;description;menu_type;icon;route_path;display_order;is_active
-91da38ac-d8ac-42e3-832e-0ea9121a43c2;furiously phew;blah bleakly;../fake-data/blob/hipster.txt;ordinary;whether dowse;strange sans;25706;true
-8f15b4df-5ce8-412f-9c7f-1cb8d916c347;woot oblong upbeat;blissfully jealously eggplant;../fake-data/blob/hipster.txt;stained wealthy;cork circa;fundraising cardboard;11607;false
-19fedf00-5f61-4772-884c-4163d197d448;reckless flawless;deeply instead;../fake-data/blob/hipster.txt;generously academics;likewise schedule;proofread;25967;true
-bc665fae-70f2-4ef4-b64a-a854b88036f8;worth nocturnal though;once;../fake-data/blob/hipster.txt;astride vol malfunction;ick definite step;ick reward;5023;true
-43e3509b-daf2-4a00-9004-0308a2a0d478;emphasise duh neighboring;around subtle phooey;../fake-data/blob/hipster.txt;tune-up jovially;through ugh;genuine;19478;true
-be120140-8f21-44fa-ab9d-9e1a255650f5;anti troubled tool;blah;../fake-data/blob/hipster.txt;nor;soon veto;after;17672;true
-028d29d5-c12b-4b2b-8a25-ab269f7a492b;better along;anti;../fake-data/blob/hipster.txt;alongside;ah;oof ick pink;28764;false
-ccc49eba-d87c-4fbd-b6ba-27b46a1281b1;spiteful lazily;though editor;../fake-data/blob/hipster.txt;honorable gosh;onto;ravioli pliers enchanted;17798;true
-29aed219-c86e-4569-b8af-551fb2b3efd5;supposing ragged;interestingly;../fake-data/blob/hipster.txt;whenever blowgun elver;ha certainly gadzooks;bell ravioli schematise;13018;true
-df56e334-c9c3-450c-bdb9-b7b00c757376;piglet hungrily;whoa;../fake-data/blob/hipster.txt;offend fence down;continually singing;excitedly;18115;true
+91da38ac-d8ac-42e3-832e-0ea9121a43c2;DASHBOARD;Dashboard;Overview of sales and operations;TOP;dashboard;/dashboard;1;true
+8f15b4df-5ce8-412f-9c7f-1cb8d916c347;ORDERS;Orders;Manage dine-in, takeaway and delivery orders;TOP;shopping_cart;/orders;2;true
+19fedf00-5f61-4772-884c-4163d197d448;MENU;Menu;Configure categories and items;TOP;restaurant;/menu;3;true
+bc665fae-70f2-4ef4-b64a-a854b88036f8;INVENTORY;Inventory;Track ingredients and stock;TOP;inventory;/inventory;4;true
+43e3509b-daf2-4a00-9004-0308a2a0d478;CUSTOMERS;Customers;Customer profiles and loyalty;TOP;people;/customers;5;true
+be120140-8f21-44fa-ab9d-9e1a255650f5;BILLING;Billing;Bills, payments and discounts;TOP;receipt;/billing;6;true
+028d29d5-c12b-4b2b-8a25-ab269f7a492b;REPORTS;Reports;Daily summaries and exports;TOP;bar_chart;/reports;7;true
+ccc49eba-d87c-4fbd-b6ba-27b46a1281b1;TABLES;Table Management;Floor plan and seating;TOP;table_bar;/tables;8;true
+29aed219-c86e-4569-b8af-551fb2b3efd5;STAFF;Staff;User and role management;TOP;shield;/staff;9;true
+df56e334-c9c3-450c-bdb9-b7b00c757376;SETTINGS;Settings;Configurations and preferences;TOP;settings;/settings;10;true

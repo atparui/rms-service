@@ -1,11 +1,11 @@
 id;table_number;table_name;capacity;floor;section;status;qr_code;qr_code_url;is_active
-514e0199-80dd-4932-b5aa-af01e8173ee3;gladly about modulo;until instead how;25363;disapprove;oof;meh book;butter;times whose;false
-d0a73453-a9f5-4a8c-a1a5-038383edd0dc;playfully;during;7965;insistent but boldly;beyond;mmm;unlike boohoo successfully;which soliloquy;true
-b80f5949-99ba-41a2-b973-2fe21e8cc045;making;slink realistic where;7259;personal tightly official;curse;fooey toward;apud;devastation;true
-fae67d82-a61c-499c-8394-12bc5ec8ee71;selfishly bleakly;probable collaborate;24907;by;times juggernaut;fill adolescent;cheetah plumber;fishery cruel uniform;false
-bfcb103d-ad83-42f7-bbcf-796092548958;aboard snowplow;waver every lest;7795;husk cop sternly;dreary questioningly hopelessly;during;how untidy;lovely as store;true
-b3f96ced-38e3-476c-80bd-234636e788a4;liquid gee untrue;rise blowgun;526;hmph powerless gee;phrase nudge;emerge;past;ew despite disposer;false
-f5416020-7752-4aa8-9aa7-7a8b6df6995e;hence whoa;though truthfully seldom;26789;woefully spiffy neatly;soon;vacantly;phew;climb shy down;true
-1c54f5a9-0395-455f-9c86-754b45423561;unnecessarily simple;yet zen ah;6301;gallery rewrite oof;hexagon;after;wombat carboxyl anti;um immediately;true
-fbd4fb44-f7fd-45fc-90ac-7b320c778fb6;aha indeed upliftingly;unsightly overdub;19527;truly inside how;not whether above;unlike bend regarding;unless;upon browse gray;false
-a60be7ec-d116-4ab1-a646-56e34e1cf0d8;decent whose lest;considering carouse;12647;gosh;mealy gadzooks scrabble;ick;which down courtroom;likewise careless;true
+514e0199-80dd-4932-b5aa-af01e8173ee3;T1;Window Booth;4;1;Main;AVAILABLE;T1-QR;/qr/t1.png;true
+d0a73453-a9f5-4a8c-a1a5-038383edd0dc;T2;Patio HighTop;2;1;Patio;OCCUPIED;T2-QR;/qr/t2.png;true
+b80f5949-99ba-41a2-b973-2fe21e8cc045;T3;Chef Counter;2;1;Bar;CLEANUP;T3-QR;/qr/t3.png;true
+fae67d82-a61c-499c-8394-12bc5ec8ee71;T4;Family Table;6;1;Main;AVAILABLE;T4-QR;/qr/t4.png;true
+bfcb103d-ad83-42f7-bbcf-796092548958;T5;Corner Nook;3;1;Main;AVAILABLE;T5-QR;/qr/t5.png;true
+b3f96ced-38e3-476c-80bd-234636e788a4;T6;Patio Round;4;1;Patio;RESERVED;T6-QR;/qr/t6.png;true
+f5416020-7752-4aa8-9aa7-7a8b6df6995e;T7;Bar Stool 1;1;1;Bar;AVAILABLE;T7-QR;/qr/t7.png;true
+1c54f5a9-0395-455f-9c86-754b45423561;T8;Bar Stool 2;1;1;Bar;AVAILABLE;T8-QR;/qr/t8.png;true
+fbd4fb44-f7fd-45fc-90ac-7b320c778fb6;T9;Private Room;8;2;Private;RESERVED;T9-QR;/qr/t9.png;true
+a60be7ec-d116-4ab1-a646-56e34e1cf0d8;T10;Community Table;10;1;Main;OCCUPIED;T10-QR;/qr/t10.png;true

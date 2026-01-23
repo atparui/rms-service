@@ -1,11 +1,11 @@
 id;role;is_active
-e4982e0d-97ff-4776-bdf2-411ab1212bbe;step-mother scarily drab;false
-bbbf7c5f-8bdf-4c82-93ba-ec4e2bf6c9b7;thankfully;true
-c8668231-e328-49fe-8625-d03701b5a0af;yellow;false
-3c064963-0a46-4f01-b47a-7a16f6508421;alongside provided alongside;true
-1860a080-4f68-4274-8e7b-f062a22086c0;opposite;false
-38bcd554-041d-4a93-a364-6d90c3220cd3;ack qualified technologist;true
-4af2818d-748d-4e3b-ac85-69880ae5e11b;often form before;true
-fca58630-3e0f-4123-b29a-7ee6834e1190;without drat;false
-4fc1bc04-7f8c-441d-bc83-56ac19f546c8;shaft exactly instead;false
-c9ec5a16-ca65-4c8c-9203-177fca61555a;cultivated bowed agitated;false
+e4982e0d-97ff-4776-bdf2-411ab1212bbe;ROLE_ADMIN;true
+bbbf7c5f-8bdf-4c82-93ba-ec4e2bf6c9b7;ROLE_MANAGER;true
+c8668231-e328-49fe-8625-d03701b5a0af;ROLE_CHEF;true
+3c064963-0a46-4f01-b47a-7a16f6508421;ROLE_WAITER;true
+1860a080-4f68-4274-8e7b-f062a22086c0;ROLE_CASHIER;true
+38bcd554-041d-4a93-a364-6d90c3220cd3;ROLE_BARTENDER;true
+4af2818d-748d-4e3b-ac85-69880ae5e11b;ROLE_RUNNER;true
+fca58630-3e0f-4123-b29a-7ee6834e1190;ROLE_HOST;true
+4fc1bc04-7f8c-441d-bc83-56ac19f546c8;ROLE_SUPPORT;true
+c9ec5a16-ca65-4c8c-9203-177fca61555a;ROLE_AUDITOR;true

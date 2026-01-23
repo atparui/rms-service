@@ -1,11 +1,11 @@
 id;bill_number;bill_date;subtotal;tax_amount;discount_amount;service_charge;total_amount;amount_paid;amount_due;status;generated_by;notes
-971714de-e6f3-4777-9a06-e1b41ba36d06;um exasperation;2025-12-28T02:25:10;18520.88;4759;30523.33;1844.98;24618.83;18211.85;16103.03;whoa anenst weakly;famously if ick;../fake-data/blob/hipster.txt
-f31fc3fd-6739-4bd7-8383-0d38b22bdd8c;as omelet before;2025-12-28T01:04:05;24429.13;30587.18;11472.47;32028.88;31503.52;26599.31;9630.51;edge against;mmm clone;../fake-data/blob/hipster.txt
-a2b1a03c-052d-4467-8c13-efdf976d3b93;harangue er as;2025-12-28T00:56:00;14745.57;28298.14;22239.43;20115.27;5419.17;16256.59;1352.68;rebound comb whose;wearily obvious;../fake-data/blob/hipster.txt
-1bde68c2-c897-449a-a076-194530269c86;barracks;2025-12-28T05:01:06;15035.48;27569.81;1975.74;1736.06;11809.04;4477.18;3491.13;blah;oof elegantly;../fake-data/blob/hipster.txt
-ac57394d-8950-4be3-b5d1-3f5223f16753;hungrily failing;2025-12-27T17:35:18;30079.89;4868.89;7276.96;685.85;17028.08;22691.11;14581.22;whenever oof numb;service because before;../fake-data/blob/hipster.txt
-51e26bec-4f9d-4702-8d6c-617502e7eb7d;aggressive;2025-12-28T01:17:34;22592.56;18368.75;31678.16;14883.96;110.54;29660.58;26552.39;suffocate;onto equatorial;../fake-data/blob/hipster.txt
-b9792fe0-1f94-4ed1-b462-f24834476716;mechanically toward;2025-12-27T20:15:00;19470.65;10752.53;24354.44;9955.27;1938.58;20373;25152.65;crossly the;blink impostor;../fake-data/blob/hipster.txt
-58afb5f7-6db1-4939-bdcc-7edc257a1c0d;excited quantify suddenly;2025-12-27T20:40:51;2432.35;30858.92;28691.38;3485.43;27158.89;5363.23;20153.75;notwithstanding who parade;hm;../fake-data/blob/hipster.txt
-97b5b65f-6213-42ca-a62b-4a10b9cc0efb;rubbery why hmph;2025-12-27T16:00:38;24652.61;31385.1;6890.07;21898.77;29997.21;31263.01;30182.29;resolve after eek;bid;../fake-data/blob/hipster.txt
-e84e6de0-91bf-49ef-a977-e873132845c7;daily innocently so;2025-12-28T00:15:37;28226.97;4777.36;12012.65;13090.89;30333.62;14812.31;17553.94;queasily whoever elegantly;phew;../fake-data/blob/hipster.txt
+971714de-e6f3-4777-9a06-e1b41ba36d06;BILL-1001;2025-12-27T12:55:00;71.00;5.33;7.10;3.55;72.78;72.78;0.00;PAID;pos_jane;Dinner for two
+f31fc3fd-6739-4bd7-8383-0d38b22bdd8c;BILL-1002;2025-12-27T13:20:00;45.50;6.60;2.00;2.28;52.38;52.38;0.00;PAID;pos_ryan;Takeaway lunch
+a2b1a03c-052d-4467-8c13-efdf976d3b93;BILL-1003;2025-12-27T18:50:00;38.50;3.41;0.00;1.93;43.84;43.84;0.00;PAID;app_order;Delivery with tip excluded
+1bde68c2-c897-449a-a076-194530269c86;BILL-1004;2025-12-27T19:15:00;24.00;2.10;0.00;1.20;27.30;27.30;0.00;PAID;pos_jane;Quick takeaway
+ac57394d-8950-4be3-b5d1-3f5223f16753;BILL-1005;2025-12-27T20:05:00;53.00;4.64;6.82;2.65;53.47;53.47;0.00;PAID;pos_sam;Happy hour group
+51e26bec-4f9d-4702-8d6c-617502e7eb7d;BILL-1006;2025-12-27T21:25:00;19.00;1.43;0.00;0.95;21.38;21.38;0.00;PAID;pos_nina;Coffee and snack
+b9792fe0-1f94-4ed1-b462-f24834476716;BILL-1007;2025-12-27T22:10:00;12.00;0.90;3.00;0.60;10.50;10.50;0.00;PAID;web;Dessert add-on
+58afb5f7-6db1-4939-bdcc-7edc257a1c0d;BILL-1008;2025-12-28T09:20:00;28.00;2.80;4.00;1.40;28.20;28.20;0.00;PAID;app_order;Breakfast combo
+97b5b65f-6213-42ca-a62b-4a10b9cc0efb;BILL-1009;2025-12-28T12:40:00;64.00;5.12;0.00;3.20;72.32;0.00;72.32;PENDING;pos_jane;Awaiting payment
+e84e6de0-91bf-49ef-a977-e873132845c7;BILL-1010;2025-12-28T18:30:00;85.00;6.80;6.83;4.25;89.22;89.22;0.00;PAID;pos_ryan;Family dinner

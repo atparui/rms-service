@@ -1,11 +1,11 @@
 id;discount_code;discount_name;discount_type;discount_value;min_order_amount;max_discount_amount;applicable_to;valid_from;valid_to;max_uses;current_uses;is_active
-4f6078d3-f54c-4f92-a5ab-211546c77727;kettledrum;sonata;reword;2894.87;31423.33;17210.37;via;2025-12-27T22:52:27;2025-12-28T03:30:33;21913;22370;false
-37204905-3ac2-494d-a6e3-d64d55143f9a;yawningly;atop;while sadly alongside;28700.79;30333.34;26183.08;curiously rim although;2025-12-27T12:54:03;2025-12-27T23:32:52;12424;25480;true
-28404b17-3b07-442a-a48f-7a673cf10494;correctly mount;frantically;generally per drat;28431.38;20982.64;11351.35;orange;2025-12-27T12:34:40;2025-12-27T07:14:33;9561;7448;true
-34c61268-1d09-4d28-b086-7df88d8c496a;event duh or;nor incidentally;mousse despite;315.12;23730.94;10406.17;geez ew;2025-12-28T03:51:47;2025-12-27T07:57:57;24126;15295;false
-3f2428f5-44c4-4fcf-82cf-4a5af4eb8877;obligation yeast;finally;once;21212.53;582.77;25729.19;steel optimistically slight;2025-12-27T05:48:03;2025-12-27T13:59:05;25102;30356;false
-b5a1c1d1-97b6-46fd-93a7-a8a31a30b041;intermix worthy;phooey gee scamper;known elevator charm;20954.11;22311.06;11819.13;inquisitively mesh potentially;2025-12-27T15:06:33;2025-12-28T02:27:38;28198;17305;true
-0bd4eeb3-e6e2-4139-937a-422191084881;fashion;skean draft ha;why hm;27859.48;6945.5;4596.16;sour handover edge;2025-12-27T20:56:42;2025-12-27T10:25:41;14970;15280;false
-2831ec28-72fe-4f1e-87d4-045472965067;boastfully;hovel happily;hungrily;6127.95;10250.46;22937.4;pish;2025-12-27T20:37:01;2025-12-27T08:05:28;5876;23798;false
-50552c63-9c73-4d59-ab8e-d412da2059e5;aside mysteriously who;modulo bloom yak;worthwhile ha despite;22226.44;29126.8;17344.65;into untried;2025-12-28T02:05:43;2025-12-27T15:51:14;26057;29228;true
-ae34a8ce-b2e8-4ae9-9ab7-8c38583c345d;veto between;throughout scientific between;eek essay stoop;26843.6;13526.46;3316.12;license;2025-12-27T17:20:30;2025-12-27T16:24:45;20458;24187;true
+4f6078d3-f54c-4f92-a5ab-211546c77727;WELCOME10;New user welcome offer;PERCENTAGE;10.00;20.00;10.00;ALL;2025-12-01;2026-12-31;5000;1200;true
+37204905-3ac2-494d-a6e3-d64d55143f9a;LUNCH5;Weekday lunch special;PERCENTAGE;5.00;15.00;5.00;FOOD;2025-12-01;2026-12-31;2000;450;true
+28404b17-3b07-442a-a48f-7a673cf10494;COFFEE2;Afternoon coffee combo;AMOUNT;2.00;8.00;2.00;BEVERAGE;2025-12-01;2026-12-31;1500;320;true
+34c61268-1d09-4d28-b086-7df88d8c496a;HAPPYHOUR;Happy hour drinks;PERCENTAGE;15.00;10.00;15.00;ALCOHOL;2025-12-01;2026-12-31;3000;980;true
+3f2428f5-44c4-4fcf-82cf-4a5af4eb8877;FAMILY20;Family platter offer;AMOUNT;20.00;60.00;20.00;FOOD;2025-12-01;2026-12-31;800;120;true
+b5a1c1d1-97b6-46fd-93a7-a8a31a30b041;STUDENT5;Student ID discount;PERCENTAGE;5.00;10.00;5.00;ALL;2025-12-01;2026-12-31;1200;210;true
+0bd4eeb3-e6e2-4139-937a-422191084881;TAKEOUT8;Takeout only;PERCENTAGE;8.00;25.00;12.00;ALL;2025-12-01;2026-12-31;1000;180;true
+2831ec28-72fe-4f1e-87d4-045472965067;DESSERT3;Add dessert for less;AMOUNT;3.00;12.00;3.00;DESSERT;2025-12-01;2026-12-31;600;90;true
+50552c63-9c73-4d59-ab8e-d412da2059e5;FIRSTBEV;First beverage free;AMOUNT;4.00;5.00;4.00;BEVERAGE;2025-12-01;2026-12-31;700;140;true
+ae34a8ce-b2e8-4ae9-9ab7-8c38583c345d;LOYAL15;Loyalty tier bonus;PERCENTAGE;15.00;30.00;15.00;ALL;2025-12-01;2026-12-31;900;300;true

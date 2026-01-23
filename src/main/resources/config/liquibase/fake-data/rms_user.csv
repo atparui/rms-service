@@ -1,11 +1,11 @@
 id;external_user_id;username;email;phone;first_name;last_name;display_name;profile_image_url;is_active;last_sync_at;sync_status;sync_error
-e465b19d-bf10-475d-bb22-8f8773d82fa4;implode;from swiftly furthermore;Timothy_Gerlach14@yahoo.com;308-898-8005 x765;Clare;Kilback;tarry woot;optimistically knight;false;2025-12-27T08:18:32;but fleck;../fake-data/blob/hipster.txt
-44fd19c4-eb49-4994-a988-c2a1770fa408;among;aw;Hershel.Moore82@yahoo.com;452-438-9525 x370;Lucas;Fisher;next;instantly hmph;false;2025-12-27T05:35:39;oof;../fake-data/blob/hipster.txt
-b6949fdd-3d6f-4058-b365-1d3aa4e3c7ef;arrange;sympathetically poorly amidst;Aniyah.Ward2@hotmail.com;530-752-9991;Dusty;Wolff;creak whether calmly;best-seller;false;2025-12-27T19:02:02;wonderful;../fake-data/blob/hipster.txt
-34796029-482f-41d4-b472-25521dd157d3;masterpiece fast;swathe boohoo;Mariano_Dare@yahoo.com;971.460.8135;Domenico;Lowe;airport for;psst;false;2025-12-27T17:49:56;heartfelt kielbasa;../fake-data/blob/hipster.txt
-268cf30c-1c68-4515-9c55-a1af9baad3f7;broadcast frizz likewise;whoa;Kenton_Franecki90@yahoo.com;1-206-523-8336;Wilson;Beier;ew gymnast deceivingly;however;true;2025-12-28T04:00:51;amid;../fake-data/blob/hipster.txt
-8d3c3b19-16f4-4c5a-95e0-d6d32a9847b1;uh-huh pause;mid lazily;Jermain.King@yahoo.com;1-799-524-1900 x1553;William;Hackett;anneal skeleton cautiously;ha;false;2025-12-28T05:05:14;to;../fake-data/blob/hipster.txt
-12309ccb-ce18-45a2-bc94-21c990899069;ah;boo extricate untrue;Marisa_Morissette97@yahoo.com;1-372-965-8461 x3978;Nathen;West;offset;only minister to;false;2025-12-27T15:46:31;sinful swift;../fake-data/blob/hipster.txt
-9973d45f-87cd-4ebb-8390-a79ea8651397;ugly;sans miserably;Coralie42@yahoo.com;692.261.8144;Bartholome;Harvey;beside tight orient;anneal;true;2025-12-27T10:13:07;colorfully circa ponder;../fake-data/blob/hipster.txt
-2912daf7-f5d2-4c7b-a7d1-7633e466fdd1;scale;cautiously circa;Tianna.Gorczany87@hotmail.com;409-568-7771 x07843;Skye;Conn;trivial sadly beneath;when even within;false;2025-12-27T20:01:07;whose;../fake-data/blob/hipster.txt
-25bebb75-baca-4866-87ec-56d7e117469c;incomparable;scented;Drake_Wuckert@hotmail.com;(933) 735-9728 x270;Nora;VonRueden;pleasure dicker;etch actually;false;2025-12-27T11:21:17;advanced ugh;../fake-data/blob/hipster.txt
+e465b19d-bf10-475d-bb22-8f8773d82fa4;AUTH-001;jane.manager;jane.manager@rms.local;+1-415-555-2001;Jane;Manager;Jane M.;/images/users/jane.png;true;2025-12-27T08:18:32;SYNCED;
+44fd19c4-eb49-4994-a988-c2a1770fa408;AUTH-002;omar.chef;omar.chef@rms.local;+1-917-555-3002;Omar;Singh;Chef Omar;/images/users/omar.png;true;2025-12-27T05:35:39;SYNCED;
+b6949fdd-3d6f-4058-b365-1d3aa4e3c7ef;AUTH-003;mia.server;mia.server@rms.local;+1-512-555-4003;Mia;Lopez;Mia L.;/images/users/mia.png;true;2025-12-27T19:02:02;SYNCED;
+34796029-482f-41d4-b472-25521dd157d3;AUTH-004;sam.cashier;sam.cashier@rms.local;+1-971-555-5004;Sam;Patel;Sam P.;/images/users/sam.png;true;2025-12-27T17:49:56;SYNCED;
+268cf30c-1c68-4515-9c55-a1af9baad3f7;AUTH-005;ryan.bar;ryan.bar@rms.local;+1-206-555-6005;Ryan;Chen;Ryan C.;/images/users/ryan.png;true;2025-12-28T04:00:51;SYNCED;
+8d3c3b19-16f4-4c5a-95e0-d6d32a9847b1;AUTH-006;nina.host;nina.host@rms.local;+1-799-555-7006;Nina;Brown;Nina B.;/images/users/nina.png;true;2025-12-28T05:05:14;SYNCED;
+12309ccb-ce18-45a2-bc94-21c990899069;AUTH-007;leo.runner;leo.runner@rms.local;+1-372-555-8007;Leo;Turner;Leo T.;/images/users/leo.png;true;2025-12-27T15:46:31;SYNCED;
+9973d45f-87cd-4ebb-8390-a79ea8651397;AUTH-008;ana.baker;ana.baker@rms.local;+1-692-555-9008;Ana;Silva;Ana S.;/images/users/ana.png;true;2025-12-27T10:13:07;SYNCED;
+2912daf7-f5d2-4c7b-a7d1-7633e466fdd1;AUTH-009;kay.manager;kay.manager@rms.local;+1-409-555-0101;Kay;Reed;Kay R.;/images/users/kay.png;true;2025-12-27T20:01:07;SYNCED;
+25bebb75-baca-4866-87ec-56d7e117469c;AUTH-010;tom.auditor;tom.auditor@rms.local;+1-933-555-1112;Tom;Davis;Tom D.;/images/users/tom.png;true;2025-12-27T11:21:17;SYNCED;

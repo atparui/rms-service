@@ -1,11 +1,11 @@
 id;addon_name;addon_code;price;is_active
-c74f2a03-8c7a-4cab-b8d0-e50149b28fd6;reporter;finally after;14105.92;false
-46d00cda-720b-4240-bde3-6a0896942734;since;readily inside weekly;8472.33;true
-0d51635c-c4d8-4c40-a772-4269a75fb4a7;woot about;alive though whereas;31855.43;false
-54dccbe2-5cc6-4f4b-90b4-20b05c7579fb;makeover above injunction;annual pro hence;790.9;true
-31f4cd79-4ace-4347-b432-a739c25badef;potable coaxingly for;the;5026.99;true
-17677e44-e018-4bed-b8a0-4f337f0bf108;from prestigious;absent;28390.22;false
-7f82e82b-dc21-4faf-8d26-065589d632a5;speedily ape whoa;yahoo;26538.64;false
-b654a2bd-56c1-4005-ab40-80b0e9aa4667;yahoo consequently;hydrocarbon and yum;29682.9;true
-791f2865-c5a4-4117-8bd1-6b808a19de7a;until degenerate cross;noted;8865.05;true
-d59be547-6048-4ace-9f2a-707dabd0856b;exacerbate hm;help;30141.02;false
+c74f2a03-8c7a-4cab-b8d0-e50149b28fd6;Extra Cheese;ADD_CHEESE;1.50;true
+46d00cda-720b-4240-bde3-6a0896942734;Garlic Bread;ADD_GBREAD;3.00;true
+0d51635c-c4d8-4c40-a772-4269a75fb4a7;Side Salad;ADD_SALAD;2.50;true
+54dccbe2-5cc6-4f4b-90b4-20b05c7579fb;Fries;ADD_FRIES;2.75;true
+31f4cd79-4ace-4347-b432-a739c25badef;Extra Shot;ADD_ESPRESSO;1.00;true
+17677e44-e018-4bed-b8a0-4f337f0bf108;Whipped Cream;ADD_WHIP;0.50;true
+7f82e82b-dc21-4faf-8d26-065589d632a5;Vanilla Scoop;ADD_VANILLA;1.25;true
+b654a2bd-56c1-4005-ab40-80b0e9aa4667;Chocolate Scoop;ADD_CHOC;1.25;true
+791f2865-c5a4-4117-8bd1-6b808a19de7a;Honey Drizzle;ADD_HONEY;0.75;true
+d59be547-6048-4ace-9f2a-707dabd0856b;Protein Shot;ADD_PROTEIN;1.75;true

@@ -1,11 +1,11 @@
 id;tax_name;tax_code;tax_rate;tax_type;is_applicable_to_food;is_applicable_to_beverage;is_applicable_to_alcohol;effective_from;effective_to;is_active
-45ac08ee-3dde-4e17-865d-41c60b6b8b2d;oxidize brr;table publicity;25925.26;notwithstanding;false;true;true;2025-12-27;2025-12-27;true
-a33265e6-8366-45cc-8ab8-d239029c6193;aftermath;around which;27816.16;softly gladly modulo;false;true;true;2025-12-27;2025-12-27;false
-84e89f7e-2bc2-4b22-9064-fc72a3e7dca1;reproachfully until excellent;shameful;12845.82;unfortunately;true;true;true;2025-12-28;2025-12-27;true
-d7891859-f0c7-49c8-a463-10098fc615c7;store how miscalculate;concerning firm drain;9207.18;mad flat;true;false;true;2025-12-27;2025-12-28;false
-f305984f-3ab1-47f8-a7b5-8290a42fe7cb;lined home yowza;meh challenge but;5897.75;bide;false;false;true;2025-12-27;2025-12-27;false
-f6da5629-3199-4a08-bea4-658965e51959;hmph proper short-term;tall;13917.72;unexpectedly diagram cute;false;false;true;2025-12-27;2025-12-28;false
-27dc8b90-ec0a-41c6-940e-b039f6ba5958;chime given wide-eyed;curry including;23869.83;gee geez;false;false;true;2025-12-27;2025-12-27;false
-4184a696-1c84-4b87-9f8a-a7bcd1f6c4b5;until plump finally;evil anneal;5049.47;confound ew;true;false;false;2025-12-28;2025-12-27;false
-48cd0279-9190-4424-b4df-efdd09deccd8;even unless;muddy minor versus;4784.23;fluctuate yippee furthermore;true;false;true;2025-12-27;2025-12-28;true
-2ea629ad-d9fd-4c1e-bb0f-5cd3733e3e06;black past;hyphenation wildly ick;28281.35;as roasted;true;true;false;2025-12-27;2025-12-28;false
+45ac08ee-3dde-4e17-865d-41c60b6b8b2d;VAT;VAT_STD;7.50;PERCENTAGE;true;true;true;2025-01-01;2026-12-31;true
+a33265e6-8366-45cc-8ab8-d239029c6193;Service Charge;SRV_CHG;5.00;PERCENTAGE;true;true;true;2025-01-01;2026-12-31;true
+84e89f7e-2bc2-4b22-9064-fc72a3e7dca1;City Tax;CITY_TAX;2.00;PERCENTAGE;true;true;true;2025-01-01;2026-12-31;true
+d7891859-f0c7-49c8-a463-10098fc615c7;Alcohol Duty;ALC_DUTY;10.00;PERCENTAGE;false;false;true;2025-01-01;2026-12-31;true
+f305984f-3ab1-47f8-a7b5-8290a42fe7cb;Packaging Fee;PKG_FEE;0.50;FIXED;true;true;true;2025-01-01;2026-12-31;true
+f6da5629-3199-4a08-bea4-658965e51959;Environmental Levy;ENV_LEVY;1.00;PERCENTAGE;true;true;true;2025-01-01;2026-12-31;true
+27dc8b90-ec0a-41c6-940e-b039f6ba5958;No Alcohol Tax;NO_ALC;0.00;PERCENTAGE;false;false;true;2025-01-01;2026-12-31;true
+4184a696-1c84-4b87-9f8a-a7bcd1f6c4b5;Tea/Coffee Exempt;BEV_EXEMPT;0.00;PERCENTAGE;false;true;false;2025-01-01;2026-12-31;true
+48cd0279-9190-4424-b4df-efdd09deccd8;Low VAT;VAT_LOW;5.00;PERCENTAGE;true;true;false;2025-01-01;2026-12-31;true
+2ea629ad-d9fd-4c1e-bb0f-5cd3733e3e06;Holiday Promo Tax Relief;HOLIDAY_RELIEF;-2.00;PERCENTAGE;true;true;true;2025-12-01;2026-01-15;false

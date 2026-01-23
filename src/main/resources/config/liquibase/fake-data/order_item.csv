@@ -1,11 +1,11 @@
 id;quantity;unit_price;item_total;special_instructions;status
-734881ac-7ab5-452a-af92-542e76976164;32100;30930.21;16147.37;../fake-data/blob/hipster.txt;intensely arcade improbable
-fa28790c-ac71-4cfd-813a-f3ca8c858275;18776;28518.68;24978.29;../fake-data/blob/hipster.txt;who hmph making
-7a6dc26d-2298-483c-b749-449a1d8f0d6f;26348;1236.11;21789.86;../fake-data/blob/hipster.txt;complete
-344b4e90-0b5c-4379-9fa4-e1a1ccd4698b;13165;18561.17;25193.12;../fake-data/blob/hipster.txt;about imagineer
-1982a0ff-e7fc-4963-9c88-4f95595e9b2c;11818;27772.79;12306.79;../fake-data/blob/hipster.txt;lest
-1c114bbd-dc53-4eca-8fdc-14f434a3cff4;7625;11748.27;8030.7;../fake-data/blob/hipster.txt;blond helpfully
-9bb28db1-902d-43bc-81aa-e19a6141b054;30143;21672.04;27335.08;../fake-data/blob/hipster.txt;extract
-39a8d0fd-2d86-4401-b71c-e571a5106e61;2620;18704.54;20754.1;../fake-data/blob/hipster.txt;courageous wherever
-2b4b0b11-5ba6-4a6c-a711-052524991b5f;1292;15708.42;3944.08;../fake-data/blob/hipster.txt;institute freely
-710416e1-113a-40bc-9041-7edba3660084;25003;20006.84;5942.98;../fake-data/blob/hipster.txt;overdue which generously
+734881ac-7ab5-452a-af92-542e76976164;2;9.50;19.00;Extra basil;PREP
+fa28790c-ac71-4cfd-813a-f3ca8c858275;1;13.00;13.00;Medium spice;PREP
+7a6dc26d-2298-483c-b749-449a1d8f0d6f;3;8.00;24.00;Serve with mint chutney;PREP
+344b4e90-0b5c-4379-9fa4-e1a1ccd4698b;1;7.50;7.50;Dressing on the side;READY
+1982a0ff-e7fc-4963-9c88-4f95595e9b2c;2;10.00;20.00;No onions;READY
+1c114bbd-dc53-4eca-8fdc-14f434a3cff4;1;12.00;12.00;Extra tartar sauce;READY
+9bb28db1-902d-43bc-81aa-e19a6141b054;2;3.50;7.00;Light ice;READY
+39a8d0fd-2d86-4401-b71c-e571a5106e61;1;4.00;4.00;Less sweet;READY
+2b4b0b11-5ba6-4a6c-a711-052524991b5f;1;6.50;6.50;Chilled;READY
+710416e1-113a-40bc-9041-7edba3660084;2;6.00;12.00;Add vanilla ice cream;READY

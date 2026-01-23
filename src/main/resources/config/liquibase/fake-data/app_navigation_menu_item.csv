@@ -1,11 +1,11 @@
 id;item_code;item_name;description;icon;route_path;component_path;display_order;badge_text;badge_color;is_active
-22f748ce-1d6b-4568-a4f3-0c3f851d7bec;spirited;capitalize partially;../fake-data/blob/hipster.txt;wetly recklessly;likewise though;bah;2702;gorgeous bruised;hefty;false
-d231bd40-dfa6-4184-bbe6-44d926d7bb13;how;bah until;../fake-data/blob/hipster.txt;toward excluding;weep;bidet who;24767;even zowie;uh-huh unlike;true
-673ffffa-4144-4916-844e-144e723a61ce;for squeaky sternly;indeed instead yieldingly;../fake-data/blob/hipster.txt;ascribe;duh;not following;4295;if wound moor;gladly which question;true
-764701e9-3d3e-43fd-a599-ee295590ffdd;where clear-cut;while sneaky midst;../fake-data/blob/hipster.txt;overcooked and;whoa unit;pro;10088;rigidly blah duh;bah descendant meh;false
-35552925-3fcf-450c-993d-4fa5c5a57030;boss;joyfully blowgun westernize;../fake-data/blob/hipster.txt;till;daintily;until chapel what;1693;warm;reservation;true
-b2976d07-bd35-4b0f-bac4-e2e47cd0b91d;fooey same angle;demob ah;../fake-data/blob/hipster.txt;mammoth with;utterly;quarterly peter;2443;meanwhile chow whose;cycle;true
-327f0d12-df91-45f3-86d6-ab611d092f4a;psst ha chap;indeed meanwhile tusk;../fake-data/blob/hipster.txt;consistency upright upside-down;provided afterwards following;buck successfully pro;25505;oof;which ill given;false
-ebb3175f-40b2-40b5-af4b-5af98c6d8704;telescope preheat instead;what naturally;../fake-data/blob/hipster.txt;little zen;blissfully where;via unabashedly attraction;16871;coin only middle;thread lest;false
-0c64e4f5-6636-438c-90dd-cba62af7cf7a;rightfully fuel compromise;resolve;../fake-data/blob/hipster.txt;silt atrium;instead;reward indeed;28444;book;gladly gah gracious;false
-4f22afd1-fa72-41e4-8db3-21d013aedc41;what;around banish freely;../fake-data/blob/hipster.txt;brr;yum where;along;28457;saloon nicely punctuation;um;true
+22f748ce-1d6b-4568-a4f3-0c3f851d7bec;ORDERS_LIST;Orders;View and manage all orders;list;/orders;/orders/list;1;; ;true
+d231bd40-dfa6-4184-bbe6-44d926d7bb13;NEW_ORDER;Create Order;Start a new order;add;/orders/new;/orders/new;2;NEW;primary;true
+673ffffa-4144-4916-844e-144e723a61ce;MENU_CATEGORIES;Menu Categories;Organize menu categories;category;/menu/categories;/menu/categories;3;; ;true
+764701e9-3d3e-43fd-a599-ee295590ffdd;MENU_ITEMS;Menu Items;Maintain menu items and pricing;restaurant;/menu/items;/menu/items;4;; ;true
+35552925-3fcf-450c-993d-4fa5c5a57030;INVENTORY_STOCK;Stock Levels;View stock counts and alerts;inventory;/inventory;/inventory;5;LOW;warning;true
+b2976d07-bd35-4b0f-bac4-e2e47cd0b91d;CUSTOMERS_LIST;Customers;Customer profiles and loyalty;people;/customers;/customers;6;; ;true
+327f0d12-df91-45f3-86d6-ab611d092f4a;BILLING_OVERVIEW;Billing;Bills, payments and refunds;receipt;/billing;/billing;7;; ;true
+ebb3175f-40b2-40b5-af4b-5af98c6d8704;REPORT_SALES;Sales Reports;Daily and weekly sales reports;bar_chart;/reports/sales;/reports/sales;8;; ;true
+0c64e4f5-6636-438c-90dd-cba62af7cf7a;TABLE_LAYOUT;Tables;Floor plan and seating;table_bar;/tables;/tables;9;; ;true
+4f22afd1-fa72-41e4-8db3-21d013aedc41;STAFF_ROLES;Staff & Roles;Manage staff access;shield;/staff;/staff;10;; ;true

@@ -1,11 +1,11 @@
 id;role;is_active;assigned_at;assigned_by;revoked_at;revoked_by
-f3b1db2a-5652-426c-9424-1694244f3d23;actually rarely within;true;2025-12-28T01:23:41;cooperative finger;2025-12-27T08:22:16;igloo rout
-9f7e3321-101b-4370-a32d-9ef7e7e2387f;motivate extricate clamor;false;2025-12-27T13:51:13;seemingly lightly concerned;2025-12-28T03:29:10;outlandish pronoun
-e4a0f888-60de-4479-b5ef-472afc1a0935;hunt shoddy;false;2025-12-27T21:03:57;times gadzooks;2025-12-27T21:48:03;underneath once stool
-5ea7416f-5173-42ce-aa63-91c12b88b22b;yum;false;2025-12-27T17:04:50;legging optimistically;2025-12-27T10:42:51;vibrant excepting plain
-4a4a2f51-fbf1-4730-b44f-bccbf8fe4322;convection;false;2025-12-27T17:03:41;quicker;2025-12-27T09:58:09;formamide
-0aff0ec4-5f64-4c67-b152-2c491f797610;cheese;false;2025-12-27T11:01:23;clearly;2025-12-27T14:13:23;phooey
-efb23edb-7bb0-4da0-9db6-89dd868fc8d0;structure tinderbox;true;2025-12-27T17:14:10;excepting;2025-12-27T07:14:35;impostor
-cc923205-0ec6-4ced-80ad-a0caebe576d7;off;false;2025-12-28T01:00:18;swathe;2025-12-27T17:03:52;chairperson
-e2b511d1-3f3e-4150-9ba3-8ea91d73ceac;out;true;2025-12-27T13:21:06;or urgently;2025-12-27T16:04:15;times
-bf135a0f-f619-45e4-9156-687bb0e657b4;indeed before what;false;2025-12-27T18:00:57;wherever gadzooks furthermore;2025-12-27T22:13:51;pfft honored
+f3b1db2a-5652-426c-9424-1694244f3d23;ROLE_MANAGER;true;2025-12-27T09:00:00;system_admin;; 
+9f7e3321-101b-4370-a32d-9ef7e7e2387f;ROLE_CHEF;true;2025-12-27T09:05:00;system_admin;; 
+e4a0f888-60de-4479-b5ef-472afc1a0935;ROLE_WAITER;true;2025-12-27T09:10:00;system_admin;; 
+5ea7416f-5173-42ce-aa63-91c12b88b22b;ROLE_CASHIER;true;2025-12-27T09:15:00;system_admin;; 
+4a4a2f51-fbf1-4730-b44f-bccbf8fe4322;ROLE_BARTENDER;true;2025-12-27T09:20:00;system_admin;; 
+0aff0ec4-5f64-4c67-b152-2c491f797610;ROLE_HOST;true;2025-12-27T09:25:00;system_admin;; 
+efb23edb-7bb0-4da0-9db6-89dd868fc8d0;ROLE_RUNNER;true;2025-12-27T09:30:00;system_admin;; 
+cc923205-0ec6-4ced-80ad-a0caebe576d7;ROLE_BAKER;true;2025-12-27T09:35:00;system_admin;; 
+e2b511d1-3f3e-4150-9ba3-8ea91d73ceac;ROLE_MANAGER;true;2025-12-27T09:40:00;system_admin;; 
+bf135a0f-f619-45e4-9156-687bb0e657b4;ROLE_SUPPORT;true;2025-12-27T09:45:00;system_admin;; 
