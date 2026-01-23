@@ -70,6 +70,7 @@ public class MultiTenantProperties {
         private String tenantConfigEndpoint = "/api/tenants/{tenantId}/database-config";
         private int connectionTimeout = 5000;
         private int readTimeout = 10000;
+        private Auth auth = new Auth();
 
         public String getBaseUrl() {
             return baseUrl;
@@ -101,6 +102,54 @@ public class MultiTenantProperties {
 
         public void setReadTimeout(int readTimeout) {
             this.readTimeout = readTimeout;
+        }
+
+        public Auth getAuth() {
+            return auth;
+        }
+
+        public void setAuth(Auth auth) {
+            this.auth = auth;
+        }
+
+        public static class Auth {
+
+            private String clientId;
+            private String clientSecret;
+            private String tokenUri;
+            private String scope;
+
+            public String getClientId() {
+                return clientId;
+            }
+
+            public void setClientId(String clientId) {
+                this.clientId = clientId;
+            }
+
+            public String getClientSecret() {
+                return clientSecret;
+            }
+
+            public void setClientSecret(String clientSecret) {
+                this.clientSecret = clientSecret;
+            }
+
+            public String getTokenUri() {
+                return tokenUri;
+            }
+
+            public void setTokenUri(String tokenUri) {
+                this.tokenUri = tokenUri;
+            }
+
+            public String getScope() {
+                return scope;
+            }
+
+            public void setScope(String scope) {
+                this.scope = scope;
+            }
         }
     }
 

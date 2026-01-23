@@ -4,11 +4,16 @@ import com.atparui.rmsservice.tenant.domain.TenantDatabaseConfig;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -23,20 +28,26 @@ public class GatewayTenantService {
     private static final Logger LOG = LoggerFactory.getLogger(GatewayTenantService.class);
 
     private final WebClient webClient;
+    private final WebClient authClient;
     private final MultiTenantProperties properties;
     private final Cache<String, TenantDatabaseConfig> tenantConfigCache;
+    private final Cache<String, TokenHolder> tokenCache;
 
     public GatewayTenantService(MultiTenantProperties properties) {
         this.properties = properties;
 
         // Build WebClient for Gateway communication
         this.webClient = WebClient.builder().baseUrl(properties.getGateway().getBaseUrl()).build();
+        this.authClient = WebClient.builder().build();
 
         // Initialize cache with TTL
         this.tenantConfigCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofSeconds(properties.getConnection().getCacheTtl()))
             .maximumSize(1000)
             .build();
+
+        // Token cache keyed by clientId to avoid fetching tokens on every request
+        this.tokenCache = Caffeine.newBuilder().maximumSize(10).build();
     }
 
     /**
@@ -85,20 +96,29 @@ public class GatewayTenantService {
         String url = properties.getGateway().getBaseUrl() + endpoint;
         LOG.debug("Fetching tenant config from Gateway: {}", url);
 
-        return webClient
-            .get()
-            .uri(endpoint)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToMono(TenantDatabaseConfig.class)
-            .timeout(Duration.ofMillis(properties.getGateway().getReadTimeout()))
-            .doOnSuccess(config -> {
-                config.setTenantId(tenantId); // Ensure tenant ID is set
-                LOG.info("Successfully fetched tenant config for tenant: {}", tenantId);
-            })
-            .doOnError(error -> {
-                LOG.error("Failed to fetch tenant config from Gateway for tenant {}: {}", tenantId, error.getMessage());
-            });
+        return getAccessToken()
+            .defaultIfEmpty("")
+            .flatMap(token ->
+                webClient
+                    .get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .headers(headers -> {
+                        if (!token.isBlank()) {
+                            headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                        }
+                    })
+                    .retrieve()
+                    .bodyToMono(TenantDatabaseConfig.class)
+                    .timeout(Duration.ofMillis(properties.getGateway().getReadTimeout()))
+                    .doOnSuccess(config -> {
+                        config.setTenantId(tenantId); // Ensure tenant ID is set
+                        LOG.info("Successfully fetched tenant config for tenant: {}", tenantId);
+                    })
+                    .doOnError(error -> {
+                        LOG.error("Failed to fetch tenant config from Gateway for tenant {}: {}", tenantId, error.getMessage());
+                    })
+            );
     }
 
     /**
@@ -118,5 +138,85 @@ public class GatewayTenantService {
     public void clearCache() {
         tenantConfigCache.invalidateAll();
         LOG.debug("Cleared all tenant config cache");
+    }
+
+    /**
+     * Retrieve (and cache) an access token for Gateway calls when client credentials are configured.
+     */
+    private Mono<String> getAccessToken() {
+        MultiTenantProperties.Gateway.Auth auth = properties.getGateway().getAuth();
+        if (auth == null || isBlank(auth.getClientId()) || isBlank(auth.getClientSecret()) || isBlank(auth.getTokenUri())) {
+            // Auth not configured; call Gateway without Authorization header.
+            return Mono.empty();
+        }
+
+        TokenHolder cached = tokenCache.getIfPresent(auth.getClientId());
+        if (cached != null && cached.isValid()) {
+            return Mono.just(cached.token);
+        }
+
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", "client_credentials");
+        form.add("client_id", auth.getClientId());
+        form.add("client_secret", auth.getClientSecret());
+        if (!isBlank(auth.getScope())) {
+            form.add("scope", auth.getScope());
+        }
+
+        return authClient
+            .post()
+            .uri(auth.getTokenUri())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .bodyValue(form)
+            .retrieve()
+            .bodyToMono(TokenResponse.class)
+            .map(response -> {
+                long expiresIn = response.getExpiresIn() != null ? response.getExpiresIn() : 300L;
+                // Buffer expiry by 30 seconds to avoid using an about-to-expire token
+                long validUntilEpoch = Instant.now().plusSeconds(Math.max(30, expiresIn - 30)).getEpochSecond();
+                TokenHolder holder = new TokenHolder(response.getAccessToken(), validUntilEpoch);
+                tokenCache.put(auth.getClientId(), holder);
+                LOG.debug("Fetched and cached access token for clientId {}", auth.getClientId());
+                return holder.token;
+            });
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private static class TokenHolder {
+        private final String token;
+        private final long validUntilEpochSeconds;
+
+        TokenHolder(String token, long validUntilEpochSeconds) {
+            this.token = token;
+            this.validUntilEpochSeconds = validUntilEpochSeconds;
+        }
+
+        boolean isValid() {
+            return !Objects.isNull(token) && Instant.now().getEpochSecond() < validUntilEpochSeconds;
+        }
+    }
+
+    private static class TokenResponse {
+        private String access_token;
+        private Long expires_in;
+
+        public String getAccessToken() {
+            return access_token;
+        }
+
+        public void setAccess_token(String access_token) {
+            this.access_token = access_token;
+        }
+
+        public Long getExpiresIn() {
+            return expires_in;
+        }
+
+        public void setExpires_in(Long expires_in) {
+            this.expires_in = expires_in;
+        }
     }
 }

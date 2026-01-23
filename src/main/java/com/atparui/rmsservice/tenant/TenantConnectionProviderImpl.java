@@ -113,8 +113,10 @@ public class TenantConnectionProviderImpl implements TenantConnectionProvider {
             LOG.warn("Tenant ID not found in context, using fallback tenant: {}", defaultTenantId);
             return getR2dbcConnectionFactory(defaultTenantId);
         } else {
-            LOG.error("Tenant ID not found in context and fallback is disabled");
-            return Mono.error(new IllegalStateException("Tenant ID is required but not found in request context"));
+            // No tenant present: allow upstream TenantAwareConnectionFactory to use the default
+            // auto-configured ConnectionFactory instead of failing loudly.
+            LOG.warn("Tenant ID not found in context; fallback disabled, using default ConnectionFactory");
+            return Mono.empty();
         }
     }
 

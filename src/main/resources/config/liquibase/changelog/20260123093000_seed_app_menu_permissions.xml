@@ -121,215 +121,200 @@
 
     <changeSet id="20260123093000-2" author="assistant">
         <!-- permissions: view/create/edit/delete per menu -->
-        <loadData tableName="permission" separator=";" usePreparedStatements="true">
-            <column name="id" type="uuid"/>
-            <column name="code" type="string"/>
-            <column name="description" type="string"/>
-            <column name="scope" type="string"/>
-            <column name="is_active" type="boolean"/>
-            <data>
-                <row id="GEN_RANDOM_UUID()" code="restaurant:view" description="View restaurant" scope="restaurant" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="restaurant:create" description="Create restaurant" scope="restaurant" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="restaurant:edit" description="Edit restaurant" scope="restaurant" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="restaurant:delete" description="Delete restaurant" scope="restaurant" is_active="true"/>
+        <sql>
+            INSERT INTO permission (id, code, description, scope, is_active) VALUES
+            (GEN_RANDOM_UUID(), 'restaurant:view', 'View restaurant', 'restaurant', true),
+            (GEN_RANDOM_UUID(), 'restaurant:create', 'Create restaurant', 'restaurant', true),
+            (GEN_RANDOM_UUID(), 'restaurant:edit', 'Edit restaurant', 'restaurant', true),
+            (GEN_RANDOM_UUID(), 'restaurant:delete', 'Delete restaurant', 'restaurant', true),
 
-                <row id="GEN_RANDOM_UUID()" code="branch:view" description="View branches" scope="branch" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="branch:create" description="Create branch" scope="branch" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="branch:edit" description="Edit branch" scope="branch" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="branch:delete" description="Delete branch" scope="branch" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'branch:view', 'View branches', 'branch', true),
+            (GEN_RANDOM_UUID(), 'branch:create', 'Create branch', 'branch', true),
+            (GEN_RANDOM_UUID(), 'branch:edit', 'Edit branch', 'branch', true),
+            (GEN_RANDOM_UUID(), 'branch:delete', 'Delete branch', 'branch', true),
 
-                <row id="GEN_RANDOM_UUID()" code="customers:view" description="View customers" scope="customers" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="customers:create" description="Create customer" scope="customers" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="customers:edit" description="Edit customer" scope="customers" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="customers:delete" description="Delete customer" scope="customers" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'customers:view', 'View customers', 'customers', true),
+            (GEN_RANDOM_UUID(), 'customers:create', 'Create customer', 'customers', true),
+            (GEN_RANDOM_UUID(), 'customers:edit', 'Edit customer', 'customers', true),
+            (GEN_RANDOM_UUID(), 'customers:delete', 'Delete customer', 'customers', true),
 
-                <row id="GEN_RANDOM_UUID()" code="users:view" description="View users" scope="users" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="users:create" description="Create user" scope="users" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="users:edit" description="Edit user" scope="users" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="users:delete" description="Delete user" scope="users" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'users:view', 'View users', 'users', true),
+            (GEN_RANDOM_UUID(), 'users:create', 'Create user', 'users', true),
+            (GEN_RANDOM_UUID(), 'users:edit', 'Edit user', 'users', true),
+            (GEN_RANDOM_UUID(), 'users:delete', 'Delete user', 'users', true),
 
-                <row id="GEN_RANDOM_UUID()" code="menu_category:view" description="View menu categories" scope="menu_category" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_category:create" description="Create menu category" scope="menu_category" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_category:edit" description="Edit menu category" scope="menu_category" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_category:delete" description="Delete menu category" scope="menu_category" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'menu_category:view', 'View menu categories', 'menu_category', true),
+            (GEN_RANDOM_UUID(), 'menu_category:create', 'Create menu category', 'menu_category', true),
+            (GEN_RANDOM_UUID(), 'menu_category:edit', 'Edit menu category', 'menu_category', true),
+            (GEN_RANDOM_UUID(), 'menu_category:delete', 'Delete menu category', 'menu_category', true),
 
-                <row id="GEN_RANDOM_UUID()" code="menu_item:view" description="View menu items" scope="menu_item" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_item:create" description="Create menu item" scope="menu_item" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_item:edit" description="Edit menu item" scope="menu_item" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="menu_item:delete" description="Delete menu item" scope="menu_item" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'menu_item:view', 'View menu items', 'menu_item', true),
+            (GEN_RANDOM_UUID(), 'menu_item:create', 'Create menu item', 'menu_item', true),
+            (GEN_RANDOM_UUID(), 'menu_item:edit', 'Edit menu item', 'menu_item', true),
+            (GEN_RANDOM_UUID(), 'menu_item:delete', 'Delete menu item', 'menu_item', true),
 
-                <row id="GEN_RANDOM_UUID()" code="inventory:view" description="View inventory" scope="inventory" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="inventory:create" description="Create inventory" scope="inventory" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="inventory:edit" description="Edit inventory" scope="inventory" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="inventory:delete" description="Delete inventory" scope="inventory" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'inventory:view', 'View inventory', 'inventory', true),
+            (GEN_RANDOM_UUID(), 'inventory:create', 'Create inventory', 'inventory', true),
+            (GEN_RANDOM_UUID(), 'inventory:edit', 'Edit inventory', 'inventory', true),
+            (GEN_RANDOM_UUID(), 'inventory:delete', 'Delete inventory', 'inventory', true),
 
-                <row id="GEN_RANDOM_UUID()" code="billing:view" description="View billing" scope="billing" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="billing:create" description="Create billing" scope="billing" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="billing:edit" description="Edit billing" scope="billing" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="billing:delete" description="Delete billing" scope="billing" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'billing:view', 'View billing', 'billing', true),
+            (GEN_RANDOM_UUID(), 'billing:create', 'Create billing', 'billing', true),
+            (GEN_RANDOM_UUID(), 'billing:edit', 'Edit billing', 'billing', true),
+            (GEN_RANDOM_UUID(), 'billing:delete', 'Delete billing', 'billing', true),
 
-                <row id="GEN_RANDOM_UUID()" code="orders:view" description="View orders" scope="orders" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="orders:create" description="Create order" scope="orders" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="orders:edit" description="Edit order" scope="orders" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="orders:delete" description="Delete order" scope="orders" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'orders:view', 'View orders', 'orders', true),
+            (GEN_RANDOM_UUID(), 'orders:create', 'Create order', 'orders', true),
+            (GEN_RANDOM_UUID(), 'orders:edit', 'Edit order', 'orders', true),
+            (GEN_RANDOM_UUID(), 'orders:delete', 'Delete order', 'orders', true),
 
-                <row id="GEN_RANDOM_UUID()" code="table_management:view" description="View tables" scope="table_management" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_management:create" description="Create table" scope="table_management" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_management:edit" description="Edit table" scope="table_management" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_management:delete" description="Delete table" scope="table_management" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'table_management:view', 'View tables', 'table_management', true),
+            (GEN_RANDOM_UUID(), 'table_management:create', 'Create table', 'table_management', true),
+            (GEN_RANDOM_UUID(), 'table_management:edit', 'Edit table', 'table_management', true),
+            (GEN_RANDOM_UUID(), 'table_management:delete', 'Delete table', 'table_management', true),
 
-                <row id="GEN_RANDOM_UUID()" code="table_roster:view" description="View table roster" scope="table_roster" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_roster:create" description="Create table roster" scope="table_roster" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_roster:edit" description="Edit table roster" scope="table_roster" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" code="table_roster:delete" description="Delete table roster" scope="table_roster" is_active="true"/>
-            </data>
-        </loadData>
+            (GEN_RANDOM_UUID(), 'table_roster:view', 'View table roster', 'table_roster', true),
+            (GEN_RANDOM_UUID(), 'table_roster:create', 'Create table roster', 'table_roster', true),
+            (GEN_RANDOM_UUID(), 'table_roster:edit', 'Edit table roster', 'table_roster', true),
+            (GEN_RANDOM_UUID(), 'table_roster:delete', 'Delete table roster', 'table_roster', true);
+        </sql>
     </changeSet>
 
     <changeSet id="20260123093000-3" author="assistant">
         <!-- Map menus to their default view permission -->
-        <loadData tableName="menu_permission" separator=";" usePreparedStatements="true">
-            <column name="id" type="uuid"/>
-            <column name="app_menu_id" type="uuid"/>
-            <column name="permission_id" type="uuid"/>
-            <data>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='restaurant' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='branch' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='branch:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='customers' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='customers:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='users' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='users:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='menu_category' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='menu_item' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='inventory' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='inventory:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='billing' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='billing:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='orders' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='table_management' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='table_management:view' LIMIT 1)"/>
-                <row id="GEN_RANDOM_UUID()" app_menu_id="(SELECT id FROM app_menu WHERE menu_key='table_roster' LIMIT 1)" permission_id="(SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1)"/>
-            </data>
-        </loadData>
+        <sql>
+            INSERT INTO menu_permission (id, app_menu_id, permission_id) VALUES
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='restaurant' LIMIT 1), (SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='branch' LIMIT 1), (SELECT id FROM permission WHERE code='branch:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='customers' LIMIT 1), (SELECT id FROM permission WHERE code='customers:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='users' LIMIT 1), (SELECT id FROM permission WHERE code='users:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='menu_category' LIMIT 1), (SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='menu_item' LIMIT 1), (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='inventory' LIMIT 1), (SELECT id FROM permission WHERE code='inventory:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='billing' LIMIT 1), (SELECT id FROM permission WHERE code='billing:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='orders' LIMIT 1), (SELECT id FROM permission WHERE code='orders:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='table_management' LIMIT 1), (SELECT id FROM permission WHERE code='table_management:view' LIMIT 1)),
+            (GEN_RANDOM_UUID(), (SELECT id FROM app_menu WHERE menu_key='table_roster' LIMIT 1), (SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1));
+        </sql>
     </changeSet>
 
     <changeSet id="20260123093000-4" author="assistant">
         <!-- Role to permission defaults -->
-        <loadData tableName="role_permission" separator=";" usePreparedStatements="true">
-            <column name="id" type="uuid"/>
-            <column name="role" type="string"/>
-            <column name="permission_id" type="uuid"/>
-            <column name="is_active" type="boolean"/>
-            <data>
-                <!-- ADMIN gets all (all codes inserted above) -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='restaurant:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='restaurant:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='restaurant:delete' LIMIT 1)" is_active="true"/>
+        <sql>
+            INSERT INTO role_permission (id, role, permission_id, is_active) VALUES
+            -- ADMIN gets all
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='restaurant:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='restaurant:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='restaurant:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='branch:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='branch:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='branch:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='branch:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='branch:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='branch:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='branch:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='branch:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='customers:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='customers:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='customers:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='customers:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='customers:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='customers:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='customers:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='customers:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='users:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='users:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='users:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='users:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='users:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='users:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='users:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='users:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_category:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_category:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_category:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_category:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_category:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_category:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_item:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_item:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='menu_item:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_item:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_item:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='menu_item:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='inventory:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='inventory:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='inventory:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='inventory:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='inventory:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='inventory:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='inventory:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='inventory:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='billing:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='billing:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='billing:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='billing:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='billing:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='billing:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='billing:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='billing:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='orders:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='orders:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='orders:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='orders:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='orders:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='orders:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_management:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_management:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_management:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_management:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_management:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_management:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_management:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_management:delete' LIMIT 1), true),
 
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_roster:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_roster:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_ADMIN" permission_id="(SELECT id FROM permission WHERE code='table_roster:delete' LIMIT 1)" is_active="true"/>
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_roster:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_roster:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_ADMIN', (SELECT id FROM permission WHERE code='table_roster:delete' LIMIT 1), true),
 
-                <!-- MANAGER: full view/create/edit/delete except users delete -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='branch:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='branch:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='branch:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='customers:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='customers:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='customers:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='users:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='users:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='users:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_category:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_category:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_item:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='menu_item:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='inventory:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='inventory:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='inventory:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='billing:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='billing:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='billing:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='orders:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='orders:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_management:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_management:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_management:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_roster:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_MANAGER" permission_id="(SELECT id FROM permission WHERE code='table_roster:edit' LIMIT 1)" is_active="true"/>
+            -- MANAGER: full view/create/edit/delete except user delete
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='restaurant:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='branch:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='branch:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='branch:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='customers:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='customers:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='customers:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='users:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='users:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='users:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_category:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_category:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_category:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_item:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='menu_item:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='inventory:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='inventory:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='inventory:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='billing:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='billing:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='billing:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='orders:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='orders:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_management:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_management:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_management:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_roster:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_MANAGER', (SELECT id FROM permission WHERE code='table_roster:edit' LIMIT 1), true),
 
-                <!-- WAITER: orders view/create/edit, table roster view, menu_item view -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_WAITER" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_WAITER" permission_id="(SELECT id FROM permission WHERE code='orders:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_WAITER" permission_id="(SELECT id FROM permission WHERE code='orders:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_WAITER" permission_id="(SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_WAITER" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)" is_active="true"/>
+            -- WAITER
+            (GEN_RANDOM_UUID(), 'ROLE_WAITER', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_WAITER', (SELECT id FROM permission WHERE code='orders:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_WAITER', (SELECT id FROM permission WHERE code='orders:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_WAITER', (SELECT id FROM permission WHERE code='table_roster:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_WAITER', (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1), true),
 
-                <!-- CHEF: orders view/edit, menu_item view -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CHEF" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CHEF" permission_id="(SELECT id FROM permission WHERE code='orders:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CHEF" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)" is_active="true"/>
+            -- CHEF
+            (GEN_RANDOM_UUID(), 'ROLE_CHEF', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CHEF', (SELECT id FROM permission WHERE code='orders:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CHEF', (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1), true),
 
-                <!-- CASHIER: orders view/create/edit, billing view/create/edit -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='orders:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='orders:edit' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='billing:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='billing:create' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CASHIER" permission_id="(SELECT id FROM permission WHERE code='billing:edit' LIMIT 1)" is_active="true"/>
+            -- CASHIER
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='orders:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='orders:edit' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='billing:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='billing:create' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CASHIER', (SELECT id FROM permission WHERE code='billing:edit' LIMIT 1), true),
 
-                <!-- CUSTOMER: menu_item view, orders create/view -->
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CUSTOMER" permission_id="(SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CUSTOMER" permission_id="(SELECT id FROM permission WHERE code='orders:view' LIMIT 1)" is_active="true"/>
-                <row id="GEN_RANDOM_UUID()" role="ROLE_CUSTOMER" permission_id="(SELECT id FROM permission WHERE code='orders:create' LIMIT 1)" is_active="true"/>
-            </data>
-        </loadData>
+            -- CUSTOMER
+            (GEN_RANDOM_UUID(), 'ROLE_CUSTOMER', (SELECT id FROM permission WHERE code='menu_item:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CUSTOMER', (SELECT id FROM permission WHERE code='orders:view' LIMIT 1), true),
+            (GEN_RANDOM_UUID(), 'ROLE_CUSTOMER', (SELECT id FROM permission WHERE code='orders:create' LIMIT 1), true);
+        </sql>
     </changeSet>
 </databaseChangeLog>
