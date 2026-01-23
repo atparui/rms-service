@@ -70,7 +70,7 @@
             <column name="id" type="${uuidType}"/>
             <column name="item_code" type="string"/>
             <column name="item_name" type="string"/>
-            <column name="description" type="clob"/>
+            <column name="description" type="string"/>
             <column name="icon" type="string"/>
             <column name="route_path" type="string"/>
             <column name="component_path" type="string"/>

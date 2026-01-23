@@ -106,7 +106,7 @@
             <column name="order_date" type="date"/>
             <column name="estimated_ready_time" type="date"/>
             <column name="actual_ready_time" type="date"/>
-            <column name="special_instructions" type="clob"/>
+            <column name="special_instructions" type="string"/>
             <column name="subtotal" type="numeric"/>
             <column name="tax_amount" type="numeric"/>
             <column name="discount_amount" type="numeric"/>
@@ -114,7 +114,7 @@
             <column name="is_paid" type="boolean"/>
             <column name="cancelled_at" type="date"/>
             <column name="cancelled_by" type="string"/>
-            <column name="cancellation_reason" type="clob"/>
+            <column name="cancellation_reason" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

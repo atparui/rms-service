@@ -58,7 +58,7 @@
             <column name="new_status" type="string"/>
             <column name="changed_at" type="date"/>
             <column name="changed_by" type="string"/>
-            <column name="notes" type="clob"/>
+            <column name="notes" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

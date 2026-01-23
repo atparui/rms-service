@@ -92,7 +92,7 @@
             <column name="amount_due" type="numeric"/>
             <column name="status" type="string"/>
             <column name="generated_by" type="string"/>
-            <column name="notes" type="clob"/>
+            <column name="notes" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

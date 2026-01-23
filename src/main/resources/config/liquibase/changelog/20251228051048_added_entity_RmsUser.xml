@@ -83,7 +83,7 @@
             <column name="is_active" type="boolean"/>
             <column name="last_sync_at" type="date"/>
             <column name="sync_status" type="string"/>
-            <column name="sync_error" type="clob"/>
+            <column name="sync_error" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

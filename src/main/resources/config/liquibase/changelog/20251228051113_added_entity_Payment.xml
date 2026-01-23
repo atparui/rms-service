@@ -80,13 +80,13 @@
             <column name="amount" type="numeric"/>
             <column name="payment_date" type="date"/>
             <column name="transaction_id" type="string"/>
-            <column name="payment_gateway_response" type="clob"/>
+            <column name="payment_gateway_response" type="string"/>
             <column name="status" type="string"/>
             <column name="processed_by" type="string"/>
-            <column name="notes" type="clob"/>
+            <column name="notes" type="string"/>
             <column name="refunded_at" type="date"/>
             <column name="refunded_by" type="string"/>
-            <column name="refund_reason" type="clob"/>
+            <column name="refund_reason" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

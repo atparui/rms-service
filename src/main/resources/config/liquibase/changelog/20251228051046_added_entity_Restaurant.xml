@@ -79,7 +79,7 @@
             <column name="id" type="${uuidType}"/>
             <column name="name" type="string"/>
             <column name="code" type="string"/>
-            <column name="description" type="clob"/>
+            <column name="description" type="string"/>
             <column name="logo_url" type="string"/>
             <column name="contact_email" type="string"/>
             <column name="contact_phone" type="string"/>
