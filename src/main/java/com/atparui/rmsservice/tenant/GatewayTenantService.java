@@ -1,12 +1,10 @@
 package com.atparui.rmsservice.tenant;
 
-import com.atparui.rmsservice.tenant.domain.TenantDatabaseConfig;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import org.slf4j.Logger;Gateway auth not configured
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +14,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import com.atparui.rmsservice.tenant.domain.TenantDatabaseConfig;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -100,23 +103,23 @@ public class GatewayTenantService {
             .defaultIfEmpty("")
             .flatMap(token ->
                 webClient
-                    .get()
-                    .uri(endpoint)
-                    .accept(MediaType.APPLICATION_JSON)
+            .get()
+            .uri(endpoint)
+            .accept(MediaType.APPLICATION_JSON)
                     .headers(headers -> {
                         if (!token.isBlank()) {
                             headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
                         }
                     })
-                    .retrieve()
-                    .bodyToMono(TenantDatabaseConfig.class)
-                    .timeout(Duration.ofMillis(properties.getGateway().getReadTimeout()))
-                    .doOnSuccess(config -> {
-                        config.setTenantId(tenantId); // Ensure tenant ID is set
-                        LOG.info("Successfully fetched tenant config for tenant: {}", tenantId);
-                    })
-                    .doOnError(error -> {
-                        LOG.error("Failed to fetch tenant config from Gateway for tenant {}: {}", tenantId, error.getMessage());
+            .retrieve()
+            .bodyToMono(TenantDatabaseConfig.class)
+            .timeout(Duration.ofMillis(properties.getGateway().getReadTimeout()))
+            .doOnSuccess(config -> {
+                config.setTenantId(tenantId); // Ensure tenant ID is set
+                LOG.info("Successfully fetched tenant config for tenant: {}", tenantId);
+            })
+            .doOnError(error -> {
+                LOG.error("Failed to fetch tenant config from Gateway for tenant {}: {}", tenantId, error.getMessage());
                     })
             );
     }
