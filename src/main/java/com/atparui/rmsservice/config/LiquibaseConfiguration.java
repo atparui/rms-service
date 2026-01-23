@@ -2,8 +2,9 @@ package com.atparui.rmsservice.config;
 
 import java.util.Optional;
 import java.util.concurrent.Executor;
+
 import javax.sql.DataSource;
-import liquibase.integration.spring.SpringLiquibase;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import liquibase.integration.spring.SpringLiquibase;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.liquibase.AsyncSpringLiquibase;
 
@@ -31,13 +34,13 @@ public class LiquibaseConfiguration {
     @Value("${DB_PORT:5432}")
     private int dbPort;
 
-    @Value("${DB_USERNAME:rms_service}")
+    @Value("${DB_USERNAME:rms-service}")
     private String dbUsername;
 
-    @Value("${DB_PASSWORD:rms_service}")
+    @Value("${DB_PASSWORD:rms-service}")
     private String dbPassword;
 
-    @Value("${DB_NAME:rms_service}")
+    @Value("${DB_NAME:rms-service}")
     private String dbName;
 
     public LiquibaseConfiguration(Environment env) {

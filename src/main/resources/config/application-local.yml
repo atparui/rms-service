@@ -57,19 +57,19 @@ spring:
   # Database Configuration (Service uses SSH tunnel to remote database)
   # The tunnel forwards localhost:5434 -> remote-server:5435
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/rms_service}
-    username: ${SPRING_DATASOURCE_USERNAME:rms_service}
-    password: ${SPRING_DATASOURCE_PASSWORD:rms_service}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/rms-service}
+    username: ${SPRING_DATASOURCE_USERNAME:rms-service}
+    password: ${SPRING_DATASOURCE_PASSWORD:rms-service}
 
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5434/rms_service}
-    username: ${SPRING_R2DBC_USERNAME:rms_service}
-    password: ${SPRING_R2DBC_PASSWORD:rms_service}
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5434/rms-service}
+    username: ${SPRING_R2DBC_USERNAME:rms-service}
+    password: ${SPRING_R2DBC_PASSWORD:rms-service}
 
   liquibase:
-    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5434/rms_service?currentSchema=public}
-    user: ${SPRING_LIQUIBASE_USER:rms_service}
-    password: ${SPRING_LIQUIBASE_PASSWORD:rms_service}
+    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5434/rms-service?currentSchema=public}
+    user: ${SPRING_LIQUIBASE_USER:rms-service}
+    password: ${SPRING_LIQUIBASE_PASSWORD:rms-service}
     default-schema: ${SPRING_LIQUIBASE_DEFAULT_SCHEMA:public}
 
   # Infrastructure Services (all via SSH tunnels to localhost)
@@ -88,9 +88,9 @@ spring:
 # These point to localhost because SSH tunnel forwards to remote
 DB_HOST: ${DB_HOST:localhost}
 DB_PORT: ${DB_PORT:5434}
-DB_NAME: ${DB_NAME:rms_service}
-DB_USERNAME: ${DB_USERNAME:rms_service}
-DB_PASSWORD: ${DB_PASSWORD:rms_service}
+DB_NAME: ${DB_NAME:rms-service}
+DB_USERNAME: ${DB_USERNAME:rms-service}
+DB_PASSWORD: ${DB_PASSWORD:rms-service}
 
 # Keycloak Configuration (via SSH tunnel to localhost:8080)
 security:

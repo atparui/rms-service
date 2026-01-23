@@ -6,7 +6,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import org.slf4j.Logger;
+import org.slf4j.Logger;Gateway auth not configured
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,5 @@
 package com.atparui.rmsservice.config;
 
-import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
-import io.r2dbc.postgresql.PostgresqlConnectionFactory;
-import io.r2dbc.spi.ConnectionFactory;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +11,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
+import io.r2dbc.postgresql.PostgresqlConnectionFactory;
+import io.r2dbc.spi.ConnectionFactory;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Database configuration for Service.
@@ -35,13 +36,13 @@ public class ServiceDatabaseConfig {
     @Value("${DB_PORT:5432}")
     private int dbPort;
 
-    @Value("${DB_USERNAME:rms_service}")
+    @Value("${DB_USERNAME:rms-service}")
     private String dbUsername;
 
-    @Value("${DB_PASSWORD:rms_service}")
+    @Value("${DB_PASSWORD:rms-service}")
     private String dbPassword;
 
-    @Value("${DB_NAME:rms_service}")
+    @Value("${DB_NAME:rms-service}")
     private String dbName;
 
     @PostConstruct
