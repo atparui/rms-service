@@ -40,6 +40,7 @@
     <include file="config/liquibase/changelog/20251228051111_added_entity_BillDiscount.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051112_added_entity_PaymentMethod.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051113_added_entity_Payment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260123090000_added_entity_AppMenuPermission.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251228051047_added_entity_constraints_Branch.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051049_added_entity_constraints_UserBranchRole.xml" relativeToChangelogFile="false"/>
@@ -66,6 +67,7 @@
     <include file="config/liquibase/changelog/20251228051110_added_entity_constraints_BillTax.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051111_added_entity_constraints_BillDiscount.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051113_added_entity_constraints_Payment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260123090001_added_entity_constraints_AppMenuPermission.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

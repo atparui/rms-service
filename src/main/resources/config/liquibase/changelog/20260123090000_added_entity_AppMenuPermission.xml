@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity AppMenu, Permission, RolePermission and MenuPermission.
+    -->
+    <changeSet id="20260123090000-1" author="assistant">
+        <createTable tableName="app_menu">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="menu_key" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_app_menu__menu_key" />
+            </column>
+            <column name="label" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="route_path" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="icon" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="sort_order" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="permission_logic" type="varchar(10)" defaultValue="ANY">
+                <constraints nullable="false" />
+            </column>
+            <column name="app_key" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260123090000-2" author="assistant">
+        <createTable tableName="permission">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(150)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_permission__code" />
+            </column>
+            <column name="description" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="scope" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260123090000-3" author="assistant">
+        <createTable tableName="role_permission">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="permission_id" type="${uuidType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <addUniqueConstraint tableName="role_permission" columnNames="role, permission_id" constraintName="ux_role_permission__role_permission_id"/>
+    </changeSet>
+
+    <changeSet id="20260123090000-4" author="assistant">
+        <createTable tableName="menu_permission">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_menu_id" type="${uuidType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="permission_id" type="${uuidType}">
+                <constraints nullable="false" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <addUniqueConstraint tableName="menu_permission" columnNames="app_menu_id, permission_id" constraintName="ux_menu_permission__menu_permission"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>
