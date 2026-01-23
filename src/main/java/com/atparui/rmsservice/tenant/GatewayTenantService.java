@@ -146,14 +146,17 @@ public class GatewayTenantService {
     private Mono<String> getAccessToken() {
         MultiTenantProperties.Gateway.Auth auth = properties.getGateway().getAuth();
         if (auth == null || isBlank(auth.getClientId()) || isBlank(auth.getClientSecret()) || isBlank(auth.getTokenUri())) {
-            // Auth not configured; call Gateway without Authorization header.
+            LOG.debug("Gateway auth not configured; calling without Authorization header");
             return Mono.empty();
         }
 
         TokenHolder cached = tokenCache.getIfPresent(auth.getClientId());
         if (cached != null && cached.isValid()) {
+            LOG.debug("Using cached access token for clientId {}", auth.getClientId());
             return Mono.just(cached.token);
         }
+
+        LOG.debug("Fetching new access token for clientId {}", auth.getClientId());
 
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "client_credentials");
@@ -176,7 +179,7 @@ public class GatewayTenantService {
                 long validUntilEpoch = Instant.now().plusSeconds(Math.max(30, expiresIn - 30)).getEpochSecond();
                 TokenHolder holder = new TokenHolder(response.getAccessToken(), validUntilEpoch);
                 tokenCache.put(auth.getClientId(), holder);
-                LOG.debug("Fetched and cached access token for clientId {}", auth.getClientId());
+                LOG.debug("Fetched and cached access token for clientId {} (expires in ~{}s)", auth.getClientId(), expiresIn);
                 return holder.token;
             });
     }
