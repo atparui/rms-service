@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Implementation of TenantConnectionProvider that provides both R2DBC and JDBC connections
@@ -99,7 +100,11 @@ public class TenantConnectionProviderImpl implements TenantConnectionProvider {
         }
 
         try {
-            TenantDatabaseConfig config = gatewayTenantService.getTenantDatabaseConfig(tenantId).block();
+            TenantDatabaseConfig config = gatewayTenantService
+                .getTenantDatabaseConfig(tenantId)
+                // Avoid blocking on event-loop / parallel workers
+                .subscribeOn(Schedulers.boundedElastic())
+                .block();
             return config != null && config.isJdbc();
         } catch (Exception e) {
             LOG.warn("Failed to get tenant config for {}: {}", tenantId, e.getMessage());
