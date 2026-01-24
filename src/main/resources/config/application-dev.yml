@@ -113,6 +113,10 @@ server:
 jhipster:
   # CORS is disabled on the microservice; the gateway handles CORS to avoid duplicate Access-Control-Allow-Origin headers.
   logging:
+  level:
+    org.springframework.r2dbc.core: DEBUG
+    io.r2dbc.postgresql.QUERY: DEBUG
+    io.r2dbc.postgresql.PARAM: DEBUG
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false

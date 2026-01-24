@@ -60,9 +60,24 @@ public class UserProvisioningService {
 
         Mono<Void> ensureJhiUser = userRepository
             .findById(userId)
-            .switchIfEmpty(userRepository.findOneByLogin(username))
             .hasElement()
-            .flatMap(exists -> exists ? Mono.<Void>empty() : userService.getUserFromAuthentication(authToken).then())
+            .flatMap(existsById -> {
+                if (existsById) {
+                    LOG.debug("jhi_user already exists by id={}, skipping insert", userId);
+                    return Mono.<Void>empty();
+                }
+                return userRepository
+                    .findOneByLogin(username)
+                    .hasElement()
+                    .flatMap(existsByLogin -> {
+                        if (existsByLogin) {
+                            LOG.debug("jhi_user already exists by login={}, skipping insert", username);
+                            return Mono.<Void>empty();
+                        }
+                        LOG.info("Provisioning jhi_user id={} login={} email={}", userId, username, email);
+                        return userService.getUserFromAuthentication(authToken).then();
+                    });
+            })
             .onErrorResume(ex -> {
                 LOG.warn("Provision jhi_user skipped due to error for {}: {}", username, ex.getMessage());
                 return Mono.empty();
@@ -89,6 +104,14 @@ public class UserProvisioningService {
                         rmsUser.setIsActive(Boolean.TRUE);
                         rmsUser.setLastSyncAt(Instant.now());
                         rmsUser.setSyncStatus("SYNCED");
+                        LOG.info(
+                            "Provisioning rms_user externalUserId={} username={} email={} firstName={} lastName={}",
+                            externalUserId,
+                            username,
+                            email,
+                            firstName,
+                            lastName
+                        );
                         return rmsUserRepository
                             .save(rmsUser)
                             .doOnSuccess(saved -> LOG.debug("Provisioned RMS user for externalUserId={}", externalUserId))
