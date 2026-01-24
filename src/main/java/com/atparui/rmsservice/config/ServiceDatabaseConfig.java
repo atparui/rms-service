@@ -30,6 +30,12 @@ public class ServiceDatabaseConfig {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceDatabaseConfig.class);
 
+    private final R2dbcProxyFactory r2dbcProxyFactory;
+
+    public ServiceDatabaseConfig(R2dbcProxyFactory r2dbcProxyFactory) {
+        this.r2dbcProxyFactory = r2dbcProxyFactory;
+    }
+
     @Value("${DB_HOST:rms-postgresql}")
     private String dbHost;
 
@@ -91,7 +97,7 @@ public class ServiceDatabaseConfig {
 
         log.info("ConnectionFactory created successfully for host: {}", dbHost);
         log.info("==========================================");
-        return factory;
+        return r2dbcProxyFactory.wrap(factory);
     }
 
     /**
@@ -121,7 +127,7 @@ public class ServiceDatabaseConfig {
 
         log.info("Health check ConnectionFactory created successfully for host: {}", dbHost);
         log.info("==========================================");
-        return factory;
+        return r2dbcProxyFactory.wrap(factory);
     }
 
     /**

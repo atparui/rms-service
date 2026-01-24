@@ -1,6 +1,7 @@
 package com.atparui.rmsservice.tenant;
 
 import com.atparui.rmsservice.tenant.domain.TenantDatabaseConfig;
+import com.atparui.rmsservice.config.R2dbcProxyFactory;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
@@ -27,10 +28,12 @@ public class TenantConnectionManager {
     private final ConcurrentMap<String, ConnectionFactory> connectionFactoryCache = new ConcurrentHashMap<>();
     private final GatewayTenantService gatewayTenantService;
     private final MultiTenantProperties properties;
+    private final R2dbcProxyFactory r2dbcProxyFactory;
 
-    public TenantConnectionManager(GatewayTenantService gatewayTenantService, MultiTenantProperties properties) {
+    public TenantConnectionManager(GatewayTenantService gatewayTenantService, MultiTenantProperties properties, R2dbcProxyFactory r2dbcProxyFactory) {
         this.gatewayTenantService = gatewayTenantService;
         this.properties = properties;
+        this.r2dbcProxyFactory = r2dbcProxyFactory;
     }
 
     /**
@@ -85,8 +88,11 @@ public class TenantConnectionManager {
 
         PostgresqlConnectionFactory connectionFactory = new PostgresqlConnectionFactory(configBuilder.build());
 
+        // Wrap to log queries (bindings + timings) before pooling
+        ConnectionFactory proxiedFactory = r2dbcProxyFactory.wrap(connectionFactory);
+
         // Wrap with connection pool
-        ConnectionPoolConfiguration poolConfig = ConnectionPoolConfiguration.builder(connectionFactory)
+        ConnectionPoolConfiguration poolConfig = ConnectionPoolConfiguration.builder(proxiedFactory)
             .maxIdleTime(Duration.ofSeconds(30))
             .initialSize(properties.getConnection().getMinPoolSize())
             .maxSize(properties.getConnection().getMaxPoolSize())

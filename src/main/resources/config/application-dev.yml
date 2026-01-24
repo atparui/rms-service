@@ -22,6 +22,7 @@ logging:
     org.springframework.kafka: INFO
     com.atparui.rmsservice: DEBUG
     com.atparui.rmsservice.broker: INFO
+    io.r2dbc.proxy.query: DEBUG
     org.springframework.data.r2dbc: TRACE
     org.springframework.data.r2dbc.core: TRACE
     org.springframework.data.r2dbc.repository.query: TRACE

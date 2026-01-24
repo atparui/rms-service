@@ -1,5 +1,23 @@
 package com.atparui.rmsservice.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.atparui.rmsservice.domain.AppMenu;
 import com.atparui.rmsservice.domain.MenuPermission;
 import com.atparui.rmsservice.domain.Permission;
@@ -9,12 +27,7 @@ import com.atparui.rmsservice.repository.MenuPermissionRepository;
 import com.atparui.rmsservice.repository.PermissionRepository;
 import com.atparui.rmsservice.security.SecurityUtils;
 import com.atparui.rmsservice.service.dto.AppMenuTreeDTO;
-import java.util.*;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -67,10 +80,18 @@ public class AppMenuAccessService {
             .findAll()
             .filter(menu -> Boolean.TRUE.equals(menu.getIsActive()))
             .filter(menu -> appKey == null || appKey.isBlank() || menu.getAppKey() == null || appKey.equalsIgnoreCase(menu.getAppKey()))
-            .collectList();
+            .collectList()
+            .doOnNext(menus -> LOG.debug("Menu query -> menus loaded: {}", menus));
 
-        Mono<List<MenuPermission>> menuPermissionsMono = menuPermissionRepository.findAll().collectList();
-        Mono<Map<UUID, Permission>> permissionMapMono = permissionRepository.findAll().collectMap(Permission::getId);
+        Mono<List<MenuPermission>> menuPermissionsMono = menuPermissionRepository
+            .findAll()
+            .collectList()
+            .doOnNext(menuPermissions -> LOG.debug("Menu query -> menuPermissions loaded: {}", menuPermissions));
+
+        Mono<Map<UUID, Permission>> permissionMapMono = permissionRepository
+            .findAll()
+            .collectMap(Permission::getId)
+            .doOnNext(permissionMap -> LOG.debug("Menu query -> permissions loaded (by id): {}", permissionMap));
 
         Mono<Set<UUID>> userPermissionIdsMono = rolePermissionService
             .findByRoles(effectiveRoles)
@@ -78,7 +99,8 @@ public class AppMenuAccessService {
             .filter(rp -> rp.getPermissionId() != null)
             .filter(rp -> rp.getIsActive() == null || rp.getIsActive())
             .map(RolePermission::getPermissionId)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toSet())
+            .doOnNext(userPermissionIds -> LOG.debug("Menu query -> userPermissionIds loaded: {}", userPermissionIds));
 
         return Mono
             .zip(menusMono, menuPermissionsMono, permissionMapMono, userPermissionIdsMono)

@@ -1,5 +1,6 @@
 package com.atparui.rmsservice.tenant;
 
+import com.atparui.rmsservice.config.R2dbcProxyFactory;
 import io.r2dbc.spi.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,20 @@ public class TenantAwareDatabaseConfiguration {
 
     private final TenantConnectionFactoryProvider connectionFactoryProvider;
     private final BeanFactory beanFactory;
+    private final R2dbcProxyFactory r2dbcProxyFactory;
 
     /**
      * Constructor that receives BeanFactory to look up the auto-configured ConnectionFactory.
      * We use BeanFactory to avoid circular dependency issues.
      */
-    public TenantAwareDatabaseConfiguration(TenantConnectionFactoryProvider connectionFactoryProvider, BeanFactory beanFactory) {
+    public TenantAwareDatabaseConfiguration(
+        TenantConnectionFactoryProvider connectionFactoryProvider,
+        BeanFactory beanFactory,
+        R2dbcProxyFactory r2dbcProxyFactory
+    ) {
         this.connectionFactoryProvider = connectionFactoryProvider;
         this.beanFactory = beanFactory;
+        this.r2dbcProxyFactory = r2dbcProxyFactory;
         LOG.info("Multi-tenant database configuration enabled");
     }
 
@@ -51,7 +58,7 @@ public class TenantAwareDatabaseConfiguration {
         LOG.info("Creating tenant-aware ConnectionFactory");
 
         // Get the auto-configured ConnectionFactory (not the tenant-aware one)
-        ConnectionFactory defaultConnectionFactory = getDefaultConnectionFactory();
+        ConnectionFactory defaultConnectionFactory = r2dbcProxyFactory.wrap(getDefaultConnectionFactory());
 
         return new TenantAwareConnectionFactory(connectionFactoryProvider, defaultConnectionFactory);
     }
