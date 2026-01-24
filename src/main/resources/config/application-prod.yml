@@ -45,6 +45,8 @@ management:
       enabled: true
 
 spring:
+  reactor:
+    context-propagation: auto
   devtools:
     restart:
       enabled: false

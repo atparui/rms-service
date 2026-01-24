@@ -45,6 +45,8 @@ management:
       probability: 1.0 # report 100% of traces
 
 spring:
+  reactor:
+    context-propagation: auto
   devtools:
     restart:
       enabled: true
