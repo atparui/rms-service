@@ -107,11 +107,7 @@ server:
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
-logging:
-  level:
-    org.springframework.r2dbc.core: DEBUG
-    io.r2dbc.postgresql.QUERY: DEBUG
-    io.r2dbc.postgresql.PARAM: DEBUG
+
 
 # ===================================================================
 # JHipster specific properties
