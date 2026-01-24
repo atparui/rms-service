@@ -117,6 +117,12 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json,image/svg+xml
     min-response-size: 1024
 
+logging:
+  level:
+    org.springframework.r2dbc.core: DEBUG
+    io.r2dbc.postgresql.QUERY: DEBUG
+    io.r2dbc.postgresql.PARAM: DEBUG
+
 # ===================================================================
 # JHipster specific properties
 #
@@ -125,14 +131,17 @@ server:
 
 jhipster:
   # CORS is disabled on the microservice; the gateway handles CORS to avoid duplicate Access-Control-Allow-Origin headers.
+  cors:
+    allowed-origins: "https://rms-demo.atparui.com,http://localhost:9000,https://localhost:9000"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    exposed-headers: "Authorization,Link,X-Total-Count"
+    allow-credentials: true
+    max-age: 1800
   http:
     cache: # Used by the CachingHttpHeadersFilter
       timeToLiveInDays: 1461
   logging:
-  level:
-    org.springframework.r2dbc.core: DEBUG
-    io.r2dbc.postgresql.QUERY: DEBUG
-    io.r2dbc.postgresql.PARAM: DEBUG
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false
