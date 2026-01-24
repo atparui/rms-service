@@ -3,6 +3,7 @@ package com.atparui.rmsservice.config;
 import io.r2dbc.proxy.core.Binding;
 import io.r2dbc.proxy.core.Bindings;
 import io.r2dbc.proxy.core.BoundValue;
+import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
 import io.r2dbc.proxy.core.QueryInfo;
 import io.r2dbc.proxy.listener.ProxyExecutionListener;
@@ -19,6 +20,28 @@ import org.slf4j.LoggerFactory;
 public class R2dbcProxyQueryLoggingListener implements ProxyExecutionListener {
 
     private static final Logger LOG = LoggerFactory.getLogger("io.r2dbc.proxy.query");
+
+    @Override
+    public void beforeMethod(MethodExecutionInfo executionInfo) {
+        LOG.trace(
+            "R2DBC method before -> type: {}, method: {}, connectionId: {}",
+            executionInfo.getMethod(),
+            executionInfo.getTarget(),
+            executionInfo.getConnectionInfo() != null ? executionInfo.getConnectionInfo().getConnectionId() : "n/a"
+        );
+    }
+
+    @Override
+    public void afterMethod(MethodExecutionInfo executionInfo) {
+        LOG.trace(
+            "R2DBC method after -> type: {}, success: {}, durationMs: {}, method: {}, connectionId: {}",
+            executionInfo.getMethod(),
+            executionInfo.getThrown() == null,
+            executionInfo.getExecuteDuration().toMillis(),
+            executionInfo.getTarget(),
+            executionInfo.getConnectionInfo() != null ? executionInfo.getConnectionInfo().getConnectionId() : "n/a"
+        );
+    }
 
     @Override
     public void beforeQuery(QueryExecutionInfo executionInfo) {
