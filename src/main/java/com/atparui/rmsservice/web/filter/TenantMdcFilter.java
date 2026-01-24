@@ -1,6 +1,5 @@
 package com.atparui.rmsservice.web.filter;
 
-import com.atparui.rmsservice.tenant.MultiTenantProperties;
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -19,24 +18,15 @@ public class TenantMdcFilter implements WebFilter {
     private static final String MDC_TENANT_KEY = "tenantId";
     private static final String CTX_TENANT_KEY = "TENANT_ID";
 
-    private final MultiTenantProperties multiTenantProperties;
-
-    public TenantMdcFilter(MultiTenantProperties multiTenantProperties) {
-        this.multiTenantProperties = multiTenantProperties;
-    }
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String headerTenant = exchange.getRequest().getHeaders().getFirst("X-Tenant-ID");
-        String fallbackTenant = multiTenantProperties.getFallback() != null ? multiTenantProperties.getFallback().getDefaultTenantId() : "unknown";
 
         return chain
             .filter(exchange)
-            // ensure tenant is in Reactor context as well
-            .contextWrite(ctx ->
-                headerTenant != null && !headerTenant.isBlank() ? ctx.put(CTX_TENANT_KEY, headerTenant) : ctx.put(CTX_TENANT_KEY, fallbackTenant)
-            )
-            .doOnSubscribe(s -> setMdc(headerTenant != null ? headerTenant : fallbackTenant))
+            // ensure tenant is in Reactor context only when header is present
+            .contextWrite(ctx -> headerTenant != null && !headerTenant.isBlank() ? ctx.put(CTX_TENANT_KEY, headerTenant) : ctx)
+            .doOnSubscribe(s -> setMdc(headerTenant))
             .doOnEach(sig -> {
                 if (sig.isOnComplete() || sig.isOnError()) {
                     return;
@@ -44,9 +34,6 @@ public class TenantMdcFilter implements WebFilter {
                 String tid = headerTenant;
                 if (sig.getContextView().hasKey(CTX_TENANT_KEY)) {
                     tid = sig.getContextView().get(CTX_TENANT_KEY);
-                }
-                if (tid == null || tid.isBlank()) {
-                    tid = fallbackTenant;
                 }
                 setMdc(tid);
             })
