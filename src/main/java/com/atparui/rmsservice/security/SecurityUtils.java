@@ -123,12 +123,44 @@ public final class SecurityUtils {
         return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
     }
 
-    @SuppressWarnings("unchecked")
     private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
-        return (Collection<String>) claims.getOrDefault(
-            "groups",
-            claims.getOrDefault("roles", claims.getOrDefault(CLAIMS_NAMESPACE + "roles", new ArrayList<>()))
-        );
+        Collection<String> flat = new ArrayList<>();
+
+        // legacy/groups
+        Object groups = claims.get("groups");
+        if (groups instanceof Collection<?> c) {
+            c.forEach(v -> flat.add(String.valueOf(v)));
+        }
+
+        // roles at root or namespaced
+        Object roles = claims.getOrDefault("roles", claims.get(CLAIMS_NAMESPACE + "roles"));
+        if (roles instanceof Collection<?> c) {
+            c.forEach(v -> flat.add(String.valueOf(v)));
+        }
+
+        // realm_access.roles
+        Object realmAccess = claims.get("realm_access");
+        if (realmAccess instanceof Map<?, ?> ra) {
+            Object raRoles = ra.get("roles");
+            if (raRoles instanceof Collection<?> c) {
+                c.forEach(v -> flat.add(String.valueOf(v)));
+            }
+        }
+
+        // resource_access.<client>.roles (collect all client roles)
+        Object resourceAccess = claims.get("resource_access");
+        if (resourceAccess instanceof Map<?, ?> resMap) {
+            resMap.values().forEach(entry -> {
+                if (entry instanceof Map<?, ?> client) {
+                    Object clientRoles = client.get("roles");
+                    if (clientRoles instanceof Collection<?> c) {
+                        c.forEach(v -> flat.add(String.valueOf(v)));
+                    }
+                }
+            });
+        }
+
+        return flat;
     }
 
     private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
