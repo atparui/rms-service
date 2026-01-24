@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,7 +50,10 @@ public class AppMenuAccessService {
         return SecurityUtils
             .getCurrentUserRoles()
             .collectList()
-            .flatMap(roles -> getMenuTreeForRoles(roles, appKey));
+            .flatMap(roles -> {
+                LOG.debug("Menu tree requested. Roles from token: {}", roles);
+                return getMenuTreeForRoles(roles, appKey);
+            });
     }
 
     /**
@@ -59,6 +61,7 @@ public class AppMenuAccessService {
      */
     public Mono<List<AppMenuTreeDTO>> getMenuTreeForRoles(List<String> roles, String appKey) {
         List<String> effectiveRoles = roles == null || roles.isEmpty() ? List.of("ROLE_USER", "ROLE_ANONYMOUS") : roles;
+        LOG.debug("Menu tree resolution using roles: {}", effectiveRoles);
 
         Mono<List<AppMenu>> menusMono = appMenuRepository
             .findAll()
@@ -71,6 +74,7 @@ public class AppMenuAccessService {
 
         Mono<Set<UUID>> userPermissionIdsMono = rolePermissionService
             .findByRoles(effectiveRoles)
+            .doOnNext(rp -> LOG.debug("RolePermission match -> role: {}, permId: {}, active: {}", rp.getRole(), rp.getPermissionId(), rp.getIsActive()))
             .filter(rp -> rp.getPermissionId() != null)
             .filter(rp -> rp.getIsActive() == null || rp.getIsActive())
             .map(RolePermission::getPermissionId)
@@ -78,6 +82,13 @@ public class AppMenuAccessService {
 
         return Mono
             .zip(menusMono, menuPermissionsMono, permissionMapMono, userPermissionIdsMono)
+            .doOnNext(tuple -> {
+                LOG.debug("Menu query inputs -> roles: {}", effectiveRoles);
+                LOG.debug("Menu query inputs -> menus: {}", tuple.getT1().size());
+                LOG.debug("Menu query inputs -> menuPermissions: {}", tuple.getT2().size());
+                LOG.debug("Menu query inputs -> permissions: {}", tuple.getT3().size());
+                LOG.debug("Menu query inputs -> userPermissionIds: {}", tuple.getT4());
+            })
             .map(tuple -> buildTree(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()));
     }
 
@@ -103,6 +114,13 @@ public class AppMenuAccessService {
             })
             .collect(Collectors.toSet());
 
+        LOG.debug(
+            "Menu build context -> menus: {}, menuPermissions: {}, activeUserPermissionIds: {}",
+            menus.size(),
+            menuPermissions.size(),
+            activeUserPermissionIds
+        );
+
         Set<UUID> allowedMenuIds = new HashSet<>();
         Map<UUID, AppMenuTreeDTO> dtoMap = new HashMap<>();
 
@@ -115,6 +133,8 @@ public class AppMenuAccessService {
             AppMenuTreeDTO dto = toTreeDto(menu, requiredCodes);
             dtoMap.put(menu.getId(), dto);
         }
+
+        LOG.debug("Allowed menu ids after evaluation: {}", allowedMenuIds);
 
         List<AppMenuTreeDTO> roots = new ArrayList<>();
         for (AppMenu menu : menus) {
