@@ -27,6 +27,7 @@ logging:
     org.springframework.data.r2dbc.repository.query: DEBUG
     io.r2dbc.postgresql.QUERY: DEBUG
     io.r2dbc.postgresql.PARAM: DEBUG
+    io.r2dbc.pool: WARN
 
 management:
   endpoints:

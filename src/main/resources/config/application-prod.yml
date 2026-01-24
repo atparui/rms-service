@@ -24,6 +24,7 @@ logging:
     org.springframework.r2dbc.core: DEBUG
     io.r2dbc.postgresql.QUERY: DEBUG
     io.r2dbc.postgresql.PARAM: DEBUG
+    io.r2dbc.pool: WARN
 
 management:
   prometheus:
