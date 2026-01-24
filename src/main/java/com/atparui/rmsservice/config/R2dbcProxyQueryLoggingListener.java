@@ -23,22 +23,24 @@ public class R2dbcProxyQueryLoggingListener implements ProxyExecutionListener {
     @Override
     public void beforeQuery(QueryExecutionInfo executionInfo) {
         LOG.debug(
-            "R2DBC before -> type: {}, batchSize: {}, queries: {}, bindings: {}",
+            "R2DBC before -> type: {}, batchSize: {}, queries: {}, bindings: {}, connId: {}",
             executionInfo.getType(),
             executionInfo.getBatchSize(),
             renderQueries(executionInfo),
-            renderBindings(executionInfo)
+            renderBindings(executionInfo),
+            executionInfo.getConnectionInfo() != null ? executionInfo.getConnectionInfo().getConnectionId() : "n/a"
         );
     }
 
     @Override
     public void afterQuery(QueryExecutionInfo executionInfo) {
         LOG.debug(
-            "R2DBC after -> success: {}, durationMs: {}, queries: {}, bindings: {}",
+            "R2DBC after -> success: {}, durationMs: {}, queries: {}, bindings: {}, connId: {}",
             executionInfo.isSuccess(),
             executionInfo.getExecuteDuration().toMillis(),
             renderQueries(executionInfo),
-            renderBindings(executionInfo)
+            renderBindings(executionInfo),
+            executionInfo.getConnectionInfo() != null ? executionInfo.getConnectionInfo().getConnectionId() : "n/a"
         );
     }
 

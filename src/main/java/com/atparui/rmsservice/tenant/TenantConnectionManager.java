@@ -50,7 +50,7 @@ public class TenantConnectionManager {
         // Check cache first
         ConnectionFactory cached = connectionFactoryCache.get(tenantId);
         if (cached != null) {
-            LOG.debug("Retrieved connection factory from cache for tenant: {}", tenantId);
+            LOG.debug("[TENANT-FACTORY] Cache hit for tenant {} -> {}", tenantId, cached.getClass().getName());
             return Mono.just(cached);
         }
 
@@ -61,7 +61,7 @@ public class TenantConnectionManager {
                 try {
                     ConnectionFactory factory = createConnectionFactory(config);
                     connectionFactoryCache.put(tenantId, factory);
-                    LOG.info("Created and cached connection factory for tenant: {}", tenantId);
+                    LOG.info("[TENANT-FACTORY] Created and cached factory for tenant {} -> {}", tenantId, factory.getClass().getName());
                     return Mono.just(factory);
                 } catch (Exception e) {
                     LOG.error("Failed to create connection factory for tenant {}: {}", tenantId, e.getMessage(), e);

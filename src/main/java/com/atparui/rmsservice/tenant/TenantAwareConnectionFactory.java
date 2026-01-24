@@ -87,9 +87,21 @@ public class TenantAwareConnectionFactory implements ConnectionFactory {
         Mono<Connection> connectionMono = Mono.from(connectionFactoryProvider.getConnectionFactory())
             .switchIfEmpty(Mono.just(defaultConnectionFactory))
             .flatMap(factory -> {
-                LOG.debug("Creating connection using tenant-specific factory");
+                LOG.debug(
+                    "[TENANT-FACTORY] Using ConnectionFactory: {} (class: {})",
+                    factory,
+                    factory.getClass().getName()
+                );
                 Publisher<? extends Connection> publisher = factory.create();
-                return (Mono<Connection>) Mono.from(publisher);
+                return (Mono<Connection>) Mono
+                    .from(publisher)
+                    .doOnNext(connection -> LOG.debug(
+                        "[TENANT-FACTORY] Obtained connection {} (class: {}) via factory {} (class: {})",
+                        connection,
+                        connection.getClass().getName(),
+                        factory,
+                        factory.getClass().getName()
+                    ));
             })
             .onErrorResume(error -> {
                 LOG.error("Error creating tenant-specific connection, falling back to default: {}", error.getMessage());
