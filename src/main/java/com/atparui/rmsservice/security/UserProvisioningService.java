@@ -57,27 +57,41 @@ public class UserProvisioningService {
         Mono<Void> ensureJhiUser = userRepository.findOneByLogin(username).hasElement()
             .flatMap(exists -> exists ? Mono.<Void>empty() : userService.getUserFromAuthentication(authToken).then());
 
-        Mono<Void> ensureRmsUser = rmsUserRepository
-            .findByExternalUserId(externalUserId)
-            .hasElement()
-            .flatMap(exists -> {
-                if (exists) {
-                    return Mono.empty();
-                }
-                RmsUser rmsUser = new RmsUser();
-                rmsUser.setId(UUID.randomUUID());
-                rmsUser.setExternalUserId(externalUserId);
-                rmsUser.setUsername(username);
-                rmsUser.setEmail(email);
-                rmsUser.setFirstName(firstName);
-                rmsUser.setLastName(lastName);
-                rmsUser.setDisplayName(displayName);
-                rmsUser.setProfileImageUrl(imageUrl);
-                rmsUser.setIsActive(Boolean.TRUE);
-                rmsUser.setLastSyncAt(Instant.now());
-                rmsUser.setSyncStatus("SYNCED");
-                return rmsUserRepository.save(rmsUser).then();
-            });
+        Mono<Void> ensureRmsUser = Mono.defer(() ->
+            rmsUserRepository
+                .findByExternalUserId(externalUserId)
+                .flatMap(existing -> {
+                    LOG.debug("RMS user already exists for externalUserId={}, skipping insert", externalUserId);
+                    return Mono.<Void>empty();
+                })
+                .switchIfEmpty(
+                    Mono.defer(() -> {
+                        RmsUser rmsUser = new RmsUser();
+                        rmsUser.setId(UUID.randomUUID());
+                        rmsUser.setExternalUserId(externalUserId);
+                        rmsUser.setUsername(username);
+                        rmsUser.setEmail(email);
+                        rmsUser.setFirstName(firstName);
+                        rmsUser.setLastName(lastName);
+                        rmsUser.setDisplayName(displayName);
+                        rmsUser.setProfileImageUrl(imageUrl);
+                        rmsUser.setIsActive(Boolean.TRUE);
+                        rmsUser.setLastSyncAt(Instant.now());
+                        rmsUser.setSyncStatus("SYNCED");
+                        return rmsUserRepository
+                            .save(rmsUser)
+                            .doOnSuccess(saved -> LOG.debug("Provisioned RMS user for externalUserId={}", externalUserId))
+                            .onErrorResume(
+                                ex -> {
+                                    // Ignore duplicate errors in case of race/previous manual inserts
+                                    LOG.warn("Provision RMS user skipped due to insert error for {}: {}", externalUserId, ex.getMessage());
+                                    return Mono.empty();
+                                }
+                            )
+                            .then();
+                    })
+                )
+        );
 
         return Mono.when(ensureJhiUser, ensureRmsUser)
             .onErrorResume(ex -> {

@@ -36,6 +36,7 @@ public class TenantContextFilter implements WebFilter {
 
         // Try to get tenant ID from header first (Option 1)
         final String headerTenantId = exchange.getRequest().getHeaders().getFirst(multiTenantProperties.getTenantIdHeader());
+        LOG.debug("TenantContextFilter incoming headers X-Tenant-ID: {}", headerTenantId);
 
         // If not found in header, try JWT claim (Option 2 - fallback)
         if (headerTenantId == null || headerTenantId.isBlank()) {
