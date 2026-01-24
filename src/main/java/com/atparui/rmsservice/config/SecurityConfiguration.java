@@ -6,6 +6,7 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 
 import com.atparui.rmsservice.security.AuthoritiesConstants;
 import com.atparui.rmsservice.security.SecurityUtils;
+import com.atparui.rmsservice.web.filter.UserProvisioningFilter;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
@@ -38,9 +40,11 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
+    private final UserProvisioningFilter userProvisioningFilter;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, UserProvisioningFilter userProvisioningFilter) {
         this.jHipsterProperties = jHipsterProperties;
+        this.userProvisioningFilter = userProvisioningFilter;
     }
 
     @Bean
@@ -82,7 +86,8 @@ public class SecurityConfiguration {
                     .pathMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
             )
             .oauth2Client(withDefaults())
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+            .addFilterAfter(userProvisioningFilter, SecurityWebFiltersOrder.AUTHENTICATION);
         return http.build();
     }
 
