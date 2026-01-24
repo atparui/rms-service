@@ -22,13 +22,14 @@ logging:
     org.springframework.kafka: INFO
     com.atparui.rmsservice: DEBUG
     com.atparui.rmsservice.broker: INFO
-    io.r2dbc.proxy.query: DEBUG
+    io.r2dbc.proxy.query: TRACE
     org.springframework.data.r2dbc: TRACE
     org.springframework.data.r2dbc.core: TRACE
     org.springframework.data.r2dbc.repository.query: TRACE
     io.r2dbc.postgresql.QUERY: TRACE
     io.r2dbc.postgresql.PARAM: TRACE
     io.r2dbc.pool: WARN
+    com.atparui.rmsservice.dbclient.menu: DEBUG
 
 management:
   endpoints:

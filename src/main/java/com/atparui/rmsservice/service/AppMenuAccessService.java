@@ -81,17 +81,20 @@ public class AppMenuAccessService {
             .filter(menu -> Boolean.TRUE.equals(menu.getIsActive()))
             .filter(menu -> appKey == null || appKey.isBlank() || menu.getAppKey() == null || appKey.equalsIgnoreCase(menu.getAppKey()))
             .collectList()
-            .doOnNext(menus -> LOG.debug("Menu query -> menus loaded: {}", menus));
+            .doOnNext(menus -> LOG.debug("Menu query -> menus loaded: {}", menus))
+            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing menus fetch"));
 
         Mono<List<MenuPermission>> menuPermissionsMono = menuPermissionRepository
             .findAll()
             .collectList()
-            .doOnNext(menuPermissions -> LOG.debug("Menu query -> menuPermissions loaded: {}", menuPermissions));
+            .doOnNext(menuPermissions -> LOG.debug("Menu query -> menuPermissions loaded: {}", menuPermissions))
+            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing menuPermissions fetch"));
 
         Mono<Map<UUID, Permission>> permissionMapMono = permissionRepository
             .findAll()
             .collectMap(Permission::getId)
-            .doOnNext(permissionMap -> LOG.debug("Menu query -> permissions loaded (by id): {}", permissionMap));
+            .doOnNext(permissionMap -> LOG.debug("Menu query -> permissions loaded (by id): {}", permissionMap))
+            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing permissions fetch"));
 
         Mono<Set<UUID>> userPermissionIdsMono = rolePermissionService
             .findByRoles(effectiveRoles)
@@ -100,7 +103,8 @@ public class AppMenuAccessService {
             .filter(rp -> rp.getIsActive() == null || rp.getIsActive())
             .map(RolePermission::getPermissionId)
             .collect(Collectors.toSet())
-            .doOnNext(userPermissionIds -> LOG.debug("Menu query -> userPermissionIds loaded: {}", userPermissionIds));
+            .doOnNext(userPermissionIds -> LOG.debug("Menu query -> userPermissionIds loaded: {}", userPermissionIds))
+            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing rolePermission fetch"));
 
         return Mono
             .zip(menusMono, menuPermissionsMono, permissionMapMono, userPermissionIdsMono)
