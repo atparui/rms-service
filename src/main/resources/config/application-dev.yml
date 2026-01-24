@@ -22,6 +22,9 @@ logging:
     org.springframework.kafka: INFO
     com.atparui.rmsservice: DEBUG
     com.atparui.rmsservice.broker: INFO
+    org.springframework.r2dbc.core: DEBUG
+    io.r2dbc.postgresql.QUERY: DEBUG
+    io.r2dbc.postgresql.PARAM: DEBUG
 
 management:
   endpoints:

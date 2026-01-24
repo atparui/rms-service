@@ -119,6 +119,9 @@ server:
 
 logging:
   level:
+    ROOT: INFO
+    tech.jhipster: INFO
+    com.atparui.rmsservice: INFO
     org.springframework.r2dbc.core: DEBUG
     io.r2dbc.postgresql.QUERY: DEBUG
     io.r2dbc.postgresql.PARAM: DEBUG
