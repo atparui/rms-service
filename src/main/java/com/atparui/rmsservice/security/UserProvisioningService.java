@@ -1,19 +1,21 @@
 package com.atparui.rmsservice.security;
 
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
+
 import com.atparui.rmsservice.domain.RmsUser;
 import com.atparui.rmsservice.repository.RmsUserRepository;
 import com.atparui.rmsservice.repository.UserRepository;
 import com.atparui.rmsservice.service.UserService;
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -35,7 +37,7 @@ public class UserProvisioningService {
         this.userService = userService;
     }
 
-    public Mono<Void> provisionIfNeeded(Authentication authentication) {
+    public Mono<Void> provisionIfNeeded(org.springframework.security.core.Authentication authentication) {
         if (!(authentication instanceof AbstractAuthenticationToken authToken)) {
             return Mono.empty();
         }
@@ -54,8 +56,17 @@ public class UserProvisioningService {
             return Mono.empty();
         }
 
-        Mono<Void> ensureJhiUser = userRepository.findOneByLogin(username).hasElement()
-            .flatMap(exists -> exists ? Mono.<Void>empty() : userService.getUserFromAuthentication(authToken).then());
+        String userId = externalUserId;
+
+        Mono<Void> ensureJhiUser = userRepository
+            .findById(userId)
+            .switchIfEmpty(userRepository.findOneByLogin(username))
+            .hasElement()
+            .flatMap(exists -> exists ? Mono.<Void>empty() : userService.getUserFromAuthentication(authToken).then())
+            .onErrorResume(ex -> {
+                LOG.warn("Provision jhi_user skipped due to error for {}: {}", username, ex.getMessage());
+                return Mono.empty();
+            });
 
         Mono<Void> ensureRmsUser = Mono.defer(() ->
             rmsUserRepository
