@@ -111,13 +111,7 @@ server:
 # ===================================================================
 
 jhipster:
-  cors:
-    allowed-origins: "https://rms-demo.atparui.com,http://localhost:9000,https://localhost:9000"
-    allowed-methods: "*"
-    allowed-headers: "*"
-    exposed-headers: "Authorization,Link,X-Total-Count"
-    allow-credentials: true
-    max-age: 1800
+  # CORS is disabled on the microservice; the gateway handles CORS to avoid duplicate Access-Control-Allow-Origin headers.
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
