@@ -159,7 +159,7 @@ public class UserService {
             return saveUser(user, true);
         }
         
-        User existingUser = existingUserOpt.get();
+        User existingUser = existingUserOpt.orElseThrow();
         
         // if IdP sends last updated information, use it to determine if an update should happen
         if (details.get("updated_at") != null) {

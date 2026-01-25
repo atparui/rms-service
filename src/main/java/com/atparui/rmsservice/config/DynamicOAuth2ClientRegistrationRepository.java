@@ -65,7 +65,7 @@ public class DynamicOAuth2ClientRegistrationRepository implements ClientRegistra
             return null;
         }
 
-        String tenantId = tenantIdOpt.get();
+        String tenantId = tenantIdOpt.orElseThrow();
         String clientType = getClientTypeFromContext().blockOptional().orElse("web");
         
         return resolveClientRegistration(tenantId, clientType);
