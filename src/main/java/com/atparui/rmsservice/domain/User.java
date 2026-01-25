@@ -2,6 +2,15 @@ package com.atparui.rmsservice.domain;
 
 import com.atparui.rmsservice.config.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.BatchSize;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -9,25 +18,23 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A user.
  */
-@Table("jhi_user")
+@Entity
+@Table(name = "jhi_user")
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "user")
-public class User extends AbstractAuditingEntity<String> implements Serializable, Persistable<String> {
+public class User extends AbstractAuditingEntity<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
+    @Column(name = "id")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
     private String id;
 
     @NotNull
@@ -36,11 +43,11 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     private String login;
 
     @Size(max = 50)
-    @Column("first_name")
+    @Column(name = "first_name")
     private String firstName;
 
     @Size(max = 50)
-    @Column("last_name")
+    @Column(name = "last_name")
     private String lastName;
 
     @Email
@@ -51,19 +58,22 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     private boolean activated = false;
 
     @Size(min = 2, max = 10)
-    @Column("lang_key")
+    @Column(name = "lang_key")
     private String langKey;
 
     @Size(max = 256)
-    @Column("image_url")
+    @Column(name = "image_url")
     private String imageUrl;
 
     @JsonIgnore
-    @org.springframework.data.annotation.Transient
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "jhi_user_authority",
+        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
+        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
+    )
+    @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
-
-    @org.springframework.data.annotation.Transient
-    private boolean isPersisted;
 
     public String getId() {
         return id;
@@ -139,16 +149,6 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     }
 
     @Override
-    public boolean isNew() {
-        return !isPersisted;
-    }
-
-    public User setIsPersisted() {
-        this.isPersisted = true;
-        return this;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -161,8 +161,7 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(getId());
     }
 
     // prettier-ignore
