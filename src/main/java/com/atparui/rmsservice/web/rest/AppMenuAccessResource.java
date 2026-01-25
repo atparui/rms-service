@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 /**
  * REST controller to fetch menu tree filtered by permissions.
@@ -33,8 +32,8 @@ public class AppMenuAccessResource {
      * @param appKey optional application key to filter menus for specific client
      */
     @GetMapping("/tree")
-    public Mono<ResponseEntity<List<AppMenuTreeDTO>>> getMenuTree(@RequestParam(value = "appKey", required = false) String appKey) {
+    public ResponseEntity<List<AppMenuTreeDTO>> getMenuTree(@RequestParam(value = "appKey", required = false) String appKey) {
         LOG.debug("REST request to get app menu tree for appKey {}", appKey);
-        return appMenuAccessService.getMenuTreeForCurrentUser(appKey).map(ResponseEntity::ok);
+        return ResponseEntity.ok(appMenuAccessService.getMenuTreeForCurrentUser(appKey));
     }
 }

@@ -1,38 +1,40 @@
 package com.atparui.rmsservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Link between a menu and required permissions.
  */
-@Table("menu_permission")
+@Entity
+@Table(name = "menu_permission")
 @JsonIgnoreProperties(value = { "new" })
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "menupermission")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class MenuPermission implements Serializable, Persistable<UUID> {
+public class MenuPermission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
-    @Column("app_menu_id")
+    @Column(name = "app_menu_id")
     private UUID appMenuId;
 
     @NotNull(message = "must not be null")
-    @Column("permission_id")
+    @Column(name = "permission_id")
     private UUID permissionId;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -74,12 +76,6 @@ public class MenuPermission implements Serializable, Persistable<UUID> {
     public MenuPermission permissionId(UUID permissionId) {
         this.setPermissionId(permissionId);
         return this;
-    }
-
-    @org.springframework.data.annotation.Transient
-    @Override
-    public boolean isNew() {
-        return !this.isPersisted;
     }
 
     public MenuPermission setIsPersisted() {

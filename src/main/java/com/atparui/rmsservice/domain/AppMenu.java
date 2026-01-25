@@ -1,80 +1,82 @@
 package com.atparui.rmsservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Application navigation menu with hierarchical structure and permission logic.
  */
-@Table("app_menu")
+@Entity
+@Table(name = "app_menu")
 @JsonIgnoreProperties(value = { "new" })
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "appmenu")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class AppMenu implements Serializable, Persistable<UUID> {
+public class AppMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("menu_key")
+    @Column(name = "menu_key")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String menuKey;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("label")
+    @Column(name = "label")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String label;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("type")
+    @Column(name = "type")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String type;
 
     @Size(max = 500)
-    @Column("route_path")
+    @Column(name = "route_path")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String routePath;
 
     @Size(max = 100)
-    @Column("icon")
+    @Column(name = "icon")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String icon;
 
-    @Column("sort_order")
+    @Column(name = "sort_order")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
     private Integer sortOrder;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean isActive;
 
     @NotNull(message = "must not be null")
     @Size(max = 10)
-    @Column("permission_logic")
+    @Column(name = "permission_logic")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String permissionLogic;
 
     @Size(max = 50)
-    @Column("app_key")
+    @Column(name = "app_key")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String appKey;
 
-    @Column("parent_id")
+    @Column(name = "parent_id")
     private UUID parentId;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -220,12 +222,6 @@ public class AppMenu implements Serializable, Persistable<UUID> {
     public AppMenu parentId(UUID parentId) {
         this.setParentId(parentId);
         return this;
-    }
-
-    @org.springframework.data.annotation.Transient
-    @Override
-    public boolean isNew() {
-        return !this.isPersisted;
     }
 
     public AppMenu setIsPersisted() {

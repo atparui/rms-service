@@ -1,5 +1,14 @@
 package com.atparui.rmsservice.service;
 
+import com.atparui.rmsservice.domain.AppMenu;
+import com.atparui.rmsservice.domain.MenuPermission;
+import com.atparui.rmsservice.domain.Permission;
+import com.atparui.rmsservice.domain.RolePermission;
+import com.atparui.rmsservice.repository.AppMenuRepository;
+import com.atparui.rmsservice.repository.MenuPermissionRepository;
+import com.atparui.rmsservice.repository.PermissionRepository;
+import com.atparui.rmsservice.security.SecurityUtils;
+import com.atparui.rmsservice.service.dto.AppMenuTreeDTO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,23 +21,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.atparui.rmsservice.domain.AppMenu;
-import com.atparui.rmsservice.domain.MenuPermission;
-import com.atparui.rmsservice.domain.Permission;
-import com.atparui.rmsservice.domain.RolePermission;
-import com.atparui.rmsservice.repository.AppMenuRepository;
-import com.atparui.rmsservice.repository.MenuPermissionRepository;
-import com.atparui.rmsservice.repository.PermissionRepository;
-import com.atparui.rmsservice.security.SecurityUtils;
-import com.atparui.rmsservice.service.dto.AppMenuTreeDTO;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Service to assemble the menu tree filtered by permissions.
@@ -59,63 +55,50 @@ public class AppMenuAccessService {
     /**
      * Build menu tree for the current authenticated user.
      */
-    public Mono<List<AppMenuTreeDTO>> getMenuTreeForCurrentUser(String appKey) {
-        return SecurityUtils
-            .getCurrentUserRoles()
-            .collectList()
-            .flatMap(roles -> {
-                LOG.debug("Menu tree requested. Roles from token: {}", roles);
-                return getMenuTreeForRoles(roles, appKey);
-            });
+    public List<AppMenuTreeDTO> getMenuTreeForCurrentUser(String appKey) {
+        List<String> roles = SecurityUtils.getCurrentUserRoles();
+        LOG.debug("Menu tree requested. Roles from token: {}", roles);
+        return getMenuTreeForRoles(roles, appKey);
     }
 
     /**
      * Build menu tree for provided roles.
      */
-    public Mono<List<AppMenuTreeDTO>> getMenuTreeForRoles(List<String> roles, String appKey) {
+    public List<AppMenuTreeDTO> getMenuTreeForRoles(List<String> roles, String appKey) {
         List<String> effectiveRoles = roles == null || roles.isEmpty() ? List.of("ROLE_USER", "ROLE_ANONYMOUS") : roles;
         LOG.debug("Menu tree resolution using roles: {}", effectiveRoles);
 
-        Mono<List<AppMenu>> menusMono = appMenuRepository
+        List<AppMenu> menus = appMenuRepository
             .findAll()
+            .stream()
             .filter(menu -> Boolean.TRUE.equals(menu.getIsActive()))
             .filter(menu -> appKey == null || appKey.isBlank() || menu.getAppKey() == null || appKey.equalsIgnoreCase(menu.getAppKey()))
-            .collectList()
-            .doOnNext(menus -> LOG.debug("Menu query -> menus loaded: {}", menus))
-            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing menus fetch"));
+            .toList();
+        LOG.debug("Menu query -> menus loaded: {}", menus);
 
-        Mono<List<MenuPermission>> menuPermissionsMono = menuPermissionRepository
-            .findAll()
-            .collectList()
-            .doOnNext(menuPermissions -> LOG.debug("Menu query -> menuPermissions loaded: {}", menuPermissions))
-            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing menuPermissions fetch"));
+        List<MenuPermission> menuPermissions = menuPermissionRepository.findAll();
+        LOG.debug("Menu query -> menuPermissions loaded: {}", menuPermissions);
 
-        Mono<Map<UUID, Permission>> permissionMapMono = permissionRepository
-            .findAll()
-            .collectMap(Permission::getId)
-            .doOnNext(permissionMap -> LOG.debug("Menu query -> permissions loaded (by id): {}", permissionMap))
-            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing permissions fetch"));
+        Map<UUID, Permission> permissionMap = permissionRepository.findAll().stream().collect(Collectors.toMap(Permission::getId, p -> p));
+        LOG.debug("Menu query -> permissions loaded (by id): {}", permissionMap);
 
-        Mono<Set<UUID>> userPermissionIdsMono = rolePermissionService
+        Set<UUID> userPermissionIds = rolePermissionService
             .findByRoles(effectiveRoles)
-            .doOnNext(rp -> LOG.debug("RolePermission match -> role: {}, permId: {}, active: {}", rp.getRole(), rp.getPermissionId(), rp.getIsActive()))
+            .stream()
+            .peek(rp -> LOG.debug("RolePermission match -> role: {}, permId: {}, active: {}", rp.getRole(), rp.getPermissionId(), rp.getIsActive()))
             .filter(rp -> rp.getPermissionId() != null)
             .filter(rp -> rp.getIsActive() == null || rp.getIsActive())
             .map(RolePermission::getPermissionId)
-            .collect(Collectors.toSet())
-            .doOnNext(userPermissionIds -> LOG.debug("Menu query -> userPermissionIds loaded: {}", userPermissionIds))
-            .doOnSubscribe(sub -> LOG.debug("Menu query -> executing rolePermission fetch"));
+            .collect(Collectors.toSet());
+        LOG.debug("Menu query -> userPermissionIds loaded: {}", userPermissionIds);
 
-        return Mono
-            .zip(menusMono, menuPermissionsMono, permissionMapMono, userPermissionIdsMono)
-            .doOnNext(tuple -> {
-                LOG.debug("Menu query inputs -> roles: {}", effectiveRoles);
-                LOG.debug("Menu query inputs -> menus: {}", tuple.getT1().size());
-                LOG.debug("Menu query inputs -> menuPermissions: {}", tuple.getT2().size());
-                LOG.debug("Menu query inputs -> permissions: {}", tuple.getT3().size());
-                LOG.debug("Menu query inputs -> userPermissionIds: {}", tuple.getT4());
-            })
-            .map(tuple -> buildTree(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()));
+        LOG.debug("Menu query inputs -> roles: {}", effectiveRoles);
+        LOG.debug("Menu query inputs -> menus: {}", menus.size());
+        LOG.debug("Menu query inputs -> menuPermissions: {}", menuPermissions.size());
+        LOG.debug("Menu query inputs -> permissions: {}", permissionMap.size());
+        LOG.debug("Menu query inputs -> userPermissionIds: {}", userPermissionIds);
+
+        return buildTree(menus, menuPermissions, permissionMap, userPermissionIds);
     }
 
     private List<AppMenuTreeDTO> buildTree(
