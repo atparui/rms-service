@@ -7,14 +7,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A TableAssignment.
  */
-@Table("table_assignment")
+@Entity
+@Table(name = "table_assignment")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TableAssignment implements Serializable, Persistable<UUID> {
@@ -22,20 +24,20 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
-    @Column("assignment_date")
+    @Column(name = "assignment_date")
     private LocalDate assignmentDate;
 
-    @Column("start_time")
+    @Column(name = "start_time")
     private Instant startTime;
 
-    @Column("end_time")
+    @Column(name = "end_time")
     private Instant endTime;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -52,13 +54,13 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private RmsUser supervisor;
 
-    @Column("branch_table_id")
+    @Column(name = "branch_table_id")
     private UUID branchTableId;
 
-    @Column("shift_id")
+    @Column(name = "shift_id")
     private UUID shiftId;
 
-    @Column("supervisor_id")
+    @Column(name = "supervisor_id")
     private UUID supervisorId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

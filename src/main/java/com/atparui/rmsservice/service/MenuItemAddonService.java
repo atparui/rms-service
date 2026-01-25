@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.MenuItemAddon;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.MenuItemAddonRepository;
 import com.atparui.rmsservice.service.dto.MenuItemAddonDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.MenuItemAddon}.
  */
@@ -28,91 +31,57 @@ public class MenuItemAddonService {
         this.menuItemAddonRepository = menuItemAddonRepository;
         this.menuItemAddonMapper = menuItemAddonMapper;
     }
-
-    /**
-     * Save a menuItemAddon.
-     *
-     * @param menuItemAddonDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemAddonDTO> save(MenuItemAddonDTO menuItemAddonDTO) {
+    @Transactional
+    public Optional<MenuItemAddonDTO> save(MenuItemAddonDTO menuItemAddonDTO) {
         LOG.debug("Request to save MenuItemAddon : {}", menuItemAddonDTO);
-        return menuItemAddonRepository.save(menuItemAddonMapper.toEntity(menuItemAddonDTO)).map(menuItemAddonMapper::toDto);
+        MenuItemAddon menuItemAddon = menuItemAddonMapper.toEntity(menuItemAddonDTO);
+        menuItemAddon = menuItemAddonRepository.save(menuItemAddon);
+        return Optional.of(menuItemAddonMapper.toDto(menuItemAddon));
     }
 
-    /**
-     * Update a menuItemAddon.
-     *
-     * @param menuItemAddonDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemAddonDTO> update(MenuItemAddonDTO menuItemAddonDTO) {
+    @Transactional
+    public Optional<MenuItemAddonDTO> update(MenuItemAddonDTO menuItemAddonDTO) {
         LOG.debug("Request to update MenuItemAddon : {}", menuItemAddonDTO);
-        return menuItemAddonRepository
-            .save(menuItemAddonMapper.toEntity(menuItemAddonDTO).setIsPersisted())
-            .map(menuItemAddonMapper::toDto);
+        MenuItemAddon menuItemAddon = menuItemAddonMapper.toEntity(menuItemAddonDTO);
+        menuItemAddon = menuItemAddonRepository.save(menuItemAddon);
+        return Optional.of(menuItemAddonMapper.toDto(menuItemAddon));
     }
 
-    /**
-     * Partially update a menuItemAddon.
-     *
-     * @param menuItemAddonDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemAddonDTO> partialUpdate(MenuItemAddonDTO menuItemAddonDTO) {
+    @Transactional
+    public Optional<MenuItemAddonDTO> partialUpdate(MenuItemAddonDTO menuItemAddonDTO) {
         LOG.debug("Request to partially update MenuItemAddon : {}", menuItemAddonDTO);
-
         return menuItemAddonRepository
             .findById(menuItemAddonDTO.getId())
             .map(existingMenuItemAddon -> {
                 menuItemAddonMapper.partialUpdate(existingMenuItemAddon, menuItemAddonDTO);
-
-                return existingMenuItemAddon;
+                return menuItemAddonRepository.save(existingMenuItemAddon);
             })
-            .flatMap(menuItemAddonRepository::save)
             .map(menuItemAddonMapper::toDto);
     }
 
-    /**
-     * Get all the menuItemAddons.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<MenuItemAddonDTO> findAll() {
+    public List<MenuItemAddonDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all MenuItemAddons");
-        return menuItemAddonRepository.findAll().map(menuItemAddonMapper::toDto);
+        Page<MenuItemAddon> page = menuItemAddonRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(menuItemAddonMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of menuItemAddons available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return menuItemAddonRepository.count();
     }
 
-    /**
-     * Get one menuItemAddon by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<MenuItemAddonDTO> findOne(UUID id) {
+    public Optional<MenuItemAddonDTO> findOne(UUID id) {
         LOG.debug("Request to get MenuItemAddon : {}", id);
         return menuItemAddonRepository.findById(id).map(menuItemAddonMapper::toDto);
     }
 
-    /**
-     * Delete the menuItemAddon by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete MenuItemAddon : {}", id);
-        return menuItemAddonRepository.deleteById(id);
+        menuItemAddonRepository.deleteById(id);
     }
 }

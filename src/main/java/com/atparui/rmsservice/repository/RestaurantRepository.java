@@ -2,41 +2,32 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.Restaurant;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the Restaurant entity.
+ * Spring Data JPA repository for the Restaurant entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface RestaurantRepository extends ReactiveCrudRepository<Restaurant, UUID>, RestaurantRepositoryInternal {
-    Flux<Restaurant> findAllBy(Pageable pageable);
+@JaversSpringDataAuditable
+public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
+    List<Restaurant> findAllBy(Pageable pageable);
 
     @Override
-    <S extends Restaurant> Mono<S> save(S entity);
+    <S extends Restaurant> S save(S entity);
 
     @Override
-    Flux<Restaurant> findAll();
+    List<Restaurant> findAll();
 
     @Override
-    Mono<Restaurant> findById(UUID id);
+    Optional<Restaurant> findById(UUID id);
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    void deleteById(UUID id);
 }
 
-interface RestaurantRepositoryInternal {
-    <S extends Restaurant> Mono<S> save(S entity);
-
-    Flux<Restaurant> findAllBy(Pageable pageable);
-
-    Flux<Restaurant> findAll();
-
-    Mono<Restaurant> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<Restaurant> findAllBy(Pageable pageable, Criteria criteria);
-}

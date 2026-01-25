@@ -37,7 +37,7 @@ jdl/
 
 2. **Node.js** (v18 or higher)
 
-3. **Java 21** and **Maven** configured
+3. **Java 25** and **Maven** configured
 
 4. **PostgreSQL** database running (for Liquibase migrations)
 

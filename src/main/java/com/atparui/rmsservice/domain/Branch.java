@@ -6,113 +6,92 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Branch.
  */
-@Table("branch")
+@Entity
+@Table(name = "branch")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "branch")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Branch implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "name")
     private String name;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "code")
     private String code;
 
-    @Column("description")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "description")
     private String description;
 
     @Size(max = 255)
-    @Column("contact_email")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "contact_email")
     private String contactEmail;
 
     @Size(max = 20)
-    @Column("contact_phone")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "contact_phone")
     private String contactPhone;
 
     @Size(max = 255)
-    @Column("address_line_1")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "address_line_1")
     private String addressLine1;
 
     @Size(max = 255)
-    @Column("address_line_2")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "address_line_2")
     private String addressLine2;
 
     @Size(max = 100)
-    @Column("city")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "city")
     private String city;
 
     @Size(max = 100)
-    @Column("state")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "state")
     private String state;
 
     @Size(max = 100)
-    @Column("country")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "country")
     private String country;
 
     @Size(max = 20)
-    @Column("postal_code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "postal_code")
     private String postalCode;
 
-    @Column("latitude")
+    @Column(name = "latitude")
     private BigDecimal latitude;
 
-    @Column("longitude")
+    @Column(name = "longitude")
     private BigDecimal longitude;
 
-    @Column("opening_time")
-    @org.springframework.data.elasticsearch.annotations.Field(
-        type = org.springframework.data.elasticsearch.annotations.FieldType.Date,
-        format = org.springframework.data.elasticsearch.annotations.DateFormat.hour_minute_second_millis
-    )
+    @Column(name = "opening_time")
     private LocalTime openingTime;
 
-    @Column("closing_time")
-    @org.springframework.data.elasticsearch.annotations.Field(
-        type = org.springframework.data.elasticsearch.annotations.FieldType.Date,
-        format = org.springframework.data.elasticsearch.annotations.DateFormat.hour_minute_second_millis
-    )
+    @Column(name = "closing_time")
     private LocalTime closingTime;
 
     @Size(max = 50)
-    @Column("timezone")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "timezone")
     private String timezone;
 
-    @Column("max_capacity")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "max_capacity")
     private Integer maxCapacity;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -121,7 +100,7 @@ public class Branch implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private Restaurant restaurant;
 
-    @Column("restaurant_id")
+    @Column(name = "restaurant_id")
     private UUID restaurantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

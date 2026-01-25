@@ -2,57 +2,46 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.UserBranchRole;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the UserBranchRole entity.
+ * Spring Data JPA repository for the UserBranchRole entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface UserBranchRoleRepository extends ReactiveCrudRepository<UserBranchRole, UUID>, UserBranchRoleRepositoryInternal {
-    Flux<UserBranchRole> findAllBy(Pageable pageable);
+public interface UserBranchRoleRepository extends JpaRepository<UserBranchRole, UUID> {
+    List<UserBranchRole> findAllBy(Pageable pageable);
 
-    @Query("SELECT * FROM user_branch_role entity WHERE entity.user_id = :id")
-    Flux<UserBranchRole> findByUser(UUID id);
+    @Query(value = "SELECT * FROM user_branch_role entity WHERE entity.user_id = :id", nativeQuery = true)
+    List<UserBranchRole> findByUser(UUID id);
 
-    @Query("SELECT * FROM user_branch_role entity WHERE entity.user_id IS NULL")
-    Flux<UserBranchRole> findAllByUserIsNull();
+    @Query(value = "SELECT * FROM user_branch_role entity WHERE entity.user_id IS NULL", nativeQuery = true)
+    List<UserBranchRole> findAllByUserIsNull();
 
-    @Query("SELECT * FROM user_branch_role entity WHERE entity.branch_id = :id")
-    Flux<UserBranchRole> findByBranch(UUID id);
+    @Query(value = "SELECT * FROM user_branch_role entity WHERE entity.branch_id = :id", nativeQuery = true)
+    List<UserBranchRole> findByBranch(UUID id);
 
-    @Query("SELECT * FROM user_branch_role entity WHERE entity.branch_id IS NULL")
-    Flux<UserBranchRole> findAllByBranchIsNull();
+    @Query(value = "SELECT * FROM user_branch_role entity WHERE entity.branch_id IS NULL", nativeQuery = true)
+    List<UserBranchRole> findAllByBranchIsNull();
 
-    @Query("SELECT * FROM user_branch_role entity WHERE entity.branch_id = :branchId AND entity.role = :role AND entity.is_active = true")
-    Flux<UserBranchRole> findByBranchIdAndRole(UUID branchId, String role);
-
-    @Override
-    <S extends UserBranchRole> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM user_branch_role entity WHERE entity.branch_id = :branchId AND entity.role = :role AND entity.is_active = true", nativeQuery = true)
+    List<UserBranchRole> findByBranchIdAndRole(UUID branchId, String role);
 
     @Override
-    Flux<UserBranchRole> findAll();
+    <S extends UserBranchRole> S save(S entity);
 
     @Override
-    Mono<UserBranchRole> findById(UUID id);
+    List<UserBranchRole> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<UserBranchRole> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface UserBranchRoleRepositoryInternal {
-    <S extends UserBranchRole> Mono<S> save(S entity);
-
-    Flux<UserBranchRole> findAllBy(Pageable pageable);
-
-    Flux<UserBranchRole> findAll();
-
-    Mono<UserBranchRole> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<UserBranchRole> findAllBy(Pageable pageable, Criteria criteria);
-}

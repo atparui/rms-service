@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.TableWaiterAssignment;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.TableWaiterAssignmentRepository;
 import com.atparui.rmsservice.service.dto.TableWaiterAssignmentDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.TableWaiterAssignment}.
  */
@@ -31,93 +34,57 @@ public class TableWaiterAssignmentService {
         this.tableWaiterAssignmentRepository = tableWaiterAssignmentRepository;
         this.tableWaiterAssignmentMapper = tableWaiterAssignmentMapper;
     }
-
-    /**
-     * Save a tableWaiterAssignment.
-     *
-     * @param tableWaiterAssignmentDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<TableWaiterAssignmentDTO> save(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
+    @Transactional
+    public Optional<TableWaiterAssignmentDTO> save(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
         LOG.debug("Request to save TableWaiterAssignment : {}", tableWaiterAssignmentDTO);
-        return tableWaiterAssignmentRepository
-            .save(tableWaiterAssignmentMapper.toEntity(tableWaiterAssignmentDTO))
-            .map(tableWaiterAssignmentMapper::toDto);
+        TableWaiterAssignment tableWaiterAssignment = tableWaiterAssignmentMapper.toEntity(tableWaiterAssignmentDTO);
+        tableWaiterAssignment = tableWaiterAssignmentRepository.save(tableWaiterAssignment);
+        return Optional.of(tableWaiterAssignmentMapper.toDto(tableWaiterAssignment));
     }
 
-    /**
-     * Update a tableWaiterAssignment.
-     *
-     * @param tableWaiterAssignmentDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<TableWaiterAssignmentDTO> update(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
+    @Transactional
+    public Optional<TableWaiterAssignmentDTO> update(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
         LOG.debug("Request to update TableWaiterAssignment : {}", tableWaiterAssignmentDTO);
-        return tableWaiterAssignmentRepository
-            .save(tableWaiterAssignmentMapper.toEntity(tableWaiterAssignmentDTO).setIsPersisted())
-            .map(tableWaiterAssignmentMapper::toDto);
+        TableWaiterAssignment tableWaiterAssignment = tableWaiterAssignmentMapper.toEntity(tableWaiterAssignmentDTO);
+        tableWaiterAssignment = tableWaiterAssignmentRepository.save(tableWaiterAssignment);
+        return Optional.of(tableWaiterAssignmentMapper.toDto(tableWaiterAssignment));
     }
 
-    /**
-     * Partially update a tableWaiterAssignment.
-     *
-     * @param tableWaiterAssignmentDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<TableWaiterAssignmentDTO> partialUpdate(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
+    @Transactional
+    public Optional<TableWaiterAssignmentDTO> partialUpdate(TableWaiterAssignmentDTO tableWaiterAssignmentDTO) {
         LOG.debug("Request to partially update TableWaiterAssignment : {}", tableWaiterAssignmentDTO);
-
         return tableWaiterAssignmentRepository
             .findById(tableWaiterAssignmentDTO.getId())
             .map(existingTableWaiterAssignment -> {
                 tableWaiterAssignmentMapper.partialUpdate(existingTableWaiterAssignment, tableWaiterAssignmentDTO);
-
-                return existingTableWaiterAssignment;
+                return tableWaiterAssignmentRepository.save(existingTableWaiterAssignment);
             })
-            .flatMap(tableWaiterAssignmentRepository::save)
             .map(tableWaiterAssignmentMapper::toDto);
     }
 
-    /**
-     * Get all the tableWaiterAssignments.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<TableWaiterAssignmentDTO> findAll() {
+    public List<TableWaiterAssignmentDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all TableWaiterAssignments");
-        return tableWaiterAssignmentRepository.findAll().map(tableWaiterAssignmentMapper::toDto);
+        Page<TableWaiterAssignment> page = tableWaiterAssignmentRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(tableWaiterAssignmentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of tableWaiterAssignments available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return tableWaiterAssignmentRepository.count();
     }
 
-    /**
-     * Get one tableWaiterAssignment by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<TableWaiterAssignmentDTO> findOne(UUID id) {
+    public Optional<TableWaiterAssignmentDTO> findOne(UUID id) {
         LOG.debug("Request to get TableWaiterAssignment : {}", id);
         return tableWaiterAssignmentRepository.findById(id).map(tableWaiterAssignmentMapper::toDto);
     }
 
-    /**
-     * Delete the tableWaiterAssignment by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete TableWaiterAssignment : {}", id);
-        return tableWaiterAssignmentRepository.deleteById(id);
+        tableWaiterAssignmentRepository.deleteById(id);
     }
 }

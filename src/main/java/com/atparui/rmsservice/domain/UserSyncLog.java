@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A UserSyncLog.
  */
-@Table("user_sync_log")
+@Entity
+@Table(name = "user_sync_log")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UserSyncLog implements Serializable, Persistable<UUID> {
@@ -21,38 +23,38 @@ public class UserSyncLog implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("sync_type")
+    @Column(name = "sync_type")
     private String syncType;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("sync_status")
+    @Column(name = "sync_status")
     private String syncStatus;
 
     @Size(max = 255)
-    @Column("external_user_id")
+    @Column(name = "external_user_id")
     private String externalUserId;
 
-    @Column("request_payload")
+    @Column(name = "request_payload")
     private String requestPayload;
 
-    @Column("response_payload")
+    @Column(name = "response_payload")
     private String responsePayload;
 
-    @Column("error_message")
+    @Column(name = "error_message")
     private String errorMessage;
 
     @NotNull(message = "must not be null")
-    @Column("synced_at")
+    @Column(name = "synced_at")
     private Instant syncedAt;
 
     @Size(max = 255)
-    @Column("synced_by")
+    @Column(name = "synced_by")
     private String syncedBy;
 
     @org.springframework.data.annotation.Transient
@@ -61,7 +63,7 @@ public class UserSyncLog implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private RmsUser user;
 
-    @Column("user_id")
+    @Column(name = "user_id")
     private UUID userId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

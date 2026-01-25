@@ -156,10 +156,10 @@ spring:
       enabled: false # Disabled - PostgreSQL and Consul are already running
       lifecycle-management: start-only
       file: src/main/docker/postgresql.yml
-  elasticsearch:
-    # uris should be set via environment variable (SPRING_ELASTICSEARCH_URIS)
-    # Default value for local development (overridden by env vars in Docker)
-    uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
+#  elasticsearch:
+#    # uris should be set via environment variable (SPRING_ELASTICSEARCH_URIS)
+#    # Default value for local development (overridden by env vars in Docker)
+#    uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
   profiles:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by maven when building the JAR file
@@ -305,4 +305,24 @@ multi-tenant:
     subdomain: rms.atparui.com
     gateway-ui-url: https://rms.atparui.com
     gateway-backend-url: https://rmsgw.atparui.com
+
+# JaVers Configuration
+javers:
+  # Use SQL repository (PostgreSQL)
+  sqlSchemaManagementEnabled: false  # Liquibase manages schema
+  # Pretty print JSON in snapshots for better readability
+  prettyPrint: true
+  # Include type name in snapshots
+  typeSafeValues: false
+  # Commit ID generator
+  commitIdGenerator: synchronized_sequence
+  # Package scan for audited entities
+  packagesToScan: com.atparui.rmsservice.domain
+  # Algorithm for list comparison
+  listCompareAlgorithm: LEVENSHTEIN_DISTANCE
+  # Mapping style
+  mappingStyle: FIELD
+  # New object snapshot (initial state)
+  newObjectSnapshot: true
+
 # application:

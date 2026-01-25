@@ -2,48 +2,37 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.MenuCategory;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the MenuCategory entity.
+ * Spring Data JPA repository for the MenuCategory entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface MenuCategoryRepository extends ReactiveCrudRepository<MenuCategory, UUID>, MenuCategoryRepositoryInternal {
-    Flux<MenuCategory> findAllBy(Pageable pageable);
+public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID> {
+    List<MenuCategory> findAllBy(Pageable pageable);
 
-    @Query("SELECT * FROM menu_category entity WHERE entity.restaurant_id = :id")
-    Flux<MenuCategory> findByRestaurant(UUID id);
+    @Query(value = "SELECT * FROM menu_category entity WHERE entity.restaurant_id = :id", nativeQuery = true)
+    List<MenuCategory> findByRestaurant(UUID id);
 
-    @Query("SELECT * FROM menu_category entity WHERE entity.restaurant_id IS NULL")
-    Flux<MenuCategory> findAllByRestaurantIsNull();
-
-    @Override
-    <S extends MenuCategory> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM menu_category entity WHERE entity.restaurant_id IS NULL", nativeQuery = true)
+    List<MenuCategory> findAllByRestaurantIsNull();
 
     @Override
-    Flux<MenuCategory> findAll();
+    <S extends MenuCategory> S save(S entity);
 
     @Override
-    Mono<MenuCategory> findById(UUID id);
+    List<MenuCategory> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<MenuCategory> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface MenuCategoryRepositoryInternal {
-    <S extends MenuCategory> Mono<S> save(S entity);
-
-    Flux<MenuCategory> findAllBy(Pageable pageable);
-
-    Flux<MenuCategory> findAll();
-
-    Mono<MenuCategory> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<MenuCategory> findAllBy(Pageable pageable, Criteria criteria);
-}

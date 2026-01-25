@@ -6,72 +6,69 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Bill.
  */
-@Table("bill")
+@Entity
+@Table(name = "bill")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "bill")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Bill implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("bill_number")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "bill_number")
     private String billNumber;
 
     @NotNull(message = "must not be null")
-    @Column("bill_date")
+    @Column(name = "bill_date")
     private Instant billDate;
 
     @NotNull(message = "must not be null")
-    @Column("subtotal")
+    @Column(name = "subtotal")
     private BigDecimal subtotal;
 
-    @Column("tax_amount")
+    @Column(name = "tax_amount")
     private BigDecimal taxAmount;
 
-    @Column("discount_amount")
+    @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
-    @Column("service_charge")
+    @Column(name = "service_charge")
     private BigDecimal serviceCharge;
 
     @NotNull(message = "must not be null")
-    @Column("total_amount")
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
-    @Column("amount_paid")
+    @Column(name = "amount_paid")
     private BigDecimal amountPaid;
 
     @NotNull(message = "must not be null")
-    @Column("amount_due")
+    @Column(name = "amount_due")
     private BigDecimal amountDue;
 
     @Size(max = 50)
-    @Column("status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "status")
     private String status;
 
     @Size(max = 255)
-    @Column("generated_by")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "generated_by")
     private String generatedBy;
 
-    @Column("notes")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "notes")
     private String notes;
 
     @org.springframework.data.annotation.Transient
@@ -89,13 +86,13 @@ public class Bill implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true)
     private Customer customer;
 
-    @Column("order_id")
+    @Column(name = "order_id")
     private UUID orderId;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
-    @Column("customer_id")
+    @Column(name = "customer_id")
     private UUID customerId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

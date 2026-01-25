@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BillItemRepository;
 import com.atparui.rmsservice.service.BillItemService;
@@ -19,10 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.BillItem}.
@@ -55,23 +54,19 @@ public class BillItemResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<BillItemDTO>> createBillItem(@Valid @RequestBody BillItemDTO billItemDTO) throws URISyntaxException {
+    public ResponseEntity<BillItemDTO> createBillItem(@Valid @RequestBody BillItemDTO billItemDTO) throws URISyntaxException {
         LOG.debug("REST request to save BillItem : {}", billItemDTO);
         if (billItemDTO.getId() != null) {
             throw new BadRequestAlertException("A new billItem cannot already have an ID", ENTITY_NAME, "idexists");
         }
         billItemDTO.setId(UUID.randomUUID());
-        return billItemService
+        BillItemDTO result = billItemService
             .save(billItemDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/bill-items/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create bill item"));
+
+        return ResponseEntity.created(new URI("/api/bill-items/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -85,7 +80,7 @@ public class BillItemResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<BillItemDTO>> updateBillItem(
+    public ResponseEntity<BillItemDTO> updateBillItem(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody BillItemDTO billItemDTO
     ) throws URISyntaxException {
@@ -97,22 +92,17 @@ public class BillItemResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billItemRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billItemRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return billItemService
-                    .update(billItemDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        BillItemDTO result = billItemService
+            .update(billItemDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -127,7 +117,7 @@ public class BillItemResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<BillItemDTO>> partialUpdateBillItem(
+    public ResponseEntity<BillItemDTO> partialUpdateBillItem(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody BillItemDTO billItemDTO
     ) throws URISyntaxException {
@@ -139,23 +129,17 @@ public class BillItemResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billItemRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billItemRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<BillItemDTO> result = billItemService.partialUpdate(billItemDTO);
+        BillItemDTO result = billItemService
+            .partialUpdate(billItemDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -163,20 +147,13 @@ public class BillItemResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of billItems in body.
      */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<List<BillItemDTO>> getAllBillItems() {
+    @GetMapping(value = "")
+    public ResponseEntity<List<BillItemDTO>> getAllBillItems(
+        @org.springdoc.core.annotations.ParameterObject org.springframework.data.domain.Pageable pageable
+    ) {
         LOG.debug("REST request to get all BillItems");
-        return billItemService.findAll().collectList();
-    }
-
-    /**
-     * {@code GET  /bill-items} : get all the billItems as a stream.
-     * @return the {@link Flux} of billItems.
-     */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<BillItemDTO> getAllBillItemsAsStream() {
-        LOG.debug("REST request to get all BillItems as a stream");
-        return billItemService.findAll();
+        List<BillItemDTO> billItems = billItemService.findAll(pageable);
+        return ResponseEntity.ok().body(billItems);
     }
 
     /**
@@ -186,9 +163,9 @@ public class BillItemResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the billItemDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<BillItemDTO>> getBillItem(@PathVariable("id") UUID id) {
+    public ResponseEntity<BillItemDTO> getBillItem(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get BillItem : {}", id);
-        Mono<BillItemDTO> billItemDTO = billItemService.findOne(id);
+        Optional<BillItemDTO> billItemDTO = billItemService.findOne(id);
         return ResponseUtil.wrapOrNotFound(billItemDTO);
     }
 
@@ -199,16 +176,11 @@ public class BillItemResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteBillItem(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteBillItem(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete BillItem : {}", id);
-        return billItemService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        billItemService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

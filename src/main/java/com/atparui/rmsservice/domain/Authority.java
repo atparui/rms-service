@@ -45,7 +45,6 @@ public class Authority implements Serializable {
         this.name = name;
     }
 
-    @Override
     public String getId() {
         return this.name;
     }

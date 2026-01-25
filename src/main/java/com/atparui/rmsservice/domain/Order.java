@@ -6,89 +6,82 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Order.
  */
-@Table("jhi_order")
+@Entity
+@Table(name = "jhi_order")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "order")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Order implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("order_number")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "order_number")
     private String orderNumber;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("order_type")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "order_type")
     private String orderType;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("order_source")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "order_source")
     private String orderSource;
 
     @Size(max = 50)
-    @Column("status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "status")
     private String status;
 
     @NotNull(message = "must not be null")
-    @Column("order_date")
+    @Column(name = "order_date")
     private Instant orderDate;
 
-    @Column("estimated_ready_time")
+    @Column(name = "estimated_ready_time")
     private Instant estimatedReadyTime;
 
-    @Column("actual_ready_time")
+    @Column(name = "actual_ready_time")
     private Instant actualReadyTime;
 
-    @Column("special_instructions")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "special_instructions")
     private String specialInstructions;
 
-    @Column("subtotal")
+    @Column(name = "subtotal")
     private BigDecimal subtotal;
 
-    @Column("tax_amount")
+    @Column(name = "tax_amount")
     private BigDecimal taxAmount;
 
-    @Column("discount_amount")
+    @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
-    @Column("total_amount")
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
-    @Column("is_paid")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_paid")
     private Boolean isPaid;
 
-    @Column("cancelled_at")
+    @Column(name = "cancelled_at")
     private Instant cancelledAt;
 
     @Size(max = 255)
-    @Column("cancelled_by")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "cancelled_by")
     private String cancelledBy;
 
-    @Column("cancellation_reason")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "cancellation_reason")
     private String cancellationReason;
 
     @org.springframework.data.annotation.Transient
@@ -109,16 +102,16 @@ public class Order implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private BranchTable branchTable;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
-    @Column("customer_id")
+    @Column(name = "customer_id")
     private UUID customerId;
 
-    @Column("user_id")
+    @Column(name = "user_id")
     private UUID userId;
 
-    @Column("branch_table_id")
+    @Column(name = "branch_table_id")
     private UUID branchTableId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

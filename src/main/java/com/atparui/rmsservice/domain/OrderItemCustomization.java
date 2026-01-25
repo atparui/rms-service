@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A OrderItemCustomization.
  */
-@Table("order_item_customization")
+@Entity
+@Table(name = "order_item_customization")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class OrderItemCustomization implements Serializable, Persistable<UUID> {
@@ -21,18 +23,18 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("quantity")
+    @Column(name = "quantity")
     private Integer quantity;
 
     @NotNull(message = "must not be null")
-    @Column("unit_price")
+    @Column(name = "unit_price")
     private BigDecimal unitPrice;
 
     @NotNull(message = "must not be null")
-    @Column("total_price")
+    @Column(name = "total_price")
     private BigDecimal totalPrice;
 
     @org.springframework.data.annotation.Transient
@@ -46,10 +48,10 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemAddon menuItemAddon;
 
-    @Column("order_item_id")
+    @Column(name = "order_item_id")
     private UUID orderItemId;
 
-    @Column("menu_item_addon_id")
+    @Column(name = "menu_item_addon_id")
     private UUID menuItemAddonId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

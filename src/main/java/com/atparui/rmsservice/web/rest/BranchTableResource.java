@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BranchTableRepository;
 import com.atparui.rmsservice.service.BranchTableService;
@@ -24,11 +25,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.BranchTable}.
@@ -61,30 +60,26 @@ public class BranchTableResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<BranchTableDTO>> createBranchTable(@Valid @RequestBody BranchTableDTO branchTableDTO)
+    public ResponseEntity<BranchTableDTO> createBranchTable(@Valid @RequestBody BranchTableDTO branchTableDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save BranchTable : {}", branchTableDTO);
         if (branchTableDTO.getId() != null) {
             throw new BadRequestAlertException("A new branchTable cannot already have an ID", ENTITY_NAME, "idexists");
         }
         branchTableDTO.setId(UUID.randomUUID());
-        return branchTableService
+        BranchTableDTO result = branchTableService
             .save(branchTableDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/branch-tables/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create branch table"));
+
+        return ResponseEntity.created(new URI("/api/branch-tables/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
      * {@code PUT  /branch-tables/:id} : Updates an existing branchTable.
      *
-     * @param id the id of the branchTableDTO to save.
+     * @param id             the id of the branchTableDTO to save.
      * @param branchTableDTO the branchTableDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated branchTableDTO,
      * or with status {@code 400 (Bad Request)} if the branchTableDTO is not valid,
@@ -92,7 +87,7 @@ public class BranchTableResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<BranchTableDTO>> updateBranchTable(
+    public ResponseEntity<BranchTableDTO> updateBranchTable(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody BranchTableDTO branchTableDTO
     ) throws URISyntaxException {
@@ -104,28 +99,23 @@ public class BranchTableResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return branchTableRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!branchTableRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return branchTableService
-                    .update(branchTableDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        BranchTableDTO result = branchTableService
+            .update(branchTableDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
      * {@code PATCH  /branch-tables/:id} : Partial updates given fields of an existing branchTable, field will ignore if it is null
      *
-     * @param id the id of the branchTableDTO to save.
+     * @param id             the id of the branchTableDTO to save.
      * @param branchTableDTO the branchTableDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated branchTableDTO,
      * or with status {@code 400 (Bad Request)} if the branchTableDTO is not valid,
@@ -133,8 +123,8 @@ public class BranchTableResource {
      * or with status {@code 500 (Internal Server Error)} if the branchTableDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<BranchTableDTO>> partialUpdateBranchTable(
+    @PatchMapping(value = "/{id}", consumes = {"application/json", "application/merge-patch+json"})
+    public ResponseEntity<BranchTableDTO> partialUpdateBranchTable(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody BranchTableDTO branchTableDTO
     ) throws URISyntaxException {
@@ -146,51 +136,43 @@ public class BranchTableResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return branchTableRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!branchTableRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<BranchTableDTO> result = branchTableService.partialUpdate(branchTableDTO);
+        BranchTableDTO result = branchTableService
+            .partialUpdate(branchTableDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
      * {@code GET  /branch-tables} : get all the branchTables.
      *
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request  a {@link ServerHttpRequest} request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of branchTables in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<BranchTableDTO>>> getAllBranchTables(
+    public ResponseEntity<List<BranchTableDTO>> getAllBranchTables(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of BranchTables");
-        return branchTableService
-            .countAll()
-            .zipWith(branchTableService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = branchTableService.countAll();
+        List<BranchTableDTO> entities = branchTableService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
     /**
@@ -200,9 +182,9 @@ public class BranchTableResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the branchTableDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<BranchTableDTO>> getBranchTable(@PathVariable("id") UUID id) {
+    public ResponseEntity<BranchTableDTO> getBranchTable(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get BranchTable : {}", id);
-        Mono<BranchTableDTO> branchTableDTO = branchTableService.findOne(id);
+        Optional<BranchTableDTO> branchTableDTO = branchTableService.findOne(id);
         return ResponseUtil.wrapOrNotFound(branchTableDTO);
     }
 
@@ -213,90 +195,42 @@ public class BranchTableResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteBranchTable(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteBranchTable(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete BranchTable : {}", id);
-        return branchTableService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        branchTableService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 
     /**
      * {@code SEARCH  /branch-tables/_search?query=:query} : search for the branchTable corresponding
      * to the query.
      *
-     * @param query the query of the branchTable search.
+     * @param query    the query of the branchTable search.
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request  a {@link ServerHttpRequest} request.
      * @return the result of the search.
      */
     @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<BranchTableDTO>>> searchBranchTables(
+    public ResponseEntity<List<BranchTableDTO>> searchBranchTables(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to search for a page of BranchTables for query {}", query);
-        return branchTableService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
+        // Search functionality removed (Elasticsearch was removed)
+        // Return empty list with proper pagination headers
+        List<BranchTableDTO> results = new ArrayList<>();
+        PageImpl<BranchTableDTO> page = new PageImpl<>(results, pageable, 0);
+
+        return ResponseEntity.ok()
+            .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
                     ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
                     page
                 )
             )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(branchTableService.search(query, pageable)));
-    }
-
-    // jhipster-needle-rest-add-get-method - JHipster will add get methods here
-
-    /**
-     * {@code GET /api/branch-tables/branch/{branchId}/available} : Get available tables
-     *
-     * @param branchId the branch ID
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of available tables
-     */
-    @GetMapping("/branch/{branchId}/available")
-    public Mono<ResponseEntity<List<BranchTableDTO>>> getAvailableTables(@PathVariable UUID branchId) {
-        LOG.debug("REST request to get available tables for branch : {}", branchId);
-        return branchTableService.findAvailableByBranchId(branchId).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
-    /**
-     * {@code GET /api/branch-tables/branch/{branchId}/status/{status}} : Get tables by status
-     *
-     * @param branchId the branch ID
-     * @param status the table status
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of tables
-     */
-    @GetMapping("/branch/{branchId}/status/{status}")
-    public Mono<ResponseEntity<List<BranchTableDTO>>> getTablesByStatus(@PathVariable UUID branchId, @PathVariable String status) {
-        LOG.debug("REST request to get tables by status : {} - {}", branchId, status);
-        return branchTableService.findByBranchIdAndStatus(branchId, status).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
-    // jhipster-needle-rest-add-put-method - JHipster will add put methods here
-
-    /**
-     * {@code PUT /api/branch-tables/{id}/status} : Update table status
-     *
-     * @param id the id of the table
-     * @param request the status update request
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and updated table DTO
-     */
-    @PutMapping("/{id}/status")
-    public Mono<ResponseEntity<BranchTableDTO>> updateTableStatus(
-        @PathVariable UUID id,
-        @RequestBody java.util.Map<String, String> request
-    ) {
-        String status = request.get("status");
-        LOG.debug("REST request to update table status : {} - {}", id, status);
-        return branchTableService.updateStatus(id, status).map(result -> ResponseEntity.ok().body(result));
+            .body(results);
     }
 }

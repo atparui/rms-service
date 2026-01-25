@@ -2,66 +2,58 @@ package com.atparui.rmsservice.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.oidc.StandardClaimNames.PREFERRED_USERNAME;
-import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import com.atparui.rmsservice.security.AuthoritiesConstants;
 import com.atparui.rmsservice.security.SecurityUtils;
 import com.atparui.rmsservice.web.filter.UserProvisioningFilter;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
-import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
-import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
-import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
-import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.config.JHipsterProperties;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
-@EnableReactiveMethodSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-    private final JHipsterProperties jHipsterProperties;
+    @Value("${spring.security.content-security-policy:default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:}")
+    private String contentSecurityPolicy;
+
     private final UserProvisioningFilter userProvisioningFilter;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties, UserProvisioningFilter userProvisioningFilter) {
-        this.jHipsterProperties = jHipsterProperties;
+    public SecurityConfiguration(UserProvisioningFilter userProvisioningFilter) {
         this.userProvisioningFilter = userProvisioningFilter;
     }
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    public SecurityFilterChain springSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher(
-                new NegatedServerWebExchangeMatcher(
-                    new OrServerWebExchangeMatcher(pathMatchers("/app/**", "/i18n/**", "/content/**", "/swagger-ui/**"))
-                )
-            )
             .csrf(csrf -> csrf.disable())
             .headers(headers ->
                 headers
-                    .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
-                    .frameOptions(frameOptions -> frameOptions.mode(Mode.DENY))
+                    .contentSecurityPolicy(csp -> csp.policyDirectives(contentSecurityPolicy))
+                    .frameOptions(frameOptions -> frameOptions.deny())
                     .referrerPolicy(referrer ->
-                        referrer.policy(ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                        referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                     )
                     .permissionsPolicy(permissions ->
                         permissions.policy(
@@ -69,35 +61,35 @@ public class SecurityConfiguration {
                         )
                     )
             )
-            .requestCache(cache -> cache.requestCache(NoOpServerRequestCache.getInstance()))
-            .authorizeExchange(authz ->
-                // prettier-ignore
+            .authorizeHttpRequests(authz ->
                 authz
-                    .pathMatchers("/api/authenticate").permitAll()
-                    .pathMatchers("/api/auth-info").permitAll()
-                    .pathMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .pathMatchers("/api/**").authenticated()
-                    .pathMatchers("/v3/api-docs/**").permitAll()
-                    .pathMatchers("/management/health").permitAll()
-                    .pathMatchers("/management/health/**").permitAll()
-                    .pathMatchers("/management/info").permitAll()
-                    .pathMatchers("/management/prometheus").permitAll()
-                    .pathMatchers("/management/jhiopenapigroups").permitAll()
-                    .pathMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/api/authenticate").permitAll()
+                    .requestMatchers("/api/auth-info").permitAll()
+                    .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/v3/api-docs/**").permitAll()
+                    .requestMatchers("/management/health").permitAll()
+                    .requestMatchers("/management/health/**").permitAll()
+                    .requestMatchers("/management/info").permitAll()
+                    .requestMatchers("/management/prometheus").permitAll()
+                    .requestMatchers("/management/jhiopenapigroups").permitAll()
+                    .requestMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/app/**", "/i18n/**", "/content/**", "/swagger-ui/**").permitAll()
+                    .anyRequest().authenticated()
             )
             .oauth2Client(withDefaults())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-            .addFilterAfter(userProvisioningFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+            .addFilterBefore(userProvisioningFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter() {
-        ReactiveJwtAuthenticationConverter jwtAuthenticationConverter = new ReactiveJwtAuthenticationConverter();
+    Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-            new Converter<Jwt, Flux<GrantedAuthority>>() {
+            new Converter<Jwt, Collection<GrantedAuthority>>() {
                 @Override
-                public Flux<GrantedAuthority> convert(Jwt jwt) {
-                    return Flux.fromIterable(SecurityUtils.extractAuthorityFromClaims(jwt.getClaims()));
+                public Collection<GrantedAuthority> convert(Jwt jwt) {
+                    return SecurityUtils.extractAuthorityFromClaims(jwt.getClaims());
                 }
             }
         );
@@ -108,32 +100,29 @@ public class SecurityConfiguration {
     /**
      * Map authorities from "groups" or "roles" claim in ID Token.
      *
-     * @return a {@link ReactiveOAuth2UserService} that has the groups from the IdP.
+     * @return a {@link OAuth2UserService} that has the groups from the IdP.
      */
     @Bean
-    public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
-        final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        final OidcUserService delegate = new OidcUserService();
 
         return userRequest -> {
             // Delegate to the default implementation for loading a user
-            return delegate
-                .loadUser(userRequest)
-                .map(user -> {
-                    Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
+            OidcUser user = delegate.loadUser(userRequest);
+            
+            Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
 
-                    user
-                        .getAuthorities()
-                        .forEach(authority -> {
-                            if (authority instanceof OidcUserAuthority) {
-                                OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
-                                mappedAuthorities.addAll(
-                                    SecurityUtils.extractAuthorityFromClaims(oidcUserAuthority.getUserInfo().getClaims())
-                                );
-                            }
-                        });
-
-                    return new DefaultOidcUser(mappedAuthorities, user.getIdToken(), user.getUserInfo(), PREFERRED_USERNAME);
+            user
+                .getAuthorities()
+                .forEach(authority -> {
+                    if (authority instanceof OidcUserAuthority oidcUserAuthority) {
+                        mappedAuthorities.addAll(
+                            SecurityUtils.extractAuthorityFromClaims(oidcUserAuthority.getUserInfo().getClaims())
+                        );
+                    }
                 });
+
+            return new DefaultOidcUser(mappedAuthorities, user.getIdToken(), user.getUserInfo(), PREFERRED_USERNAME);
         };
     }
     // Note: jwtDecoder bean is provided by DynamicJwtDecoder (@Component @Primary)

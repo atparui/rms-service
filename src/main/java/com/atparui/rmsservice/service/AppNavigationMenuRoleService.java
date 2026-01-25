@@ -1,4 +1,9 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.AppNavigationMenuRole;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.AppNavigationMenuRoleRepository;
 import com.atparui.rmsservice.service.dto.AppNavigationMenuRoleDTO;
@@ -9,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.AppNavigationMenuRole}.
  */
@@ -32,94 +34,57 @@ public class AppNavigationMenuRoleService {
         this.appNavigationMenuRoleRepository = appNavigationMenuRoleRepository;
         this.appNavigationMenuRoleMapper = appNavigationMenuRoleMapper;
     }
-
-    /**
-     * Save a appNavigationMenuRole.
-     *
-     * @param appNavigationMenuRoleDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuRoleDTO> save(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuRoleDTO> save(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
         LOG.debug("Request to save AppNavigationMenuRole : {}", appNavigationMenuRoleDTO);
-        return appNavigationMenuRoleRepository
-            .save(appNavigationMenuRoleMapper.toEntity(appNavigationMenuRoleDTO))
-            .map(appNavigationMenuRoleMapper::toDto);
+        AppNavigationMenuRole appNavigationMenuRole = appNavigationMenuRoleMapper.toEntity(appNavigationMenuRoleDTO);
+        appNavigationMenuRole = appNavigationMenuRoleRepository.save(appNavigationMenuRole);
+        return Optional.of(appNavigationMenuRoleMapper.toDto(appNavigationMenuRole));
     }
 
-    /**
-     * Update a appNavigationMenuRole.
-     *
-     * @param appNavigationMenuRoleDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuRoleDTO> update(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuRoleDTO> update(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
         LOG.debug("Request to update AppNavigationMenuRole : {}", appNavigationMenuRoleDTO);
-        return appNavigationMenuRoleRepository
-            .save(appNavigationMenuRoleMapper.toEntity(appNavigationMenuRoleDTO).setIsPersisted())
-            .map(appNavigationMenuRoleMapper::toDto);
+        AppNavigationMenuRole appNavigationMenuRole = appNavigationMenuRoleMapper.toEntity(appNavigationMenuRoleDTO);
+        appNavigationMenuRole = appNavigationMenuRoleRepository.save(appNavigationMenuRole);
+        return Optional.of(appNavigationMenuRoleMapper.toDto(appNavigationMenuRole));
     }
 
-    /**
-     * Partially update a appNavigationMenuRole.
-     *
-     * @param appNavigationMenuRoleDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuRoleDTO> partialUpdate(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuRoleDTO> partialUpdate(AppNavigationMenuRoleDTO appNavigationMenuRoleDTO) {
         LOG.debug("Request to partially update AppNavigationMenuRole : {}", appNavigationMenuRoleDTO);
-
         return appNavigationMenuRoleRepository
             .findById(appNavigationMenuRoleDTO.getId())
             .map(existingAppNavigationMenuRole -> {
                 appNavigationMenuRoleMapper.partialUpdate(existingAppNavigationMenuRole, appNavigationMenuRoleDTO);
-
-                return existingAppNavigationMenuRole;
+                return appNavigationMenuRoleRepository.save(existingAppNavigationMenuRole);
             })
-            .flatMap(appNavigationMenuRoleRepository::save)
             .map(appNavigationMenuRoleMapper::toDto);
     }
 
-    /**
-     * Get all the appNavigationMenuRoles.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<AppNavigationMenuRoleDTO> findAll(Pageable pageable) {
+    public List<AppNavigationMenuRoleDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all AppNavigationMenuRoles");
-        return appNavigationMenuRoleRepository.findAllBy(pageable).map(appNavigationMenuRoleMapper::toDto);
+        Page<AppNavigationMenuRole> page = appNavigationMenuRoleRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(appNavigationMenuRoleMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of appNavigationMenuRoles available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return appNavigationMenuRoleRepository.count();
     }
 
-    /**
-     * Get one appNavigationMenuRole by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<AppNavigationMenuRoleDTO> findOne(UUID id) {
+    public Optional<AppNavigationMenuRoleDTO> findOne(UUID id) {
         LOG.debug("Request to get AppNavigationMenuRole : {}", id);
         return appNavigationMenuRoleRepository.findById(id).map(appNavigationMenuRoleMapper::toDto);
     }
 
-    /**
-     * Delete the appNavigationMenuRole by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete AppNavigationMenuRole : {}", id);
-        return appNavigationMenuRoleRepository.deleteById(id);
+        appNavigationMenuRoleRepository.deleteById(id);
     }
 }

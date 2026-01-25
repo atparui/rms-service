@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A OrderStatusHistory.
  */
-@Table("order_status_history")
+@Entity
+@Table(name = "order_status_history")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class OrderStatusHistory implements Serializable, Persistable<UUID> {
@@ -21,27 +23,27 @@ public class OrderStatusHistory implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @Size(max = 50)
-    @Column("previous_status")
+    @Column(name = "previous_status")
     private String previousStatus;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("new_status")
+    @Column(name = "new_status")
     private String newStatus;
 
     @NotNull(message = "must not be null")
-    @Column("changed_at")
+    @Column(name = "changed_at")
     private Instant changedAt;
 
     @Size(max = 255)
-    @Column("changed_by")
+    @Column(name = "changed_by")
     private String changedBy;
 
-    @Column("notes")
+    @Column(name = "notes")
     private String notes;
 
     @org.springframework.data.annotation.Transient
@@ -51,7 +53,7 @@ public class OrderStatusHistory implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "branch", "customer", "user", "branchTable" }, allowSetters = true)
     private Order order;
 
-    @Column("order_id")
+    @Column(name = "order_id")
     private UUID orderId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

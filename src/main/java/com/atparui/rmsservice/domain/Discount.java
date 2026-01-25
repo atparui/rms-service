@@ -7,14 +7,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Discount.
  */
-@Table("discount")
+@Entity
+@Table(name = "discount")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Discount implements Serializable, Persistable<UUID> {
@@ -22,51 +24,51 @@ public class Discount implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @Size(max = 50)
-    @Column("discount_code")
+    @Column(name = "discount_code")
     private String discountCode;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("discount_name")
+    @Column(name = "discount_name")
     private String discountName;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("discount_type")
+    @Column(name = "discount_type")
     private String discountType;
 
     @NotNull(message = "must not be null")
-    @Column("discount_value")
+    @Column(name = "discount_value")
     private BigDecimal discountValue;
 
-    @Column("min_order_amount")
+    @Column(name = "min_order_amount")
     private BigDecimal minOrderAmount;
 
-    @Column("max_discount_amount")
+    @Column(name = "max_discount_amount")
     private BigDecimal maxDiscountAmount;
 
     @Size(max = 50)
-    @Column("applicable_to")
+    @Column(name = "applicable_to")
     private String applicableTo;
 
     @NotNull(message = "must not be null")
-    @Column("valid_from")
+    @Column(name = "valid_from")
     private Instant validFrom;
 
-    @Column("valid_to")
+    @Column(name = "valid_to")
     private Instant validTo;
 
-    @Column("max_uses")
+    @Column(name = "max_uses")
     private Integer maxUses;
 
-    @Column("current_uses")
+    @Column(name = "current_uses")
     private Integer currentUses;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -75,7 +77,7 @@ public class Discount implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private Restaurant restaurant;
 
-    @Column("restaurant_id")
+    @Column(name = "restaurant_id")
     private UUID restaurantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

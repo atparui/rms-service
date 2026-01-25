@@ -2,54 +2,43 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.Discount;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the Discount entity.
+ * Spring Data JPA repository for the Discount entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface DiscountRepository extends ReactiveCrudRepository<Discount, UUID>, DiscountRepositoryInternal {
-    @Query("SELECT * FROM discount entity WHERE entity.restaurant_id = :id")
-    Flux<Discount> findByRestaurant(UUID id);
+public interface DiscountRepository extends JpaRepository<Discount, UUID> {
+    @Query(value = "SELECT * FROM discount entity WHERE entity.restaurant_id = :id", nativeQuery = true)
+    List<Discount> findByRestaurant(UUID id);
 
-    @Query("SELECT * FROM discount entity WHERE entity.restaurant_id IS NULL")
-    Flux<Discount> findAllByRestaurantIsNull();
+    @Query(value = "SELECT * FROM discount entity WHERE entity.restaurant_id IS NULL", nativeQuery = true)
+    List<Discount> findAllByRestaurantIsNull();
 
     @Query(
         "SELECT * FROM discount entity WHERE entity.restaurant_id = :restaurantId AND entity.is_active = true AND (entity.valid_from <= CURRENT_DATE AND (entity.valid_to IS NULL OR entity.valid_to >= CURRENT_DATE))"
     )
-    Flux<Discount> findActiveByRestaurantId(UUID restaurantId);
+    List<Discount> findActiveByRestaurantId(UUID restaurantId);
 
-    @Query("SELECT * FROM discount entity WHERE entity.discount_code = :discountCode AND entity.restaurant_id = :restaurantId")
-    Mono<Discount> findByDiscountCodeAndRestaurantId(String discountCode, UUID restaurantId);
-
-    @Override
-    <S extends Discount> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM discount entity WHERE entity.discount_code = :discountCode AND entity.restaurant_id = :restaurantId", nativeQuery = true)
+    Optional<Discount> findByDiscountCodeAndRestaurantId(String discountCode, UUID restaurantId);
 
     @Override
-    Flux<Discount> findAll();
+    <S extends Discount> S save(S entity);
 
     @Override
-    Mono<Discount> findById(UUID id);
+    List<Discount> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<Discount> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface DiscountRepositoryInternal {
-    <S extends Discount> Mono<S> save(S entity);
-
-    Flux<Discount> findAllBy(Pageable pageable);
-
-    Flux<Discount> findAll();
-
-    Mono<Discount> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<Discount> findAllBy(Pageable pageable, Criteria criteria);
-}

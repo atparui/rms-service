@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "permission")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "permission")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Permission implements Serializable {
 
@@ -29,20 +28,16 @@ public class Permission implements Serializable {
     @NotNull(message = "must not be null")
     @Size(max = 150)
     @Column(name = "code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String code;
 
     @Column(name = "description")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String description;
 
     @Size(max = 100)
     @Column(name = "scope")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String scope;
 
     @Column(name = "is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean isActive;
 
     @Transient

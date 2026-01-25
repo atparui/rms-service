@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BranchRepository;
 import com.atparui.rmsservice.service.BranchService;
@@ -24,11 +25,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.Branch}.
@@ -61,23 +60,19 @@ public class BranchResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<BranchDTO>> createBranch(@Valid @RequestBody BranchDTO branchDTO) throws URISyntaxException {
+    public ResponseEntity<BranchDTO> createBranch(@Valid @RequestBody BranchDTO branchDTO) throws URISyntaxException {
         LOG.debug("REST request to save Branch : {}", branchDTO);
         if (branchDTO.getId() != null) {
             throw new BadRequestAlertException("A new branch cannot already have an ID", ENTITY_NAME, "idexists");
         }
         branchDTO.setId(UUID.randomUUID());
-        return branchService
+        BranchDTO result = branchService
             .save(branchDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/branches/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create branch"));
+
+        return ResponseEntity.created(new URI("/api/branches/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -91,7 +86,7 @@ public class BranchResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<BranchDTO>> updateBranch(
+    public ResponseEntity<BranchDTO> updateBranch(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody BranchDTO branchDTO
     ) throws URISyntaxException {
@@ -103,22 +98,17 @@ public class BranchResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return branchRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!branchRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return branchService
-                    .update(branchDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        BranchDTO result = branchService
+            .update(branchDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -133,7 +123,7 @@ public class BranchResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<BranchDTO>> partialUpdateBranch(
+    public ResponseEntity<BranchDTO> partialUpdateBranch(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody BranchDTO branchDTO
     ) throws URISyntaxException {
@@ -145,23 +135,17 @@ public class BranchResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return branchRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!branchRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<BranchDTO> result = branchService.partialUpdate(branchDTO);
+        BranchDTO result = branchService
+            .partialUpdate(branchDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -172,24 +156,22 @@ public class BranchResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of branches in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<BranchDTO>>> getAllBranches(
+    public ResponseEntity<List<BranchDTO>> getAllBranches(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of Branches");
-        return branchService
-            .countAll()
-            .zipWith(branchService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = branchService.countAll();
+        List<BranchDTO> entities = branchService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
     /**
@@ -199,9 +181,9 @@ public class BranchResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the branchDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<BranchDTO>> getBranch(@PathVariable("id") UUID id) {
+    public ResponseEntity<BranchDTO> getBranch(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Branch : {}", id);
-        Mono<BranchDTO> branchDTO = branchService.findOne(id);
+        Optional<BranchDTO> branchDTO = branchService.findOne(id);
         return ResponseUtil.wrapOrNotFound(branchDTO);
     }
 
@@ -212,17 +194,12 @@ public class BranchResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteBranch(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteBranch(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Branch : {}", id);
-        return branchService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        branchService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 
     /**
@@ -235,21 +212,24 @@ public class BranchResource {
      * @return the result of the search.
      */
     @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<BranchDTO>>> searchBranches(
+    public ResponseEntity<List<BranchDTO>> searchBranches(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to search for a page of Branches for query {}", query);
-        return branchService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
+        // Search functionality removed (Elasticsearch was removed)
+        // Return empty list with proper pagination headers
+        List<BranchDTO> results = new ArrayList<>();
+        PageImpl<BranchDTO> page = new PageImpl<>(results, pageable, 0);
+
+        return ResponseEntity.ok()
+            .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
                     ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
                     page
                 )
             )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(branchService.search(query, pageable)));
+            .body(results);
     }
 }

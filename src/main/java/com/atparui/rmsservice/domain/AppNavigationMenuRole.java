@@ -5,14 +5,16 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A AppNavigationMenuRole.
  */
-@Table("app_navigation_menu_role")
+@Entity
+@Table(name = "app_navigation_menu_role")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppNavigationMenuRole implements Serializable, Persistable<UUID> {
@@ -20,15 +22,15 @@ public class AppNavigationMenuRole implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("role")
+    @Column(name = "role")
     private String role;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -41,10 +43,10 @@ public class AppNavigationMenuRole implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "parentMenu" }, allowSetters = true)
     private AppNavigationMenuItem appNavigationMenuItem;
 
-    @Column("app_navigation_menu_id")
+    @Column(name = "app_navigation_menu_id")
     private UUID appNavigationMenuId;
 
-    @Column("app_navigation_menu_item_id")
+    @Column(name = "app_navigation_menu_item_id")
     private UUID appNavigationMenuItemId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

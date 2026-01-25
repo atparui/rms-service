@@ -1,8 +1,8 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.UserBranchRoleRepository;
 import com.atparui.rmsservice.service.UserBranchRoleService;
-import com.atparui.rmsservice.service.dto.UserBranchRoleAssignmentDTO;
 import com.atparui.rmsservice.service.dto.UserBranchRoleDTO;
 import com.atparui.rmsservice.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -24,28 +24,21 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.atparui.rmsservice.domain.UserBranchRole}.
- */
 @RestController
 @RequestMapping("/api/user-branch-roles")
 public class UserBranchRoleResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserBranchRoleResource.class);
-
     private static final String ENTITY_NAME = "rmsserviceUserBranchRole";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final UserBranchRoleService userBranchRoleService;
-
     private final UserBranchRoleRepository userBranchRoleRepository;
 
     public UserBranchRoleResource(UserBranchRoleService userBranchRoleService, UserBranchRoleRepository userBranchRoleRepository) {
@@ -53,46 +46,24 @@ public class UserBranchRoleResource {
         this.userBranchRoleRepository = userBranchRoleRepository;
     }
 
-    /**
-     * {@code POST  /user-branch-roles} : Create a new userBranchRole.
-     *
-     * @param userBranchRoleDTO the userBranchRoleDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new userBranchRoleDTO, or with status {@code 400 (Bad Request)} if the userBranchRole has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public Mono<ResponseEntity<UserBranchRoleDTO>> createUserBranchRole(@Valid @RequestBody UserBranchRoleDTO userBranchRoleDTO)
-        throws URISyntaxException {
+    public ResponseEntity<UserBranchRoleDTO> createUserBranchRole(@Valid @RequestBody UserBranchRoleDTO userBranchRoleDTO) throws URISyntaxException {
         LOG.debug("REST request to save UserBranchRole : {}", userBranchRoleDTO);
         if (userBranchRoleDTO.getId() != null) {
             throw new BadRequestAlertException("A new userBranchRole cannot already have an ID", ENTITY_NAME, "idexists");
         }
         userBranchRoleDTO.setId(UUID.randomUUID());
-        return userBranchRoleService
+        UserBranchRoleDTO result = userBranchRoleService
             .save(userBranchRoleDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/user-branch-roles/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create user branch role"));
+
+        return ResponseEntity.created(new URI("/api/user-branch-roles/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PUT  /user-branch-roles/:id} : Updates an existing userBranchRole.
-     *
-     * @param id the id of the userBranchRoleDTO to save.
-     * @param userBranchRoleDTO the userBranchRoleDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated userBranchRoleDTO,
-     * or with status {@code 400 (Bad Request)} if the userBranchRoleDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the userBranchRoleDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserBranchRoleDTO>> updateUserBranchRole(
+    public ResponseEntity<UserBranchRoleDTO> updateUserBranchRole(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody UserBranchRoleDTO userBranchRoleDTO
     ) throws URISyntaxException {
@@ -104,37 +75,21 @@ public class UserBranchRoleResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return userBranchRoleRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!userBranchRoleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return userBranchRoleService
-                    .update(userBranchRoleDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        UserBranchRoleDTO result = userBranchRoleService
+            .update(userBranchRoleDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PATCH  /user-branch-roles/:id} : Partial updates given fields of an existing userBranchRole, field will ignore if it is null
-     *
-     * @param id the id of the userBranchRoleDTO to save.
-     * @param userBranchRoleDTO the userBranchRoleDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated userBranchRoleDTO,
-     * or with status {@code 400 (Bad Request)} if the userBranchRoleDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the userBranchRoleDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the userBranchRoleDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<UserBranchRoleDTO>> partialUpdateUserBranchRole(
+    public ResponseEntity<UserBranchRoleDTO> partialUpdateUserBranchRole(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody UserBranchRoleDTO userBranchRoleDTO
     ) throws URISyntaxException {
@@ -146,126 +101,51 @@ public class UserBranchRoleResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return userBranchRoleRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!userBranchRoleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<UserBranchRoleDTO> result = userBranchRoleService.partialUpdate(userBranchRoleDTO);
+        UserBranchRoleDTO result = userBranchRoleService
+            .partialUpdate(userBranchRoleDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code GET  /user-branch-roles} : get all the userBranchRoles.
-     *
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of userBranchRoles in body.
-     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<UserBranchRoleDTO>>> getAllUserBranchRoles(
+    public ResponseEntity<List<UserBranchRoleDTO>> getAllUserBranchRoles(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of UserBranchRoles");
-        return userBranchRoleService
-            .countAll()
-            .zipWith(userBranchRoleService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = userBranchRoleService.countAll();
+        List<UserBranchRoleDTO> entities = userBranchRoleService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
-    /**
-     * {@code GET  /user-branch-roles/:id} : get the "id" userBranchRole.
-     *
-     * @param id the id of the userBranchRoleDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the userBranchRoleDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserBranchRoleDTO>> getUserBranchRole(@PathVariable("id") UUID id) {
+    public ResponseEntity<UserBranchRoleDTO> getUserBranchRole(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get UserBranchRole : {}", id);
-        Mono<UserBranchRoleDTO> userBranchRoleDTO = userBranchRoleService.findOne(id);
+        Optional<UserBranchRoleDTO> userBranchRoleDTO = userBranchRoleService.findOne(id);
         return ResponseUtil.wrapOrNotFound(userBranchRoleDTO);
     }
 
-    /**
-     * {@code DELETE  /user-branch-roles/:id} : delete the "id" userBranchRole.
-     *
-     * @param id the id of the userBranchRoleDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteUserBranchRole(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteUserBranchRole(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete UserBranchRole : {}", id);
-        return userBranchRoleService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
-    }
-
-    // jhipster-needle-rest-add-get-method - JHipster will add get methods here
-
-    /**
-     * {@code GET /api/user-branch-roles/branch/{branchId}/role/{role}} : Get users by branch and role
-     *
-     * @param branchId the branch ID
-     * @param role the role name
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of user branch roles
-     */
-    @GetMapping("/branch/{branchId}/role/{role}")
-    public Mono<ResponseEntity<List<UserBranchRoleDTO>>> getUsersByBranchAndRole(@PathVariable UUID branchId, @PathVariable String role) {
-        LOG.debug("REST request to get users by branch and role : {} - {}", branchId, role);
-        return userBranchRoleService.findByBranchIdAndRole(branchId, role).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
-    // jhipster-needle-rest-add-post-method - JHipster will add post methods here
-
-    /**
-     * {@code POST /api/user-branch-roles/assign} : Assign role to user for branch
-     *
-     * @param assignmentDTO the assignment details
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and user branch role DTO
-     */
-    @PostMapping("/assign")
-    public Mono<ResponseEntity<UserBranchRoleDTO>> assignRole(@Valid @RequestBody UserBranchRoleAssignmentDTO assignmentDTO) {
-        LOG.debug("REST request to assign role : {}", assignmentDTO);
-        return userBranchRoleService.assignRole(assignmentDTO).map(result -> ResponseEntity.status(HttpStatus.CREATED).body(result));
-    }
-
-    // jhipster-needle-rest-add-put-method - JHipster will add put methods here
-
-    /**
-     * {@code PUT /api/user-branch-roles/{id}/revoke} : Revoke role from user
-     *
-     * @param id the id of the user branch role
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}
-     */
-    @PutMapping("/{id}/revoke")
-    public Mono<ResponseEntity<UserBranchRoleDTO>> revokeRole(@PathVariable UUID id) {
-        LOG.debug("REST request to revoke role : {}", id);
-        return userBranchRoleService.revokeRole(id).map(result -> ResponseEntity.ok().body(result));
+        userBranchRoleService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

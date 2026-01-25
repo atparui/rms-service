@@ -29,11 +29,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-import tech.jhipster.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
 
 /**
  * REST controller for getting the audit events for entity
- * Only enabled when Javers is available (requires JPA, so disabled for R2DBC)
+ * Only enabled when Javers is available (requires JPA)
  */
 @RestController
 @RequestMapping("/api")

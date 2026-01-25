@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.tenant.domain;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
@@ -32,7 +33,7 @@ public class TenantDatabaseConfig implements Serializable {
     private String validationQuery = "SELECT 1";
 
     @JsonProperty("driverType")
-    private String driverType = "R2DBC"; // Default to R2DBC for backward compatibility
+    private String driverType = "JDBC"; // Default to JDBC
 
     @JsonProperty("clients")
     private java.util.List<TenantClientConfig> clients;
@@ -106,7 +107,7 @@ public class TenantDatabaseConfig implements Serializable {
     }
 
     public void setDriverType(String driverType) {
-        this.driverType = driverType != null ? driverType.toUpperCase() : "R2DBC";
+        this.driverType = driverType != null ? driverType.toUpperCase() : "JDBC";
     }
 
     /**

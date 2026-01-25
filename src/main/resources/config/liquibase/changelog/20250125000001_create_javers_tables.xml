@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        JaVers Audit Tables
+        These tables store the complete audit history of entity changes.
+        
+        Tables:
+        - jv_global_id: Stores entity identifiers
+        - jv_commit: Stores commit metadata (who, when)
+        - jv_commit_property: Stores additional commit properties
+        - jv_snapshot: Stores entity state snapshots
+    -->
+
+    <changeSet id="20250125000001-1" author="javers">
+        <comment>Create JaVers global_id table</comment>
+        <createTable tableName="jv_global_id">
+            <column name="global_id_pk" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="local_id" type="varchar(191)"/>
+            <column name="fragment" type="varchar(200)"/>
+            <column name="type_name" type="varchar(200)"/>
+            <column name="owner_id_fk" type="bigint"/>
+        </createTable>
+        
+        <createIndex indexName="jv_global_id_local_id_idx" tableName="jv_global_id">
+            <column name="local_id"/>
+        </createIndex>
+        
+        <createIndex indexName="jv_global_id_owner_id_fk_idx" tableName="jv_global_id">
+            <column name="owner_id_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20250125000001-2" author="javers">
+        <comment>Create JaVers commit table</comment>
+        <createTable tableName="jv_commit">
+            <column name="commit_pk" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="author" type="varchar(200)"/>
+            <column name="commit_date" type="timestamp"/>
+            <column name="commit_date_instant" type="varchar(30)"/>
+            <column name="commit_id" type="numeric(22,2)"/>
+        </createTable>
+        
+        <createIndex indexName="jv_commit_commit_id_idx" tableName="jv_commit">
+            <column name="commit_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20250125000001-3" author="javers">
+        <comment>Create JaVers commit_property table</comment>
+        <createTable tableName="jv_commit_property">
+            <column name="property_name" type="varchar(191)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_value" type="varchar(600)"/>
+            <column name="commit_fk" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addPrimaryKey tableName="jv_commit_property" 
+                       columnNames="commit_fk,property_name" 
+                       constraintName="jv_commit_property_pk"/>
+        
+        <addForeignKeyConstraint baseTableName="jv_commit_property"
+                                 baseColumnNames="commit_fk"
+                                 constraintName="jv_commit_property_commit_fk"
+                                 referencedTableName="jv_commit"
+                                 referencedColumnNames="commit_pk"/>
+        
+        <createIndex indexName="jv_commit_property_commit_fk_idx" tableName="jv_commit_property">
+            <column name="commit_fk"/>
+        </createIndex>
+        
+        <createIndex indexName="jv_commit_property_property_name_idx" tableName="jv_commit_property">
+            <column name="property_name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20250125000001-4" author="javers">
+        <comment>Create JaVers snapshot table</comment>
+        <createTable tableName="jv_snapshot">
+            <column name="snapshot_pk" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(200)"/>
+            <column name="version" type="bigint"/>
+            <column name="state" type="text"/>
+            <column name="changed_properties" type="text"/>
+            <column name="managed_type" type="varchar(200)"/>
+            <column name="global_id_fk" type="bigint"/>
+            <column name="commit_fk" type="bigint"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseTableName="jv_snapshot"
+                                 baseColumnNames="global_id_fk"
+                                 constraintName="jv_snapshot_global_id_fk"
+                                 referencedTableName="jv_global_id"
+                                 referencedColumnNames="global_id_pk"/>
+        
+        <addForeignKeyConstraint baseTableName="jv_snapshot"
+                                 baseColumnNames="commit_fk"
+                                 constraintName="jv_snapshot_commit_fk"
+                                 referencedTableName="jv_commit"
+                                 referencedColumnNames="commit_pk"/>
+        
+        <createIndex indexName="jv_snapshot_global_id_fk_idx" tableName="jv_snapshot">
+            <column name="global_id_fk"/>
+        </createIndex>
+        
+        <createIndex indexName="jv_snapshot_commit_fk_idx" tableName="jv_snapshot">
+            <column name="commit_fk"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

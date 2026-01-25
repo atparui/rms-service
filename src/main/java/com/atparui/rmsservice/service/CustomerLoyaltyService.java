@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.CustomerLoyalty;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.CustomerLoyaltyRepository;
 import com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.CustomerLoyalty}.
  */
@@ -28,103 +31,57 @@ public class CustomerLoyaltyService {
         this.customerLoyaltyRepository = customerLoyaltyRepository;
         this.customerLoyaltyMapper = customerLoyaltyMapper;
     }
-
-    /**
-     * Save a customerLoyalty.
-     *
-     * @param customerLoyaltyDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<CustomerLoyaltyDTO> save(CustomerLoyaltyDTO customerLoyaltyDTO) {
+    @Transactional
+    public Optional<CustomerLoyaltyDTO> save(CustomerLoyaltyDTO customerLoyaltyDTO) {
         LOG.debug("Request to save CustomerLoyalty : {}", customerLoyaltyDTO);
-        return customerLoyaltyRepository.save(customerLoyaltyMapper.toEntity(customerLoyaltyDTO)).map(customerLoyaltyMapper::toDto);
+        CustomerLoyalty customerLoyalty = customerLoyaltyMapper.toEntity(customerLoyaltyDTO);
+        customerLoyalty = customerLoyaltyRepository.save(customerLoyalty);
+        return Optional.of(customerLoyaltyMapper.toDto(customerLoyalty));
     }
 
-    /**
-     * Update a customerLoyalty.
-     *
-     * @param customerLoyaltyDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<CustomerLoyaltyDTO> update(CustomerLoyaltyDTO customerLoyaltyDTO) {
+    @Transactional
+    public Optional<CustomerLoyaltyDTO> update(CustomerLoyaltyDTO customerLoyaltyDTO) {
         LOG.debug("Request to update CustomerLoyalty : {}", customerLoyaltyDTO);
-        return customerLoyaltyRepository
-            .save(customerLoyaltyMapper.toEntity(customerLoyaltyDTO).setIsPersisted())
-            .map(customerLoyaltyMapper::toDto);
+        CustomerLoyalty customerLoyalty = customerLoyaltyMapper.toEntity(customerLoyaltyDTO);
+        customerLoyalty = customerLoyaltyRepository.save(customerLoyalty);
+        return Optional.of(customerLoyaltyMapper.toDto(customerLoyalty));
     }
 
-    /**
-     * Partially update a customerLoyalty.
-     *
-     * @param customerLoyaltyDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<CustomerLoyaltyDTO> partialUpdate(CustomerLoyaltyDTO customerLoyaltyDTO) {
+    @Transactional
+    public Optional<CustomerLoyaltyDTO> partialUpdate(CustomerLoyaltyDTO customerLoyaltyDTO) {
         LOG.debug("Request to partially update CustomerLoyalty : {}", customerLoyaltyDTO);
-
         return customerLoyaltyRepository
             .findById(customerLoyaltyDTO.getId())
             .map(existingCustomerLoyalty -> {
                 customerLoyaltyMapper.partialUpdate(existingCustomerLoyalty, customerLoyaltyDTO);
-
-                return existingCustomerLoyalty;
+                return customerLoyaltyRepository.save(existingCustomerLoyalty);
             })
-            .flatMap(customerLoyaltyRepository::save)
             .map(customerLoyaltyMapper::toDto);
     }
 
-    /**
-     * Get all the customerLoyalties.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<CustomerLoyaltyDTO> findAll() {
-        LOG.debug("Request to get all CustomerLoyalties");
-        return customerLoyaltyRepository.findAll().map(customerLoyaltyMapper::toDto);
+    public List<CustomerLoyaltyDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all CustomerLoyaltys");
+        Page<CustomerLoyalty> page = customerLoyaltyRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(customerLoyaltyMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of customerLoyalties available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return customerLoyaltyRepository.count();
     }
 
-    /**
-     * Get one customerLoyalty by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<CustomerLoyaltyDTO> findOne(UUID id) {
+    public Optional<CustomerLoyaltyDTO> findOne(UUID id) {
         LOG.debug("Request to get CustomerLoyalty : {}", id);
         return customerLoyaltyRepository.findById(id).map(customerLoyaltyMapper::toDto);
     }
 
-    /**
-     * Delete the customerLoyalty by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete CustomerLoyalty : {}", id);
-        return customerLoyaltyRepository.deleteById(id);
-    }
-
-    /**
-     * Find customer loyalty by customer ID
-     *
-     * @param customerId the customer ID
-     * @return the list of customer loyalty DTOs
-     */
-    @Transactional(readOnly = true)
-    public Flux<CustomerLoyaltyDTO> findByCustomer(UUID customerId) {
-        LOG.debug("Request to find CustomerLoyalty by customer ID : {}", customerId);
-        return customerLoyaltyRepository.findByCustomer(customerId).map(customerLoyaltyMapper::toDto);
+        customerLoyaltyRepository.deleteById(id);
     }
 }

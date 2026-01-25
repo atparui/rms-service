@@ -6,81 +6,71 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A RmsUser.
  */
-@Table("rms_user")
+@Entity
+@Table(name = "rms_user")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "rmsuser")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class RmsUser implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("external_user_id")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "external_user_id")
     private String externalUserId;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("username")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "username")
     private String username;
 
     @Size(max = 255)
-    @Column("email")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "email")
     private String email;
 
     @Size(max = 20)
-    @Column("phone")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "phone")
     private String phone;
 
     @Size(max = 100)
-    @Column("first_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "first_name")
     private String firstName;
 
     @Size(max = 100)
-    @Column("last_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "last_name")
     private String lastName;
 
     @Size(max = 255)
-    @Column("display_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "display_name")
     private String displayName;
 
     @Size(max = 500)
-    @Column("profile_image_url")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column("last_sync_at")
+    @Column(name = "last_sync_at")
     private Instant lastSyncAt;
 
     @Size(max = 50)
-    @Column("sync_status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "sync_status")
     private String syncStatus;
 
-    @Column("sync_error")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "sync_error")
     private String syncError;
 
     @org.springframework.data.annotation.Transient

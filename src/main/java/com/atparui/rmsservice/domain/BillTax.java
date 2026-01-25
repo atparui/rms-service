@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A BillTax.
  */
-@Table("bill_tax")
+@Entity
+@Table(name = "bill_tax")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BillTax implements Serializable, Persistable<UUID> {
@@ -21,24 +23,24 @@ public class BillTax implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("tax_name")
+    @Column(name = "tax_name")
     private String taxName;
 
     @NotNull(message = "must not be null")
-    @Column("tax_rate")
+    @Column(name = "tax_rate")
     private BigDecimal taxRate;
 
     @NotNull(message = "must not be null")
-    @Column("taxable_amount")
+    @Column(name = "taxable_amount")
     private BigDecimal taxableAmount;
 
     @NotNull(message = "must not be null")
-    @Column("tax_amount")
+    @Column(name = "tax_amount")
     private BigDecimal taxAmount;
 
     @org.springframework.data.annotation.Transient
@@ -52,10 +54,10 @@ public class BillTax implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private TaxConfig taxConfig;
 
-    @Column("bill_id")
+    @Column(name = "bill_id")
     private UUID billId;
 
-    @Column("tax_config_id")
+    @Column(name = "tax_config_id")
     private UUID taxConfigId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

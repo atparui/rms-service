@@ -136,4 +136,60 @@ public final class SecurityUtils {
         }
         return List.of();
     }
+
+    /**
+     * Extract authorities from JWT claims (groups or roles).
+     *
+     * @param claims the JWT claims
+     * @return a list of authorities
+     */
+    public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
+        return extractRolesFromClaims(claims)
+            .stream()
+            .map(role -> (GrantedAuthority) new org.springframework.security.core.authority.SimpleGrantedAuthority(role))
+            .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> extractRolesFromClaims(Map<String, Object> claims) {
+        // Try to get roles from different claim locations
+        // 1. Check for "groups" claim (common in Keycloak)
+        Object groups = claims.get("groups");
+        if (groups instanceof List) {
+            return ((List<Object>) groups).stream()
+                .map(Object::toString)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
+                .collect(Collectors.toList());
+        }
+
+        // 2. Check for "roles" claim
+        Object roles = claims.get("roles");
+        if (roles instanceof List) {
+            return ((List<Object>) roles).stream()
+                .map(Object::toString)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
+                .collect(Collectors.toList());
+        }
+
+        // 3. Check for namespaced "groups"
+        Object namespacedGroups = claims.get(CLAIMS_NAMESPACE + "groups");
+        if (namespacedGroups instanceof List) {
+            return ((List<Object>) namespacedGroups).stream()
+                .map(Object::toString)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
+                .collect(Collectors.toList());
+        }
+
+        // 4. Check for namespaced "roles"
+        Object namespacedRoles = claims.get(CLAIMS_NAMESPACE + "roles");
+        if (namespacedRoles instanceof List) {
+            return ((List<Object>) namespacedRoles).stream()
+                .map(Object::toString)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
+                .collect(Collectors.toList());
+        }
+
+        // Default to ROLE_USER if no roles found
+        return List.of("ROLE_USER");
+    }
 }

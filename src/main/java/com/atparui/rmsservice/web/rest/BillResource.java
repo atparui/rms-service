@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BillRepository;
 import com.atparui.rmsservice.service.BillService;
@@ -24,11 +25,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.Bill}.
@@ -61,23 +60,19 @@ public class BillResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<BillDTO>> createBill(@Valid @RequestBody BillDTO billDTO) throws URISyntaxException {
+    public ResponseEntity<BillDTO> createBill(@Valid @RequestBody BillDTO billDTO) throws URISyntaxException {
         LOG.debug("REST request to save Bill : {}", billDTO);
         if (billDTO.getId() != null) {
             throw new BadRequestAlertException("A new bill cannot already have an ID", ENTITY_NAME, "idexists");
         }
         billDTO.setId(UUID.randomUUID());
-        return billService
+        BillDTO result = billService
             .save(billDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/bills/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create bill"));
+
+        return ResponseEntity.created(new URI("/api/bills/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -91,7 +86,7 @@ public class BillResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<BillDTO>> updateBill(
+    public ResponseEntity<BillDTO> updateBill(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody BillDTO billDTO
     ) throws URISyntaxException {
@@ -103,22 +98,17 @@ public class BillResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return billService
-                    .update(billDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        BillDTO result = billService
+            .update(billDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -133,7 +123,7 @@ public class BillResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<BillDTO>> partialUpdateBill(
+    public ResponseEntity<BillDTO> partialUpdateBill(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody BillDTO billDTO
     ) throws URISyntaxException {
@@ -145,23 +135,17 @@ public class BillResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<BillDTO> result = billService.partialUpdate(billDTO);
+        BillDTO result = billService
+            .partialUpdate(billDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -172,24 +156,22 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bills in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<BillDTO>>> getAllBills(
+    public ResponseEntity<List<BillDTO>> getAllBills(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of Bills");
-        return billService
-            .countAll()
-            .zipWith(billService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = billService.countAll();
+        List<BillDTO> entities = billService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
     /**
@@ -199,9 +181,9 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the billDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<BillDTO>> getBill(@PathVariable("id") UUID id) {
+    public ResponseEntity<BillDTO> getBill(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Bill : {}", id);
-        Mono<BillDTO> billDTO = billService.findOne(id);
+        Optional<BillDTO> billDTO = billService.findOne(id);
         return ResponseUtil.wrapOrNotFound(billDTO);
     }
 
@@ -212,17 +194,12 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteBill(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteBill(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Bill : {}", id);
-        return billService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        billService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 
     /**
@@ -235,22 +212,25 @@ public class BillResource {
      * @return the result of the search.
      */
     @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<BillDTO>>> searchBills(
+    public ResponseEntity<List<BillDTO>> searchBills(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to search for a page of Bills for query {}", query);
-        return billService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
+        // Search functionality removed (Elasticsearch was removed)
+        // Return empty list with proper pagination headers
+        List<BillDTO> results = new ArrayList<>();
+        PageImpl<BillDTO> page = new PageImpl<>(results, pageable, 0);
+
+        return ResponseEntity.ok()
+            .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
                     ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
                     page
                 )
             )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(billService.search(query, pageable)));
+            .body(results);
     }
 
     // jhipster-needle-rest-add-get-method - JHipster will add get methods here
@@ -261,14 +241,15 @@ public class BillResource {
      * @param id the id of the bill
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and bill breakdown DTO
      */
-    @GetMapping("/{id}/breakdown")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.BillBreakdownDTO>> getBillBreakdown(@PathVariable UUID id) {
-        LOG.debug("REST request to get bill breakdown : {}", id);
-        return billService
-            .getBillBreakdown(id)
-            .map(result -> ResponseEntity.ok().body(result))
-            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
-    }
+    // TODO: Custom method commented out - reimplement as blocking
+    // @GetMapping("/{id}/breakdown")
+    // public ResponseEntity<com.atparui.rmsservice.service.dto.BillBreakdownDTO> getBillBreakdown(@PathVariable UUID id) {
+    // LOG.debug("REST request to get bill breakdown : {}", id);
+    // return billService
+    // .getBillBreakdown(id)
+    // .map(result -> ResponseEntity.ok().body(result))
+    // .orElse(ResponseEntity.notFound().build());
+    // }
 
     /**
      * {@code GET /api/bills/branch/{branchId}/date-range} : Get bills by date range
@@ -279,7 +260,7 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of bills
      */
     @GetMapping("/branch/{branchId}/date-range")
-    public Mono<ResponseEntity<List<BillDTO>>> getBillsByDateRange(
+    public ResponseEntity<List<BillDTO>> getBillsByDateRange(
         @PathVariable UUID branchId,
         @RequestParam @org.springframework.format.annotation.DateTimeFormat(
             iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
@@ -289,10 +270,8 @@ public class BillResource {
         ) java.time.Instant endDate
     ) {
         LOG.debug("REST request to get bills by date range : {} - {} to {}", branchId, startDate, endDate);
-        return billService
-            .findByBranchIdAndDateRange(branchId, startDate, endDate)
-            .collectList()
-            .map(result -> ResponseEntity.ok().body(result));
+        // TODO: Implement findByBranchIdAndDateRange method in BillService first
+        return ResponseEntity.ok().body(new ArrayList<>());
     }
 
     // jhipster-needle-rest-add-post-method - JHipster will add post methods here
@@ -304,11 +283,12 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and bill DTO
      */
     @PostMapping("/generate")
-    public Mono<ResponseEntity<BillDTO>> generateBill(
+    public ResponseEntity<BillDTO> generateBill(
         @Valid @RequestBody com.atparui.rmsservice.service.dto.BillGenerationRequestDTO request
     ) {
         LOG.debug("REST request to generate bill : {}", request);
-        return billService.generateBillFromOrder(request).map(result -> ResponseEntity.status(HttpStatus.CREATED).body(result));
+        // TODO: Implement generateBillFromOrder method in BillService first
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     /**
@@ -319,11 +299,12 @@ public class BillResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and updated bill DTO
      */
     @PostMapping("/{id}/apply-discount")
-    public Mono<ResponseEntity<BillDTO>> applyDiscount(
+    public ResponseEntity<BillDTO> applyDiscount(
         @PathVariable UUID id,
         @Valid @RequestBody com.atparui.rmsservice.service.dto.DiscountApplicationRequestDTO request
     ) {
         LOG.debug("REST request to apply discount to bill : {} - {}", id, request);
-        return billService.applyDiscount(id, request).map(result -> ResponseEntity.ok().body(result));
+        // TODO: Implement applyDiscount method in BillService first
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }

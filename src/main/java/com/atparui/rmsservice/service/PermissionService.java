@@ -1,4 +1,8 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.domain.Permission;
 import com.atparui.rmsservice.repository.PermissionRepository;
@@ -11,9 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.Permission}.
  */
@@ -30,52 +31,57 @@ public class PermissionService {
         this.permissionRepository = permissionRepository;
         this.permissionMapper = permissionMapper;
     }
-
-    public Mono<PermissionDTO> save(PermissionDTO permissionDTO) {
+    @Transactional
+    public Optional<PermissionDTO> save(PermissionDTO permissionDTO) {
         LOG.debug("Request to save Permission : {}", permissionDTO);
-        return permissionRepository.save(permissionMapper.toEntity(permissionDTO)).map(permissionMapper::toDto);
+        Permission permission = permissionMapper.toEntity(permissionDTO);
+        permission = permissionRepository.save(permission);
+        return Optional.of(permissionMapper.toDto(permission));
     }
 
-    public Mono<PermissionDTO> update(PermissionDTO permissionDTO) {
+    @Transactional
+    public Optional<PermissionDTO> update(PermissionDTO permissionDTO) {
         LOG.debug("Request to update Permission : {}", permissionDTO);
-        return permissionRepository.save(permissionMapper.toEntity(permissionDTO).setIsPersisted()).map(permissionMapper::toDto);
+        Permission permission = permissionMapper.toEntity(permissionDTO);
+        permission = permissionRepository.save(permission);
+        return Optional.of(permissionMapper.toDto(permission));
     }
 
-    public Mono<PermissionDTO> partialUpdate(PermissionDTO permissionDTO) {
+    @Transactional
+    public Optional<PermissionDTO> partialUpdate(PermissionDTO permissionDTO) {
         LOG.debug("Request to partially update Permission : {}", permissionDTO);
         return permissionRepository
             .findById(permissionDTO.getId())
-            .map(existing -> {
-                permissionMapper.partialUpdate(existing, permissionDTO);
-                return existing;
+            .map(existingPermission -> {
+                permissionMapper.partialUpdate(existingPermission, permissionDTO);
+                return permissionRepository.save(existingPermission);
             })
-            .flatMap(permissionRepository::save)
             .map(permissionMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Flux<PermissionDTO> findAll(Pageable pageable) {
+    public List<PermissionDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all Permissions");
-        return permissionRepository.findAllBy(pageable).map(permissionMapper::toDto);
+        Page<Permission> page = permissionRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(permissionMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return permissionRepository.count();
     }
 
     @Transactional(readOnly = true)
-    public Mono<PermissionDTO> findOne(UUID id) {
+    public Optional<PermissionDTO> findOne(UUID id) {
         LOG.debug("Request to get Permission : {}", id);
         return permissionRepository.findById(id).map(permissionMapper::toDto);
     }
 
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete Permission : {}", id);
-        return permissionRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public Flux<Permission> findByCodes(Collection<String> codes) {
-        return permissionRepository.findByCodeIn(codes);
+        permissionRepository.deleteById(id);
     }
 }

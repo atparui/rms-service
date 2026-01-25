@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.config;
+import java.util.Optional;
 
 import com.atparui.rmsservice.tenant.TenantContextHolder;
 import com.atparui.rmsservice.tenant.TenantOAuth2ClientService;
@@ -9,11 +10,10 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 /**
  * Dynamic OAuth2 Client Registration Repository that resolves client registrations
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
  * and client types dynamically.
  */
 @Component
-public class DynamicOAuth2ClientRegistrationRepository implements ReactiveClientRegistrationRepository {
+public class DynamicOAuth2ClientRegistrationRepository implements ClientRegistrationRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DynamicOAuth2ClientRegistrationRepository.class);
 
@@ -49,31 +49,26 @@ public class DynamicOAuth2ClientRegistrationRepository implements ReactiveClient
      * 2. Client type (web or mobile, from request header or default to web)
      *
      * @param registrationId the registration ID (typically "oidc")
-     * @return Mono containing ClientRegistration
+     * @return ClientRegistration or null
      */
     @Override
-    public Mono<ClientRegistration> findByRegistrationId(String registrationId) {
+    public ClientRegistration findByRegistrationId(String registrationId) {
         if (!DEFAULT_REGISTRATION_ID.equals(registrationId)) {
             LOG.warn("Unknown registration ID: {}", registrationId);
-            return Mono.empty();
+            return null;
         }
 
         // Get tenant ID from context
-        return TenantContextHolder.getCurrentTenantId()
-            .flatMap(tenantId ->
-                // Determine client type from context or default to "web"
-                getClientTypeFromContext()
-                    .flatMap(clientType -> {
-                        final String finalClientType = clientType;
-                        return resolveClientRegistration(tenantId, finalClientType);
-                    })
-            )
-            .switchIfEmpty(
-                Mono.defer(() -> {
-                    LOG.warn("No tenant ID found in context, cannot resolve OAuth2 client registration");
-                    return Mono.empty();
-                })
-            );
+        Optional<String> tenantIdOpt = TenantContextHolder.getCurrentTenantId().blockOptional();
+        if (tenantIdOpt.isEmpty()) {
+            LOG.warn("No tenant ID found in context, cannot resolve OAuth2 client registration");
+            return null;
+        }
+
+        String tenantId = tenantIdOpt.get();
+        String clientType = getClientTypeFromContext().blockOptional().orElse("web");
+        
+        return resolveClientRegistration(tenantId, clientType);
     }
 
     /**
@@ -82,11 +77,11 @@ public class DynamicOAuth2ClientRegistrationRepository implements ReactiveClient
      *
      * @param tenantId the tenant ID
      * @param clientType the client type (web or mobile)
-     * @return Mono containing ClientRegistration
+     * @return ClientRegistration or null
      */
-    public Mono<ClientRegistration> resolveClientRegistration(String tenantId, String clientType) {
+    public ClientRegistration resolveClientRegistration(String tenantId, String clientType) {
         if (tenantId == null || tenantId.isBlank()) {
-            return Mono.error(new IllegalArgumentException("Tenant ID cannot be null or blank"));
+            throw new IllegalArgumentException("Tenant ID cannot be null or blank");
         }
         final String finalClientType = (clientType == null || clientType.isBlank()) ? "web" : clientType;
 
@@ -96,52 +91,55 @@ public class DynamicOAuth2ClientRegistrationRepository implements ReactiveClient
         ClientRegistration cached = registrationCache.getIfPresent(cacheKey);
         if (cached != null) {
             LOG.debug("Retrieved client registration from cache for tenant: {}, clientType: {}", tenantId, finalClientType);
-            return Mono.just(cached);
+            return cached;
         }
 
-        // Fetch OAuth2 client config from gateway
-        return tenantOAuth2ClientService
-            .getOAuth2ClientConfig(tenantId, finalClientType)
-            .flatMap(config -> {
-                TenantDatabaseConfig.TenantClientConfig clientConfig = config.getClientByType(finalClientType);
+        try {
+            // Fetch OAuth2 client config from gateway
+            TenantDatabaseConfig config = tenantOAuth2ClientService
+                .getOAuth2ClientConfig(tenantId, finalClientType)
+                .block();
+                
+            if (config == null) {
+                LOG.error("No OAuth2 configuration found for tenant {} and clientType {}", tenantId, finalClientType);
+                return null;
+            }
 
-                if (clientConfig == null) {
-                    LOG.error("No OAuth2 client configuration found for tenant {} and clientType {}", tenantId, finalClientType);
-                    return Mono.error(
-                        new IllegalStateException(
-                            "No OAuth2 client configuration found for tenant: " + tenantId + ", clientType: " + finalClientType
-                        )
-                    );
-                }
+            TenantDatabaseConfig.TenantClientConfig clientConfig = config.getClientByType(finalClientType);
 
-                if (config.getIssuerUri() == null) {
-                    LOG.error("No issuer URI found for tenant {}", tenantId);
-                    return Mono.error(new IllegalStateException("No issuer URI found for tenant: " + tenantId));
-                }
+            if (clientConfig == null) {
+                LOG.error("No OAuth2 client configuration found for tenant {} and clientType {}", tenantId, finalClientType);
+                return null;
+            }
 
-                // Build ClientRegistration
-                ClientRegistration registration = buildClientRegistration(
-                    tenantId,
-                    finalClientType,
-                    config.getIssuerUri(),
-                    clientConfig.getClientId(),
-                    clientConfig.getClientSecret()
-                );
+            if (config.getIssuerUri() == null) {
+                LOG.error("No issuer URI found for tenant {}", tenantId);
+                return null;
+            }
 
-                // Cache the registration
-                registrationCache.put(cacheKey, registration);
-                LOG.info("Created and cached client registration for tenant: {}, clientType: {}", tenantId, finalClientType);
+            // Build ClientRegistration
+            ClientRegistration registration = buildClientRegistration(
+                tenantId,
+                finalClientType,
+                config.getIssuerUri(),
+                clientConfig.getClientId(),
+                clientConfig.getClientSecret()
+            );
 
-                return Mono.just(registration);
-            })
-            .doOnError(error -> {
-                LOG.error(
-                    "Failed to resolve client registration for tenant {} and clientType {}: {}",
-                    tenantId,
-                    finalClientType,
-                    error.getMessage()
-                );
-            });
+            // Cache the registration
+            registrationCache.put(cacheKey, registration);
+            LOG.info("Created and cached client registration for tenant: {}, clientType: {}", tenantId, finalClientType);
+
+            return registration;
+        } catch (Exception error) {
+            LOG.error(
+                "Failed to resolve client registration for tenant {} and clientType {}: {}",
+                tenantId,
+                finalClientType,
+                error.getMessage()
+            );
+            return null;
+        }
     }
 
     /**
@@ -170,14 +168,13 @@ public class DynamicOAuth2ClientRegistrationRepository implements ReactiveClient
     }
 
     /**
-     * Extract client type from Reactor context.
+     * Extract client type from servlet request context.
      * Client type is set by ClientTypeFilter based on X-Client-Type header.
      */
-    private Mono<String> getClientTypeFromContext() {
-        return Mono.deferContextual(ctx -> {
-            String clientType = ctx.getOrDefault("CLIENT_TYPE", "web");
-            return Mono.just(clientType);
-        });
+    private reactor.core.publisher.Mono<String> getClientTypeFromContext() {
+        // In non-reactive apps, we could get this from ServletRequestAttributes if needed
+        // For now, default to "web"
+        return reactor.core.publisher.Mono.just("web");
     }
 
     /**

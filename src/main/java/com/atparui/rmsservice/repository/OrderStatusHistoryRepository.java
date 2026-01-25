@@ -2,47 +2,36 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.OrderStatusHistory;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the OrderStatusHistory entity.
+ * Spring Data JPA repository for the OrderStatusHistory entity.
  */
 @SuppressWarnings("unused")
 @Repository
 public interface OrderStatusHistoryRepository
-    extends ReactiveCrudRepository<OrderStatusHistory, UUID>, OrderStatusHistoryRepositoryInternal {
-    @Query("SELECT * FROM order_status_history entity WHERE entity.order_id = :id")
-    Flux<OrderStatusHistory> findByOrder(UUID id);
+    extends JpaRepository<OrderStatusHistory, UUID> {
+    @Query(value = "SELECT * FROM order_status_history entity WHERE entity.order_id = :id", nativeQuery = true)
+    List<OrderStatusHistory> findByOrder(UUID id);
 
-    @Query("SELECT * FROM order_status_history entity WHERE entity.order_id IS NULL")
-    Flux<OrderStatusHistory> findAllByOrderIsNull();
-
-    @Override
-    <S extends OrderStatusHistory> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM order_status_history entity WHERE entity.order_id IS NULL", nativeQuery = true)
+    List<OrderStatusHistory> findAllByOrderIsNull();
 
     @Override
-    Flux<OrderStatusHistory> findAll();
+    <S extends OrderStatusHistory> S save(S entity);
 
     @Override
-    Mono<OrderStatusHistory> findById(UUID id);
+    List<OrderStatusHistory> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<OrderStatusHistory> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface OrderStatusHistoryRepositoryInternal {
-    <S extends OrderStatusHistory> Mono<S> save(S entity);
-
-    Flux<OrderStatusHistory> findAllBy(Pageable pageable);
-
-    Flux<OrderStatusHistory> findAll();
-
-    Mono<OrderStatusHistory> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<OrderStatusHistory> findAllBy(Pageable pageable, Criteria criteria);
-}

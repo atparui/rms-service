@@ -5,14 +5,16 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A AppNavigationMenuItem.
  */
-@Table("app_navigation_menu_item")
+@Entity
+@Table(name = "app_navigation_menu_item")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppNavigationMenuItem implements Serializable, Persistable<UUID> {
@@ -20,47 +22,47 @@ public class AppNavigationMenuItem implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("item_code")
+    @Column(name = "item_code")
     private String itemCode;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("item_name")
+    @Column(name = "item_name")
     private String itemName;
 
-    @Column("description")
+    @Column(name = "description")
     private String description;
 
     @Size(max = 100)
-    @Column("icon")
+    @Column(name = "icon")
     private String icon;
 
     @NotNull(message = "must not be null")
     @Size(max = 500)
-    @Column("route_path")
+    @Column(name = "route_path")
     private String routePath;
 
     @Size(max = 500)
-    @Column("component_path")
+    @Column(name = "component_path")
     private String componentPath;
 
-    @Column("display_order")
+    @Column(name = "display_order")
     private Integer displayOrder;
 
     @Size(max = 50)
-    @Column("badge_text")
+    @Column(name = "badge_text")
     private String badgeText;
 
     @Size(max = 50)
-    @Column("badge_color")
+    @Column(name = "badge_color")
     private String badgeColor;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -69,7 +71,7 @@ public class AppNavigationMenuItem implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private AppNavigationMenu parentMenu;
 
-    @Column("parent_menu_id")
+    @Column(name = "parent_menu_id")
     private UUID parentMenuId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

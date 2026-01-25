@@ -5,86 +5,75 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Customer.
  */
-@Table("customer")
+@Entity
+@Table(name = "customer")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "customer")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Customer implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @Size(max = 50)
-    @Column("customer_code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "customer_code")
     private String customerCode;
 
     @Size(max = 20)
-    @Column("phone")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "phone")
     private String phone;
 
     @Size(max = 255)
-    @Column("email")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "email")
     private String email;
 
     @Size(max = 100)
-    @Column("first_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "first_name")
     private String firstName;
 
     @Size(max = 100)
-    @Column("last_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column("date_of_birth")
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
     @Size(max = 255)
-    @Column("address_line_1")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "address_line_1")
     private String addressLine1;
 
     @Size(max = 255)
-    @Column("address_line_2")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "address_line_2")
     private String addressLine2;
 
     @Size(max = 100)
-    @Column("city")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "city")
     private String city;
 
     @Size(max = 100)
-    @Column("state")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "state")
     private String state;
 
     @Size(max = 100)
-    @Column("country")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "country")
     private String country;
 
     @Size(max = 20)
-    @Column("postal_code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "postal_code")
     private String postalCode;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -93,7 +82,7 @@ public class Customer implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private RmsUser user;
 
-    @Column("user_id")
+    @Column(name = "user_id")
     private UUID userId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

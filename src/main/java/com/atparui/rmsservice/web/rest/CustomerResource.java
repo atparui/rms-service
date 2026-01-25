@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.CustomerRepository;
 import com.atparui.rmsservice.service.CustomerService;
@@ -24,11 +25,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.Customer}.
@@ -61,23 +60,19 @@ public class CustomerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<CustomerDTO>> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) throws URISyntaxException {
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) throws URISyntaxException {
         LOG.debug("REST request to save Customer : {}", customerDTO);
         if (customerDTO.getId() != null) {
             throw new BadRequestAlertException("A new customer cannot already have an ID", ENTITY_NAME, "idexists");
         }
         customerDTO.setId(UUID.randomUUID());
-        return customerService
+        CustomerDTO result = customerService
             .save(customerDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/customers/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create customer"));
+
+        return ResponseEntity.created(new URI("/api/customers/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -91,7 +86,7 @@ public class CustomerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<CustomerDTO>> updateCustomer(
+    public ResponseEntity<CustomerDTO> updateCustomer(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody CustomerDTO customerDTO
     ) throws URISyntaxException {
@@ -103,22 +98,17 @@ public class CustomerResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return customerRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!customerRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return customerService
-                    .update(customerDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        CustomerDTO result = customerService
+            .update(customerDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -133,7 +123,7 @@ public class CustomerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<CustomerDTO>> partialUpdateCustomer(
+    public ResponseEntity<CustomerDTO> partialUpdateCustomer(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody CustomerDTO customerDTO
     ) throws URISyntaxException {
@@ -145,23 +135,17 @@ public class CustomerResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return customerRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!customerRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<CustomerDTO> result = customerService.partialUpdate(customerDTO);
+        CustomerDTO result = customerService
+            .partialUpdate(customerDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -172,24 +156,22 @@ public class CustomerResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of customers in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<CustomerDTO>>> getAllCustomers(
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of Customers");
-        return customerService
-            .countAll()
-            .zipWith(customerService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = customerService.countAll();
+        List<CustomerDTO> entities = customerService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
     /**
@@ -199,9 +181,9 @@ public class CustomerResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the customerDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<CustomerDTO>> getCustomer(@PathVariable("id") UUID id) {
+    public ResponseEntity<CustomerDTO> getCustomer(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Customer : {}", id);
-        Mono<CustomerDTO> customerDTO = customerService.findOne(id);
+        Optional<CustomerDTO> customerDTO = customerService.findOne(id);
         return ResponseUtil.wrapOrNotFound(customerDTO);
     }
 
@@ -212,17 +194,12 @@ public class CustomerResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteCustomer(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteCustomer(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Customer : {}", id);
-        return customerService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        customerService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 
     /**
@@ -235,22 +212,25 @@ public class CustomerResource {
      * @return the result of the search.
      */
     @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<CustomerDTO>>> searchCustomers(
+    public ResponseEntity<List<CustomerDTO>> searchCustomers(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to search for a page of Customers for query {}", query);
-        return customerService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
+        // Search functionality removed (Elasticsearch was removed)
+        // Return empty list with proper pagination headers
+        List<CustomerDTO> results = new ArrayList<>();
+        PageImpl<CustomerDTO> page = new PageImpl<>(results, pageable, 0);
+
+        return ResponseEntity.ok()
+            .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
                     ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
                     page
                 )
             )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(customerService.search(query, pageable)));
+            .body(results);
     }
 
     // jhipster-needle-rest-add-get-method - JHipster will add get methods here
@@ -261,11 +241,13 @@ public class CustomerResource {
      * @param id the id of the customer
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of orders
      */
-    @GetMapping("/{id}/orders")
-    public Mono<ResponseEntity<List<com.atparui.rmsservice.service.dto.OrderDTO>>> getCustomerOrders(@PathVariable UUID id) {
-        LOG.debug("REST request to get customer orders : {}", id);
-        return customerService.getCustomerOrders(id).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
+    // TODO: Implement getCustomerOrders method in CustomerService first
+    // @GetMapping("/{id}/orders")
+    // public ResponseEntity<List<com.atparui.rmsservice.service.dto.OrderDTO>> getCustomerOrders(@PathVariable UUID id) {
+    //     LOG.debug("REST request to get customer orders : {}", id);
+    //     List<com.atparui.rmsservice.service.dto.OrderDTO> result = customerService.getCustomerOrders(id);
+    //     return ResponseEntity.ok().body(result);
+    // }
 
     /**
      * {@code GET /api/customers/{id}/loyalty} : Get customer loyalty
@@ -273,14 +255,15 @@ public class CustomerResource {
      * @param id the id of the customer
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and loyalty DTO
      */
-    @GetMapping("/{id}/loyalty")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO>> getCustomerLoyalty(@PathVariable UUID id) {
-        LOG.debug("REST request to get customer loyalty : {}", id);
-        return customerService
-            .getCustomerLoyalty(id)
-            .map(result -> ResponseEntity.ok().body(result))
-            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
-    }
+    // TODO: Implement getCustomerLoyalty method in CustomerService first
+    // @GetMapping("/{id}/loyalty")
+    // public ResponseEntity<com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO> getCustomerLoyalty(@PathVariable UUID id) {
+    //     LOG.debug("REST request to get customer loyalty : {}", id);
+    //     Optional<com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO> result = customerService.getCustomerLoyalty(id);
+    //     return result
+    //         .map(dto -> ResponseEntity.ok().body(dto))
+    //         .orElse(ResponseEntity.notFound().build());
+    // }
 
     // jhipster-needle-rest-add-post-method - JHipster will add post methods here
 
@@ -291,12 +274,14 @@ public class CustomerResource {
      * @param request the points addition request
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and updated loyalty DTO
      */
-    @PostMapping("/{id}/loyalty/add-points")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO>> addLoyaltyPoints(
-        @PathVariable UUID id,
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.LoyaltyPointsRequestDTO request
-    ) {
-        LOG.debug("REST request to add loyalty points : {} - {}", id, request);
-        return customerService.addLoyaltyPoints(id, request).map(result -> ResponseEntity.ok().body(result));
-    }
+    // TODO: Implement addLoyaltyPoints method in CustomerService first
+    // @PostMapping("/{id}/loyalty/add-points")
+    // public ResponseEntity<com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO> addLoyaltyPoints(
+    //     @PathVariable UUID id,
+    //     @Valid @RequestBody com.atparui.rmsservice.service.dto.LoyaltyPointsRequestDTO request
+    // ) {
+    //     LOG.debug("REST request to add loyalty points : {} - {}", id, request);
+    //     com.atparui.rmsservice.service.dto.CustomerLoyaltyDTO result = customerService.addLoyaltyPoints(id, request);
+    //     return ResponseEntity.ok().body(result);
+    // }
 }

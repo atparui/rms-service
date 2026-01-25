@@ -2,52 +2,41 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.BillItem;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the BillItem entity.
+ * Spring Data JPA repository for the BillItem entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BillItemRepository extends ReactiveCrudRepository<BillItem, UUID>, BillItemRepositoryInternal {
-    @Query("SELECT * FROM bill_item entity WHERE entity.bill_id = :id")
-    Flux<BillItem> findByBill(UUID id);
+public interface BillItemRepository extends JpaRepository<BillItem, UUID> {
+    @Query(value = "SELECT * FROM bill_item entity WHERE entity.bill_id = :id", nativeQuery = true)
+    List<BillItem> findByBill(UUID id);
 
-    @Query("SELECT * FROM bill_item entity WHERE entity.bill_id IS NULL")
-    Flux<BillItem> findAllByBillIsNull();
+    @Query(value = "SELECT * FROM bill_item entity WHERE entity.bill_id IS NULL", nativeQuery = true)
+    List<BillItem> findAllByBillIsNull();
 
-    @Query("SELECT * FROM bill_item entity WHERE entity.order_item_id = :id")
-    Flux<BillItem> findByOrderItem(UUID id);
+    @Query(value = "SELECT * FROM bill_item entity WHERE entity.order_item_id = :id", nativeQuery = true)
+    List<BillItem> findByOrderItem(UUID id);
 
-    @Query("SELECT * FROM bill_item entity WHERE entity.order_item_id IS NULL")
-    Flux<BillItem> findAllByOrderItemIsNull();
-
-    @Override
-    <S extends BillItem> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM bill_item entity WHERE entity.order_item_id IS NULL", nativeQuery = true)
+    List<BillItem> findAllByOrderItemIsNull();
 
     @Override
-    Flux<BillItem> findAll();
+    <S extends BillItem> S save(S entity);
 
     @Override
-    Mono<BillItem> findById(UUID id);
+    List<BillItem> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<BillItem> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface BillItemRepositoryInternal {
-    <S extends BillItem> Mono<S> save(S entity);
-
-    Flux<BillItem> findAllBy(Pageable pageable);
-
-    Flux<BillItem> findAll();
-
-    Mono<BillItem> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<BillItem> findAllBy(Pageable pageable, Criteria criteria);
-}

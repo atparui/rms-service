@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.OrderStatusHistory;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.OrderStatusHistoryRepository;
 import com.atparui.rmsservice.service.dto.OrderStatusHistoryDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.OrderStatusHistory}.
  */
@@ -31,93 +34,57 @@ public class OrderStatusHistoryService {
         this.orderStatusHistoryRepository = orderStatusHistoryRepository;
         this.orderStatusHistoryMapper = orderStatusHistoryMapper;
     }
-
-    /**
-     * Save a orderStatusHistory.
-     *
-     * @param orderStatusHistoryDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<OrderStatusHistoryDTO> save(OrderStatusHistoryDTO orderStatusHistoryDTO) {
+    @Transactional
+    public Optional<OrderStatusHistoryDTO> save(OrderStatusHistoryDTO orderStatusHistoryDTO) {
         LOG.debug("Request to save OrderStatusHistory : {}", orderStatusHistoryDTO);
-        return orderStatusHistoryRepository
-            .save(orderStatusHistoryMapper.toEntity(orderStatusHistoryDTO))
-            .map(orderStatusHistoryMapper::toDto);
+        OrderStatusHistory orderStatusHistory = orderStatusHistoryMapper.toEntity(orderStatusHistoryDTO);
+        orderStatusHistory = orderStatusHistoryRepository.save(orderStatusHistory);
+        return Optional.of(orderStatusHistoryMapper.toDto(orderStatusHistory));
     }
 
-    /**
-     * Update a orderStatusHistory.
-     *
-     * @param orderStatusHistoryDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<OrderStatusHistoryDTO> update(OrderStatusHistoryDTO orderStatusHistoryDTO) {
+    @Transactional
+    public Optional<OrderStatusHistoryDTO> update(OrderStatusHistoryDTO orderStatusHistoryDTO) {
         LOG.debug("Request to update OrderStatusHistory : {}", orderStatusHistoryDTO);
-        return orderStatusHistoryRepository
-            .save(orderStatusHistoryMapper.toEntity(orderStatusHistoryDTO).setIsPersisted())
-            .map(orderStatusHistoryMapper::toDto);
+        OrderStatusHistory orderStatusHistory = orderStatusHistoryMapper.toEntity(orderStatusHistoryDTO);
+        orderStatusHistory = orderStatusHistoryRepository.save(orderStatusHistory);
+        return Optional.of(orderStatusHistoryMapper.toDto(orderStatusHistory));
     }
 
-    /**
-     * Partially update a orderStatusHistory.
-     *
-     * @param orderStatusHistoryDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<OrderStatusHistoryDTO> partialUpdate(OrderStatusHistoryDTO orderStatusHistoryDTO) {
+    @Transactional
+    public Optional<OrderStatusHistoryDTO> partialUpdate(OrderStatusHistoryDTO orderStatusHistoryDTO) {
         LOG.debug("Request to partially update OrderStatusHistory : {}", orderStatusHistoryDTO);
-
         return orderStatusHistoryRepository
             .findById(orderStatusHistoryDTO.getId())
             .map(existingOrderStatusHistory -> {
                 orderStatusHistoryMapper.partialUpdate(existingOrderStatusHistory, orderStatusHistoryDTO);
-
-                return existingOrderStatusHistory;
+                return orderStatusHistoryRepository.save(existingOrderStatusHistory);
             })
-            .flatMap(orderStatusHistoryRepository::save)
             .map(orderStatusHistoryMapper::toDto);
     }
 
-    /**
-     * Get all the orderStatusHistories.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<OrderStatusHistoryDTO> findAll() {
-        LOG.debug("Request to get all OrderStatusHistories");
-        return orderStatusHistoryRepository.findAll().map(orderStatusHistoryMapper::toDto);
+    public List<OrderStatusHistoryDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all OrderStatusHistorys");
+        Page<OrderStatusHistory> page = orderStatusHistoryRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(orderStatusHistoryMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of orderStatusHistories available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return orderStatusHistoryRepository.count();
     }
 
-    /**
-     * Get one orderStatusHistory by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<OrderStatusHistoryDTO> findOne(UUID id) {
+    public Optional<OrderStatusHistoryDTO> findOne(UUID id) {
         LOG.debug("Request to get OrderStatusHistory : {}", id);
         return orderStatusHistoryRepository.findById(id).map(orderStatusHistoryMapper::toDto);
     }
 
-    /**
-     * Delete the orderStatusHistory by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete OrderStatusHistory : {}", id);
-        return orderStatusHistoryRepository.deleteById(id);
+        orderStatusHistoryRepository.deleteById(id);
     }
 }

@@ -1,26 +1,27 @@
 package com.atparui.rmsservice.broker;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
 @Component
 public class KafkaConsumer implements Consumer<String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaConsumer.class);
 
-    private Sinks.Many<String> sink = Sinks.many().unicast().onBackpressureBuffer();
+    private List<String> messages = Collections.synchronizedList(new ArrayList<>());
 
-    public Flux<String> getFlux() {
-        return this.sink.asFlux();
+    public List<String> getMessages() {
+        return new ArrayList<>(this.messages);
     }
 
     @Override
     public void accept(String input) {
         LOG.debug("Got message from kafka stream: {}", input);
-        sink.emitNext(input, Sinks.EmitFailureHandler.FAIL_FAST);
+        messages.add(input);
     }
 }

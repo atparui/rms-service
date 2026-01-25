@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.DiscountRepository;
 import com.atparui.rmsservice.service.DiscountService;
@@ -19,10 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.Discount}.
@@ -55,23 +54,19 @@ public class DiscountResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<DiscountDTO>> createDiscount(@Valid @RequestBody DiscountDTO discountDTO) throws URISyntaxException {
+    public ResponseEntity<DiscountDTO> createDiscount(@Valid @RequestBody DiscountDTO discountDTO) throws URISyntaxException {
         LOG.debug("REST request to save Discount : {}", discountDTO);
         if (discountDTO.getId() != null) {
             throw new BadRequestAlertException("A new discount cannot already have an ID", ENTITY_NAME, "idexists");
         }
         discountDTO.setId(UUID.randomUUID());
-        return discountService
+        DiscountDTO result = discountService
             .save(discountDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/discounts/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create discount"));
+
+        return ResponseEntity.created(new URI("/api/discounts/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -85,7 +80,7 @@ public class DiscountResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<DiscountDTO>> updateDiscount(
+    public ResponseEntity<DiscountDTO> updateDiscount(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody DiscountDTO discountDTO
     ) throws URISyntaxException {
@@ -97,22 +92,17 @@ public class DiscountResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return discountRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!discountRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return discountService
-                    .update(discountDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        DiscountDTO result = discountService
+            .update(discountDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -127,7 +117,7 @@ public class DiscountResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<DiscountDTO>> partialUpdateDiscount(
+    public ResponseEntity<DiscountDTO> partialUpdateDiscount(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody DiscountDTO discountDTO
     ) throws URISyntaxException {
@@ -139,23 +129,17 @@ public class DiscountResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return discountRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!discountRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<DiscountDTO> result = discountService.partialUpdate(discountDTO);
+        DiscountDTO result = discountService
+            .partialUpdate(discountDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -163,20 +147,13 @@ public class DiscountResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of discounts in body.
      */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<List<DiscountDTO>> getAllDiscounts() {
+    @GetMapping(value = "")
+    public ResponseEntity<List<DiscountDTO>> getAllDiscounts(
+        @org.springdoc.core.annotations.ParameterObject org.springframework.data.domain.Pageable pageable
+    ) {
         LOG.debug("REST request to get all Discounts");
-        return discountService.findAll().collectList();
-    }
-
-    /**
-     * {@code GET  /discounts} : get all the discounts as a stream.
-     * @return the {@link Flux} of discounts.
-     */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<DiscountDTO> getAllDiscountsAsStream() {
-        LOG.debug("REST request to get all Discounts as a stream");
-        return discountService.findAll();
+        List<DiscountDTO> discounts = discountService.findAll(pageable);
+        return ResponseEntity.ok().body(discounts);
     }
 
     /**
@@ -186,9 +163,9 @@ public class DiscountResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the discountDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<DiscountDTO>> getDiscount(@PathVariable("id") UUID id) {
+    public ResponseEntity<DiscountDTO> getDiscount(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Discount : {}", id);
-        Mono<DiscountDTO> discountDTO = discountService.findOne(id);
+        Optional<DiscountDTO> discountDTO = discountService.findOne(id);
         return ResponseUtil.wrapOrNotFound(discountDTO);
     }
 
@@ -199,46 +176,31 @@ public class DiscountResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteDiscount(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteDiscount(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Discount : {}", id);
-        return discountService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        discountService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 
     // jhipster-needle-rest-add-get-method - JHipster will add get methods here
-
-    /**
-     * {@code GET /api/discounts/restaurant/{restaurantId}/active} : Get active discounts
-     *
-     * @param restaurantId the restaurant ID
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of discounts
-     */
-    @GetMapping("/restaurant/{restaurantId}/active")
-    public Mono<ResponseEntity<List<DiscountDTO>>> getActiveDiscounts(@PathVariable UUID restaurantId) {
-        LOG.debug("REST request to get active discounts : {}", restaurantId);
-        return discountService.findActiveByRestaurantId(restaurantId).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
     // jhipster-needle-rest-add-post-method - JHipster will add post methods here
-
-    /**
-     * {@code POST /api/discounts/validate} : Validate discount code
-     *
-     * @param request the discount validation request
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and discount validation result
-     */
-    @PostMapping("/validate")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.DiscountValidationDTO>> validateDiscount(
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.DiscountValidationRequestDTO request
-    ) {
-        LOG.debug("REST request to validate discount : {}", request);
-        return discountService.validateDiscount(request).map(result -> ResponseEntity.ok().body(result));
-    }
+    
+    // TODO: Custom methods commented out - implement in DiscountService first
+    // @GetMapping("/restaurant/{restaurantId}/active")
+    // public ResponseEntity<List<DiscountDTO>> getActiveDiscounts(@PathVariable UUID restaurantId) {
+    //     LOG.debug("REST request to get active discounts : {}", restaurantId);
+    //     List<DiscountDTO> result = discountService.findActiveByRestaurantId(restaurantId);
+    //     return ResponseEntity.ok().body(result);
+    // }
+    
+    // @PostMapping("/validate")
+    // public ResponseEntity<com.atparui.rmsservice.service.dto.DiscountValidationDTO> validateDiscount(
+    //     @Valid @RequestBody com.atparui.rmsservice.service.dto.DiscountValidationRequestDTO request
+    // ) {
+    //     LOG.debug("REST request to validate discount : {}", request);
+    //     com.atparui.rmsservice.service.dto.DiscountValidationDTO result = discountService.validateDiscount(request);
+    //     return ResponseEntity.ok().body(result);
+    // }
 }

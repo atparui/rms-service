@@ -31,10 +31,10 @@ management:
       exposure:
         exclude: '*'
   health:
-    elasticsearch:
-      enabled: false
-  zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
-    tracing:
+#    elasticsearch:
+#      enabled: false
+#  zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
+#    tracing:
       endpoint: http://localhost:9411/api/v2/spans
   tracing:
     sampling:
@@ -42,9 +42,12 @@ management:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/rms-service
-    username: rms-service
-    password: ${DB_PASSWORD:rms-service}
+    # P6Spy enabled in dev profile for SQL logging
+    # Use environment variable RMS_SERVICE_JDBC_URL from dev.env
+    # Default: jdbc:p6spy:postgresql://localhost:5432/rms-service
+    url: ${RMS_SERVICE_JDBC_URL:jdbc:p6spy:postgresql://localhost:5432/rms-service}
+    username: ${RMS_SERVICE_DB_USER:rms-service}
+    password: ${RMS_SERVICE_DB_PASSWORD:rms-service}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -95,13 +98,15 @@ spring:
             include: livenessState
           readiness:
             include: readinessState
-  elasticsearch:
-    uris: http://localhost:9200
-  liquibase:
-    contexts: dev, faker
-    url: jdbc:postgresql://localhost:5432/rms-service?ssl=false&sslmode=disable&TimeZone=UTC
-    user: rms-service
-    password: ${DB_PASSWORD:rms-service}
+#  elasticsearch:
+#    uris: http://localhost:9200
+#  liquibase:
+#    contexts: dev, faker
+    # Liquibase uses standard PostgreSQL URL (no p6spy)
+    # Use environment variable RMS_SERVICE_LIQUIBASE_URL from dev.env
+    url: ${RMS_SERVICE_LIQUIBASE_URL:jdbc:postgresql://localhost:5432/rms-service?ssl=false&sslmode=disable&TimeZone=UTC}
+    user: ${RMS_SERVICE_DB_USER:rms-service}
+    password: ${RMS_SERVICE_DB_PASSWORD:rms-service}
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:

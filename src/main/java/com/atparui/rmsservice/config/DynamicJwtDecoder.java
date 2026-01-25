@@ -1,4 +1,6 @@
 package com.atparui.rmsservice.config;
+import java.util.List;
+import java.util.Optional;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -11,7 +13,6 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 /**
  * Dynamic JWT Decoder that resolves the issuer from the token and validates against the correct Keycloak realm.
@@ -19,7 +20,7 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @Primary
-public class DynamicJwtDecoder implements ReactiveJwtDecoder {
+public class DynamicJwtDecoder implements JwtDecoder {
 
     private static final Logger log = LoggerFactory.getLogger(DynamicJwtDecoder.class);
 
@@ -33,13 +34,13 @@ public class DynamicJwtDecoder implements ReactiveJwtDecoder {
     }
 
     // Cache JWT decoders per issuer to avoid recreating them
-    private final Cache<String, ReactiveJwtDecoder> decoderCache = Caffeine.newBuilder()
+    private final Cache<String, JwtDecoder> decoderCache = Caffeine.newBuilder()
         .maximumSize(100)
         .expireAfterWrite(1, TimeUnit.HOURS)
         .build();
 
     @Override
-    public Mono<Jwt> decode(String token) throws JwtException {
+    public Jwt decode(String token) throws JwtException {
         try {
             // Parse token to extract issuer without full validation
             String extractedIssuer = extractIssuerFromToken(token);
@@ -55,13 +56,13 @@ public class DynamicJwtDecoder implements ReactiveJwtDecoder {
 
             // Get or create decoder for this issuer
             final String finalIssuer = issuer;
-            ReactiveJwtDecoder decoder = decoderCache.get(issuer, this::createDecoderForIssuer);
+            JwtDecoder decoder = decoderCache.get(issuer, this::createDecoderForIssuer);
 
             // Decode and validate token
-            return decoder.decode(token).doOnError(error -> log.error("Failed to decode token from issuer: {}", finalIssuer, error));
+            return decoder.decode(token);
         } catch (Exception e) {
             log.error("Error decoding token", e);
-            return Mono.error(new JwtException("Failed to decode token", e));
+            throw new JwtException("Failed to decode token", e);
         }
     }
 
@@ -94,7 +95,7 @@ public class DynamicJwtDecoder implements ReactiveJwtDecoder {
     /**
      * Create a JWT decoder for a specific issuer (realm).
      */
-    private ReactiveJwtDecoder createDecoderForIssuer(String issuerUri) {
+    private JwtDecoder createDecoderForIssuer(String issuerUri) {
         try {
             log.info("Creating JWT decoder for issuer: {}", issuerUri);
 
@@ -103,7 +104,7 @@ public class DynamicJwtDecoder implements ReactiveJwtDecoder {
             String jwkSetUri = issuerUri + "/protocol/openid-connect/certs";
 
             // Create decoder from JWK Set URI
-            NimbusReactiveJwtDecoder jwtDecoder = new NimbusReactiveJwtDecoder(jwkSetUri);
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
 
             // Create validators
             OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);

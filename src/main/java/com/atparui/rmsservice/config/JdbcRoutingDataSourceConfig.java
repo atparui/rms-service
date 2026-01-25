@@ -10,10 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -24,6 +27,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "com.atparui.rmsservice.repository")
+@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @ConditionalOnProperty(prefix = "multi-tenant", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class JdbcRoutingDataSourceConfig {
 
@@ -31,16 +36,16 @@ public class JdbcRoutingDataSourceConfig {
 
     private final TenantJdbcConnectionManager tenantJdbcConnectionManager;
     private final MultiTenantProperties properties;
-    private final DataSourceProperties dataSourceProperties;
+    private final Environment environment;
 
     public JdbcRoutingDataSourceConfig(
         TenantJdbcConnectionManager tenantJdbcConnectionManager,
         MultiTenantProperties properties,
-        DataSourceProperties dataSourceProperties
+        Environment environment
     ) {
         this.tenantJdbcConnectionManager = tenantJdbcConnectionManager;
         this.properties = properties;
-        this.dataSourceProperties = dataSourceProperties;
+        this.environment = environment;
     }
 
     @Bean
@@ -77,7 +82,15 @@ public class JdbcRoutingDataSourceConfig {
     }
 
     private DataSource buildDefaultDataSource() {
-        return dataSourceProperties.initializeDataSourceBuilder().build();
+        String url = environment.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/rmsservice");
+        String username = environment.getProperty("spring.datasource.username", "rmsservice");
+        String password = environment.getProperty("spring.datasource.password", "");
+        
+        return DataSourceBuilder.create()
+            .url(url)
+            .username(username)
+            .password(password)
+            .build();
     }
 
     @Bean

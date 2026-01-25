@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.TaxConfig;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.TaxConfigRepository;
 import com.atparui.rmsservice.service.dto.TaxConfigDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.TaxConfig}.
  */
@@ -28,89 +31,57 @@ public class TaxConfigService {
         this.taxConfigRepository = taxConfigRepository;
         this.taxConfigMapper = taxConfigMapper;
     }
-
-    /**
-     * Save a taxConfig.
-     *
-     * @param taxConfigDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<TaxConfigDTO> save(TaxConfigDTO taxConfigDTO) {
+    @Transactional
+    public Optional<TaxConfigDTO> save(TaxConfigDTO taxConfigDTO) {
         LOG.debug("Request to save TaxConfig : {}", taxConfigDTO);
-        return taxConfigRepository.save(taxConfigMapper.toEntity(taxConfigDTO)).map(taxConfigMapper::toDto);
+        TaxConfig taxConfig = taxConfigMapper.toEntity(taxConfigDTO);
+        taxConfig = taxConfigRepository.save(taxConfig);
+        return Optional.of(taxConfigMapper.toDto(taxConfig));
     }
 
-    /**
-     * Update a taxConfig.
-     *
-     * @param taxConfigDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<TaxConfigDTO> update(TaxConfigDTO taxConfigDTO) {
+    @Transactional
+    public Optional<TaxConfigDTO> update(TaxConfigDTO taxConfigDTO) {
         LOG.debug("Request to update TaxConfig : {}", taxConfigDTO);
-        return taxConfigRepository.save(taxConfigMapper.toEntity(taxConfigDTO).setIsPersisted()).map(taxConfigMapper::toDto);
+        TaxConfig taxConfig = taxConfigMapper.toEntity(taxConfigDTO);
+        taxConfig = taxConfigRepository.save(taxConfig);
+        return Optional.of(taxConfigMapper.toDto(taxConfig));
     }
 
-    /**
-     * Partially update a taxConfig.
-     *
-     * @param taxConfigDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<TaxConfigDTO> partialUpdate(TaxConfigDTO taxConfigDTO) {
+    @Transactional
+    public Optional<TaxConfigDTO> partialUpdate(TaxConfigDTO taxConfigDTO) {
         LOG.debug("Request to partially update TaxConfig : {}", taxConfigDTO);
-
         return taxConfigRepository
             .findById(taxConfigDTO.getId())
             .map(existingTaxConfig -> {
                 taxConfigMapper.partialUpdate(existingTaxConfig, taxConfigDTO);
-
-                return existingTaxConfig;
+                return taxConfigRepository.save(existingTaxConfig);
             })
-            .flatMap(taxConfigRepository::save)
             .map(taxConfigMapper::toDto);
     }
 
-    /**
-     * Get all the taxConfigs.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<TaxConfigDTO> findAll() {
+    public List<TaxConfigDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all TaxConfigs");
-        return taxConfigRepository.findAll().map(taxConfigMapper::toDto);
+        Page<TaxConfig> page = taxConfigRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(taxConfigMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of taxConfigs available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return taxConfigRepository.count();
     }
 
-    /**
-     * Get one taxConfig by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<TaxConfigDTO> findOne(UUID id) {
+    public Optional<TaxConfigDTO> findOne(UUID id) {
         LOG.debug("Request to get TaxConfig : {}", id);
         return taxConfigRepository.findById(id).map(taxConfigMapper::toDto);
     }
 
-    /**
-     * Delete the taxConfig by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete TaxConfig : {}", id);
-        return taxConfigRepository.deleteById(id);
+        taxConfigRepository.deleteById(id);
     }
 }

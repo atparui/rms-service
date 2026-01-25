@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.service;
+import java.util.stream.Collectors;
 
 import com.atparui.rmsservice.domain.RolePermission;
 import com.atparui.rmsservice.repository.RolePermissionRepository;
@@ -31,37 +32,44 @@ public class RolePermissionService {
         this.rolePermissionRepository = rolePermissionRepository;
         this.rolePermissionMapper = rolePermissionMapper;
     }
-
-    public RolePermissionDTO save(RolePermissionDTO rolePermissionDTO) {
+    @Transactional
+    public Optional<RolePermissionDTO> save(RolePermissionDTO rolePermissionDTO) {
         LOG.debug("Request to save RolePermission : {}", rolePermissionDTO);
-        RolePermission saved = rolePermissionRepository.save(rolePermissionMapper.toEntity(rolePermissionDTO));
-        return rolePermissionMapper.toDto(saved);
+        RolePermission rolePermission = rolePermissionMapper.toEntity(rolePermissionDTO);
+        rolePermission = rolePermissionRepository.save(rolePermission);
+        return Optional.of(rolePermissionMapper.toDto(rolePermission));
     }
 
-    public RolePermissionDTO update(RolePermissionDTO rolePermissionDTO) {
+    @Transactional
+    public Optional<RolePermissionDTO> update(RolePermissionDTO rolePermissionDTO) {
         LOG.debug("Request to update RolePermission : {}", rolePermissionDTO);
-        RolePermission saved = rolePermissionRepository.save(rolePermissionMapper.toEntity(rolePermissionDTO).setIsPersisted());
-        return rolePermissionMapper.toDto(saved);
+        RolePermission rolePermission = rolePermissionMapper.toEntity(rolePermissionDTO);
+        rolePermission = rolePermissionRepository.save(rolePermission);
+        return Optional.of(rolePermissionMapper.toDto(rolePermission));
     }
 
+    @Transactional
     public Optional<RolePermissionDTO> partialUpdate(RolePermissionDTO rolePermissionDTO) {
         LOG.debug("Request to partially update RolePermission : {}", rolePermissionDTO);
         return rolePermissionRepository
             .findById(rolePermissionDTO.getId())
-            .map(existing -> {
-                rolePermissionMapper.partialUpdate(existing, rolePermissionDTO);
-                return existing;
+            .map(existingRolePermission -> {
+                rolePermissionMapper.partialUpdate(existingRolePermission, rolePermissionDTO);
+                return rolePermissionRepository.save(existingRolePermission);
             })
-            .map(rolePermissionRepository::save)
             .map(rolePermissionMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Page<RolePermissionDTO> findAll(Pageable pageable) {
+    public List<RolePermissionDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all RolePermissions");
-        return rolePermissionRepository.findAll(pageable).map(rolePermissionMapper::toDto);
+        Page<RolePermission> page = rolePermissionRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(rolePermissionMapper::toDto)
+            .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public long countAll() {
         return rolePermissionRepository.count();
     }
@@ -72,13 +80,22 @@ public class RolePermissionService {
         return rolePermissionRepository.findById(id).map(rolePermissionMapper::toDto);
     }
 
+    @Transactional
     public void delete(UUID id) {
         LOG.debug("Request to delete RolePermission : {}", id);
         rolePermissionRepository.deleteById(id);
     }
 
+    /**
+     * Find role permissions by roles.
+     * Used for menu access control.
+     *
+     * @param roles the list of roles
+     * @return the list of RolePermission entities
+     */
     @Transactional(readOnly = true)
     public List<RolePermission> findByRoles(Collection<String> roles) {
+        LOG.debug("Request to get RolePermissions by roles : {}", roles);
         return rolePermissionRepository.findByRoleIn(roles);
     }
 }

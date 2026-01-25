@@ -6,91 +6,78 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A MenuItem.
  */
-@Table("menu_item")
+@Entity
+@Table(name = "menu_item")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "menuitem")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MenuItem implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "name")
     private String name;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "code")
     private String code;
 
-    @Column("description")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "description")
     private String description;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("item_type")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "item_type")
     private String itemType;
 
     @Size(max = 100)
-    @Column("cuisine_type")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "cuisine_type")
     private String cuisineType;
 
-    @Column("is_vegetarian")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_vegetarian")
     private Boolean isVegetarian;
 
-    @Column("is_vegan")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_vegan")
     private Boolean isVegan;
 
-    @Column("is_alcoholic")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_alcoholic")
     private Boolean isAlcoholic;
 
-    @Column("spice_level")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "spice_level")
     private Integer spiceLevel;
 
-    @Column("preparation_time")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "preparation_time")
     private Integer preparationTime;
 
     @NotNull(message = "must not be null")
-    @Column("base_price")
+    @Column(name = "base_price")
     private BigDecimal basePrice;
 
     @Size(max = 500)
-    @Column("image_url")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column("is_available")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_available")
     private Boolean isAvailable;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column("display_order")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "display_order")
     private Integer displayOrder;
 
     @org.springframework.data.annotation.Transient
@@ -104,10 +91,10 @@ public class MenuItem implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private MenuCategory menuCategory;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
-    @Column("menu_category_id")
+    @Column(name = "menu_category_id")
     private UUID menuCategoryId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

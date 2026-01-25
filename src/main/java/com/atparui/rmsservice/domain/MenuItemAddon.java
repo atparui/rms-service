@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A MenuItemAddon.
  */
-@Table("menu_item_addon")
+@Entity
+@Table(name = "menu_item_addon")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MenuItemAddon implements Serializable, Persistable<UUID> {
@@ -21,24 +23,24 @@ public class MenuItemAddon implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("addon_name")
+    @Column(name = "addon_name")
     private String addonName;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("addon_code")
+    @Column(name = "addon_code")
     private String addonCode;
 
     @NotNull(message = "must not be null")
-    @Column("price")
+    @Column(name = "price")
     private BigDecimal price;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -48,7 +50,7 @@ public class MenuItemAddon implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "branch", "menuCategory" }, allowSetters = true)
     private MenuItem menuItem;
 
-    @Column("menu_item_id")
+    @Column(name = "menu_item_id")
     private UUID menuItemId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

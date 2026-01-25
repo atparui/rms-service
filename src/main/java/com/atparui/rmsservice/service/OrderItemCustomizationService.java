@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.OrderItemCustomization;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.OrderItemCustomizationRepository;
 import com.atparui.rmsservice.service.dto.OrderItemCustomizationDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.OrderItemCustomization}.
  */
@@ -31,93 +34,57 @@ public class OrderItemCustomizationService {
         this.orderItemCustomizationRepository = orderItemCustomizationRepository;
         this.orderItemCustomizationMapper = orderItemCustomizationMapper;
     }
-
-    /**
-     * Save a orderItemCustomization.
-     *
-     * @param orderItemCustomizationDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<OrderItemCustomizationDTO> save(OrderItemCustomizationDTO orderItemCustomizationDTO) {
+    @Transactional
+    public Optional<OrderItemCustomizationDTO> save(OrderItemCustomizationDTO orderItemCustomizationDTO) {
         LOG.debug("Request to save OrderItemCustomization : {}", orderItemCustomizationDTO);
-        return orderItemCustomizationRepository
-            .save(orderItemCustomizationMapper.toEntity(orderItemCustomizationDTO))
-            .map(orderItemCustomizationMapper::toDto);
+        OrderItemCustomization orderItemCustomization = orderItemCustomizationMapper.toEntity(orderItemCustomizationDTO);
+        orderItemCustomization = orderItemCustomizationRepository.save(orderItemCustomization);
+        return Optional.of(orderItemCustomizationMapper.toDto(orderItemCustomization));
     }
 
-    /**
-     * Update a orderItemCustomization.
-     *
-     * @param orderItemCustomizationDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<OrderItemCustomizationDTO> update(OrderItemCustomizationDTO orderItemCustomizationDTO) {
+    @Transactional
+    public Optional<OrderItemCustomizationDTO> update(OrderItemCustomizationDTO orderItemCustomizationDTO) {
         LOG.debug("Request to update OrderItemCustomization : {}", orderItemCustomizationDTO);
-        return orderItemCustomizationRepository
-            .save(orderItemCustomizationMapper.toEntity(orderItemCustomizationDTO).setIsPersisted())
-            .map(orderItemCustomizationMapper::toDto);
+        OrderItemCustomization orderItemCustomization = orderItemCustomizationMapper.toEntity(orderItemCustomizationDTO);
+        orderItemCustomization = orderItemCustomizationRepository.save(orderItemCustomization);
+        return Optional.of(orderItemCustomizationMapper.toDto(orderItemCustomization));
     }
 
-    /**
-     * Partially update a orderItemCustomization.
-     *
-     * @param orderItemCustomizationDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<OrderItemCustomizationDTO> partialUpdate(OrderItemCustomizationDTO orderItemCustomizationDTO) {
+    @Transactional
+    public Optional<OrderItemCustomizationDTO> partialUpdate(OrderItemCustomizationDTO orderItemCustomizationDTO) {
         LOG.debug("Request to partially update OrderItemCustomization : {}", orderItemCustomizationDTO);
-
         return orderItemCustomizationRepository
             .findById(orderItemCustomizationDTO.getId())
             .map(existingOrderItemCustomization -> {
                 orderItemCustomizationMapper.partialUpdate(existingOrderItemCustomization, orderItemCustomizationDTO);
-
-                return existingOrderItemCustomization;
+                return orderItemCustomizationRepository.save(existingOrderItemCustomization);
             })
-            .flatMap(orderItemCustomizationRepository::save)
             .map(orderItemCustomizationMapper::toDto);
     }
 
-    /**
-     * Get all the orderItemCustomizations.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<OrderItemCustomizationDTO> findAll() {
+    public List<OrderItemCustomizationDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all OrderItemCustomizations");
-        return orderItemCustomizationRepository.findAll().map(orderItemCustomizationMapper::toDto);
+        Page<OrderItemCustomization> page = orderItemCustomizationRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(orderItemCustomizationMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of orderItemCustomizations available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return orderItemCustomizationRepository.count();
     }
 
-    /**
-     * Get one orderItemCustomization by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<OrderItemCustomizationDTO> findOne(UUID id) {
+    public Optional<OrderItemCustomizationDTO> findOne(UUID id) {
         LOG.debug("Request to get OrderItemCustomization : {}", id);
         return orderItemCustomizationRepository.findById(id).map(orderItemCustomizationMapper::toDto);
     }
 
-    /**
-     * Delete the orderItemCustomization by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete OrderItemCustomization : {}", id);
-        return orderItemCustomizationRepository.deleteById(id);
+        orderItemCustomizationRepository.deleteById(id);
     }
 }

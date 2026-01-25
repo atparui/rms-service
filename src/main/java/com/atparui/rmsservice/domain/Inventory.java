@@ -7,14 +7,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Inventory.
  */
-@Table("inventory")
+@Entity
+@Table(name = "inventory")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Inventory implements Serializable, Persistable<UUID> {
@@ -22,28 +24,28 @@ public class Inventory implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("current_stock")
+    @Column(name = "current_stock")
     private BigDecimal currentStock;
 
     @Size(max = 50)
-    @Column("unit")
+    @Column(name = "unit")
     private String unit;
 
-    @Column("min_stock_level")
+    @Column(name = "min_stock_level")
     private BigDecimal minStockLevel;
 
-    @Column("max_stock_level")
+    @Column(name = "max_stock_level")
     private BigDecimal maxStockLevel;
 
     @NotNull(message = "must not be null")
-    @Column("last_updated_at")
+    @Column(name = "last_updated_at")
     private Instant lastUpdatedAt;
 
     @Size(max = 255)
-    @Column("last_updated_by")
+    @Column(name = "last_updated_by")
     private String lastUpdatedBy;
 
     @org.springframework.data.annotation.Transient
@@ -57,10 +59,10 @@ public class Inventory implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "branch", "menuCategory" }, allowSetters = true)
     private MenuItem menuItem;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
-    @Column("menu_item_id")
+    @Column(name = "menu_item_id")
     private UUID menuItemId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

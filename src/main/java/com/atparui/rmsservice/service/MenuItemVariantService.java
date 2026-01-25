@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.MenuItemVariant;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.MenuItemVariantRepository;
 import com.atparui.rmsservice.service.dto.MenuItemVariantDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.MenuItemVariant}.
  */
@@ -28,91 +31,57 @@ public class MenuItemVariantService {
         this.menuItemVariantRepository = menuItemVariantRepository;
         this.menuItemVariantMapper = menuItemVariantMapper;
     }
-
-    /**
-     * Save a menuItemVariant.
-     *
-     * @param menuItemVariantDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemVariantDTO> save(MenuItemVariantDTO menuItemVariantDTO) {
+    @Transactional
+    public Optional<MenuItemVariantDTO> save(MenuItemVariantDTO menuItemVariantDTO) {
         LOG.debug("Request to save MenuItemVariant : {}", menuItemVariantDTO);
-        return menuItemVariantRepository.save(menuItemVariantMapper.toEntity(menuItemVariantDTO)).map(menuItemVariantMapper::toDto);
+        MenuItemVariant menuItemVariant = menuItemVariantMapper.toEntity(menuItemVariantDTO);
+        menuItemVariant = menuItemVariantRepository.save(menuItemVariant);
+        return Optional.of(menuItemVariantMapper.toDto(menuItemVariant));
     }
 
-    /**
-     * Update a menuItemVariant.
-     *
-     * @param menuItemVariantDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemVariantDTO> update(MenuItemVariantDTO menuItemVariantDTO) {
+    @Transactional
+    public Optional<MenuItemVariantDTO> update(MenuItemVariantDTO menuItemVariantDTO) {
         LOG.debug("Request to update MenuItemVariant : {}", menuItemVariantDTO);
-        return menuItemVariantRepository
-            .save(menuItemVariantMapper.toEntity(menuItemVariantDTO).setIsPersisted())
-            .map(menuItemVariantMapper::toDto);
+        MenuItemVariant menuItemVariant = menuItemVariantMapper.toEntity(menuItemVariantDTO);
+        menuItemVariant = menuItemVariantRepository.save(menuItemVariant);
+        return Optional.of(menuItemVariantMapper.toDto(menuItemVariant));
     }
 
-    /**
-     * Partially update a menuItemVariant.
-     *
-     * @param menuItemVariantDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemVariantDTO> partialUpdate(MenuItemVariantDTO menuItemVariantDTO) {
+    @Transactional
+    public Optional<MenuItemVariantDTO> partialUpdate(MenuItemVariantDTO menuItemVariantDTO) {
         LOG.debug("Request to partially update MenuItemVariant : {}", menuItemVariantDTO);
-
         return menuItemVariantRepository
             .findById(menuItemVariantDTO.getId())
             .map(existingMenuItemVariant -> {
                 menuItemVariantMapper.partialUpdate(existingMenuItemVariant, menuItemVariantDTO);
-
-                return existingMenuItemVariant;
+                return menuItemVariantRepository.save(existingMenuItemVariant);
             })
-            .flatMap(menuItemVariantRepository::save)
             .map(menuItemVariantMapper::toDto);
     }
 
-    /**
-     * Get all the menuItemVariants.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<MenuItemVariantDTO> findAll() {
+    public List<MenuItemVariantDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all MenuItemVariants");
-        return menuItemVariantRepository.findAll().map(menuItemVariantMapper::toDto);
+        Page<MenuItemVariant> page = menuItemVariantRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(menuItemVariantMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of menuItemVariants available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return menuItemVariantRepository.count();
     }
 
-    /**
-     * Get one menuItemVariant by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<MenuItemVariantDTO> findOne(UUID id) {
+    public Optional<MenuItemVariantDTO> findOne(UUID id) {
         LOG.debug("Request to get MenuItemVariant : {}", id);
         return menuItemVariantRepository.findById(id).map(menuItemVariantMapper::toDto);
     }
 
-    /**
-     * Delete the menuItemVariant by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete MenuItemVariant : {}", id);
-        return menuItemVariantRepository.deleteById(id);
+        menuItemVariantRepository.deleteById(id);
     }
 }

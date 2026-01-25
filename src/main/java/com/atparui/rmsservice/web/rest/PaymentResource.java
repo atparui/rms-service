@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.PaymentRepository;
 import com.atparui.rmsservice.service.PaymentService;
@@ -8,7 +9,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,28 +24,21 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.atparui.rmsservice.domain.Payment}.
- */
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PaymentResource.class);
-
     private static final String ENTITY_NAME = "rmsservicePayment";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final PaymentService paymentService;
-
     private final PaymentRepository paymentRepository;
 
     public PaymentResource(PaymentService paymentService, PaymentRepository paymentRepository) {
@@ -53,45 +46,24 @@ public class PaymentResource {
         this.paymentRepository = paymentRepository;
     }
 
-    /**
-     * {@code POST  /payments} : Create a new payment.
-     *
-     * @param paymentDTO the paymentDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new paymentDTO, or with status {@code 400 (Bad Request)} if the payment has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public Mono<ResponseEntity<PaymentDTO>> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) throws URISyntaxException {
+    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) throws URISyntaxException {
         LOG.debug("REST request to save Payment : {}", paymentDTO);
         if (paymentDTO.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "idexists");
         }
         paymentDTO.setId(UUID.randomUUID());
-        return paymentService
+        PaymentDTO result = paymentService
             .save(paymentDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/payments/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create payment"));
+
+        return ResponseEntity.created(new URI("/api/payments/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PUT  /payments/:id} : Updates an existing payment.
-     *
-     * @param id the id of the paymentDTO to save.
-     * @param paymentDTO the paymentDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated paymentDTO,
-     * or with status {@code 400 (Bad Request)} if the paymentDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the paymentDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<PaymentDTO>> updatePayment(
+    public ResponseEntity<PaymentDTO> updatePayment(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody PaymentDTO paymentDTO
     ) throws URISyntaxException {
@@ -103,37 +75,21 @@ public class PaymentResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return paymentRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!paymentRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return paymentService
-                    .update(paymentDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        PaymentDTO result = paymentService
+            .update(paymentDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PATCH  /payments/:id} : Partial updates given fields of an existing payment, field will ignore if it is null
-     *
-     * @param id the id of the paymentDTO to save.
-     * @param paymentDTO the paymentDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated paymentDTO,
-     * or with status {@code 400 (Bad Request)} if the paymentDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the paymentDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the paymentDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<PaymentDTO>> partialUpdatePayment(
+    public ResponseEntity<PaymentDTO> partialUpdatePayment(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody PaymentDTO paymentDTO
     ) throws URISyntaxException {
@@ -145,193 +101,51 @@ public class PaymentResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return paymentRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!paymentRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<PaymentDTO> result = paymentService.partialUpdate(paymentDTO);
+        PaymentDTO result = paymentService
+            .partialUpdate(paymentDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code GET  /payments} : get all the payments.
-     *
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of payments in body.
-     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<PaymentDTO>>> getAllPayments(
+    public ResponseEntity<List<PaymentDTO>> getAllPayments(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of Payments");
-        return paymentService
-            .countAll()
-            .zipWith(paymentService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = paymentService.countAll();
+        List<PaymentDTO> entities = paymentService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
-    /**
-     * {@code GET  /payments/:id} : get the "id" payment.
-     *
-     * @param id the id of the paymentDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the paymentDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<PaymentDTO>> getPayment(@PathVariable("id") UUID id) {
+    public ResponseEntity<PaymentDTO> getPayment(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Payment : {}", id);
-        Mono<PaymentDTO> paymentDTO = paymentService.findOne(id);
+        Optional<PaymentDTO> paymentDTO = paymentService.findOne(id);
         return ResponseUtil.wrapOrNotFound(paymentDTO);
     }
 
-    /**
-     * {@code DELETE  /payments/:id} : delete the "id" payment.
-     *
-     * @param id the id of the paymentDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deletePayment(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deletePayment(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Payment : {}", id);
-        return paymentService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
-    }
-
-    /**
-     * {@code SEARCH  /payments/_search?query=:query} : search for the payment corresponding
-     * to the query.
-     *
-     * @param query the query of the payment search.
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<PaymentDTO>>> searchPayments(
-        @RequestParam("query") String query,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
-    ) {
-        LOG.debug("REST request to search for a page of Payments for query {}", query);
-        return paymentService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
-                PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                    page
-                )
-            )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(paymentService.search(query, pageable)));
-    }
-
-    // jhipster-needle-rest-add-get-method - JHipster will add get methods here
-
-    /**
-     * {@code GET /api/payments/bill/{billId}} : Get payments by bill
-     *
-     * @param billId the bill ID
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of payments
-     */
-    @GetMapping("/bill/{billId}")
-    public Mono<ResponseEntity<List<PaymentDTO>>> getPaymentsByBill(@PathVariable UUID billId) {
-        LOG.debug("REST request to get payments by bill : {}", billId);
-        return paymentService.findByBillId(billId).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
-    /**
-     * {@code GET /api/payments/branch/{branchId}/summary} : Get payment summary
-     *
-     * @param branchId the branch ID
-     * @param startDate the start date
-     * @param endDate the end date
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and payment summary
-     */
-    @GetMapping("/branch/{branchId}/summary")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.PaymentSummaryDTO>> getPaymentSummary(
-        @PathVariable UUID branchId,
-        @RequestParam @org.springframework.format.annotation.DateTimeFormat(
-            iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
-        ) java.time.Instant startDate,
-        @RequestParam @org.springframework.format.annotation.DateTimeFormat(
-            iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
-        ) java.time.Instant endDate
-    ) {
-        LOG.debug("REST request to get payment summary : {} - {} to {}", branchId, startDate, endDate);
-        return paymentService.getPaymentSummary(branchId, startDate, endDate).map(result -> ResponseEntity.ok().body(result));
-    }
-
-    // jhipster-needle-rest-add-post-method - JHipster will add post methods here
-
-    /**
-     * {@code POST /api/payments/process} : Process payment for a bill
-     *
-     * @param request the payment request
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and payment DTO
-     */
-    @PostMapping("/process")
-    public Mono<ResponseEntity<PaymentDTO>> processPayment(
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.PaymentRequestDTO request
-    ) {
-        LOG.debug("REST request to process payment : {}", request);
-        return paymentService.processPayment(request).map(result -> ResponseEntity.status(HttpStatus.CREATED).body(result));
-    }
-
-    /**
-     * {@code POST /api/payments/process-partial} : Process partial payment
-     *
-     * @param request the partial payment request
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and payment DTO
-     */
-    @PostMapping("/process-partial")
-    public Mono<ResponseEntity<PaymentDTO>> processPartialPayment(
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.PartialPaymentRequestDTO request
-    ) {
-        LOG.debug("REST request to process partial payment : {}", request);
-        return paymentService.processPartialPayment(request).map(result -> ResponseEntity.status(HttpStatus.CREATED).body(result));
-    }
-
-    /**
-     * {@code POST /api/payments/{id}/refund} : Process refund
-     *
-     * @param id the id of the payment
-     * @param request the refund request
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and refunded payment DTO
-     */
-    @PostMapping("/{id}/refund")
-    public Mono<ResponseEntity<PaymentDTO>> processRefund(
-        @PathVariable UUID id,
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.RefundRequestDTO request
-    ) {
-        LOG.debug("REST request to process refund : {} - {}", id, request);
-        return paymentService.processRefund(id, request).map(result -> ResponseEntity.ok().body(result));
+        paymentService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

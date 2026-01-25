@@ -7,14 +7,16 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A TaxConfig.
  */
-@Table("tax_config")
+@Entity
+@Table(name = "tax_config")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TaxConfig implements Serializable, Persistable<UUID> {
@@ -22,45 +24,45 @@ public class TaxConfig implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("tax_name")
+    @Column(name = "tax_name")
     private String taxName;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("tax_code")
+    @Column(name = "tax_code")
     private String taxCode;
 
     @NotNull(message = "must not be null")
-    @Column("tax_rate")
+    @Column(name = "tax_rate")
     private BigDecimal taxRate;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("tax_type")
+    @Column(name = "tax_type")
     private String taxType;
 
-    @Column("is_applicable_to_food")
+    @Column(name = "is_applicable_to_food")
     private Boolean isApplicableToFood;
 
-    @Column("is_applicable_to_beverage")
+    @Column(name = "is_applicable_to_beverage")
     private Boolean isApplicableToBeverage;
 
-    @Column("is_applicable_to_alcohol")
+    @Column(name = "is_applicable_to_alcohol")
     private Boolean isApplicableToAlcohol;
 
     @NotNull(message = "must not be null")
-    @Column("effective_from")
+    @Column(name = "effective_from")
     private LocalDate effectiveFrom;
 
-    @Column("effective_to")
+    @Column(name = "effective_to")
     private LocalDate effectiveTo;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -69,7 +71,7 @@ public class TaxConfig implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private Restaurant restaurant;
 
-    @Column("restaurant_id")
+    @Column(name = "restaurant_id")
     private UUID restaurantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

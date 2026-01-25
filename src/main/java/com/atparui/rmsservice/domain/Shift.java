@@ -7,14 +7,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Shift.
  */
-@Table("shift")
+@Entity
+@Table(name = "shift")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Shift implements Serializable, Persistable<UUID> {
@@ -22,27 +24,27 @@ public class Shift implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("shift_name")
+    @Column(name = "shift_name")
     private String shiftName;
 
     @NotNull(message = "must not be null")
-    @Column("start_time")
+    @Column(name = "start_time")
     private LocalTime startTime;
 
     @NotNull(message = "must not be null")
-    @Column("end_time")
+    @Column(name = "end_time")
     private LocalTime endTime;
 
     @NotNull(message = "must not be null")
-    @Column("shift_date")
+    @Column(name = "shift_date")
     private LocalDate shiftDate;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -52,7 +54,7 @@ public class Shift implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

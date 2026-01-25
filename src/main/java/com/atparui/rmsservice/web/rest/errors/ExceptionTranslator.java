@@ -32,15 +32,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.support.WebExchangeBindException;
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-import tech.jhipster.config.JHipsterConstants;
-import tech.jhipster.web.rest.errors.ExceptionTranslation;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import com.atparui.rmsservice.config.ApplicationConstants;
 import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
 import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
-import tech.jhipster.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
@@ -48,7 +45,7 @@ import tech.jhipster.web.util.HeaderUtil;
  */
 @ControllerAdvice
 @Component("jhiExceptionTranslator")
-public class ExceptionTranslator extends ResponseEntityExceptionHandler implements ExceptionTranslation {
+public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private static final String FIELD_ERRORS_KEY = "fieldErrors";
     private static final String MESSAGE_KEY = "message";
@@ -67,8 +64,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
     }
 
     @ExceptionHandler
-    @Override
-    public Mono<ResponseEntity<Object>> handleAnyException(Throwable ex, ServerWebExchange request) {
+    public ResponseEntity<Object> handleAnyException(Throwable ex, WebRequest request) {
         LOG.debug("Converting Exception to Problem Details:", ex);
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
         return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
@@ -76,23 +72,18 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
     @Nullable
     @Override
-    protected Mono<ResponseEntity<Object>> handleExceptionInternal(
+    protected ResponseEntity<Object> handleExceptionInternal(
         Exception ex,
         @Nullable Object body,
         HttpHeaders headers,
         HttpStatusCode statusCode,
-        ServerWebExchange request
+        WebRequest request
     ) {
-        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, (ServerWebExchange) request) : body;
-        if (request.getResponse().isCommitted()) {
-            return Mono.error(ex);
-        }
-        return Mono.just(
-            new ResponseEntity<>(body, updateContentType(headers), HttpStatusCode.valueOf(((ProblemDetailWithCause) body).getStatus()))
-        );
+        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, (WebRequest) request) : body;
+        return new ResponseEntity<>(body, updateContentType(headers), HttpStatusCode.valueOf(((ProblemDetailWithCause) body).getStatus()));
     }
 
-    protected ProblemDetailWithCause wrapAndCustomizeProblem(Throwable ex, ServerWebExchange request) {
+    protected ProblemDetailWithCause wrapAndCustomizeProblem(Throwable ex, WebRequest request) {
         return customizeProblem(getProblemDetailWithCause(ex), ex, request);
     }
 
@@ -103,7 +94,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
     }
 
-    protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, ServerWebExchange request) {
+    protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, WebRequest request) {
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
@@ -129,7 +120,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) problem.setProperty(PATH_KEY, getPathValue(request));
 
         if (
-            (err instanceof WebExchangeBindException fieldException) &&
+            (err instanceof MethodArgumentNotValidException fieldException) &&
             (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
         ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
 
@@ -142,7 +133,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         return getCustomizedTitle(err) != null ? getCustomizedTitle(err) : extractTitleForResponseStatus(err, statusCode);
     }
 
-    private List<FieldErrorVM> getFieldErrors(WebExchangeBindException ex) {
+    private List<FieldErrorVM> getFieldErrors(MethodArgumentNotValidException ex) {
         return ex
             .getBindingResult()
             .getFieldErrors()
@@ -190,7 +181,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             return ErrorConstants.ERR_VALIDATION;
         } else if (err instanceof ConcurrencyFailureException || err.getCause() instanceof ConcurrencyFailureException) {
             return ErrorConstants.ERR_CONCURRENCY_FAILURE;
-        } else if (err instanceof WebExchangeBindException) {
+        } else if (err instanceof MethodArgumentNotValidException) {
             return ErrorConstants.ERR_VALIDATION;
         }
         return null;
@@ -203,7 +194,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
     private String getCustomizedErrorDetails(Throwable err) {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-        if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)) {
+        if (activeProfiles.contains(ApplicationConstants.SPRING_PROFILE_PRODUCTION)) {
             if (err instanceof HttpMessageConversionException) return "Unable to convert http message";
             if (err instanceof DataAccessException) return "Failure during data access";
             if (containsPackageName(err.getMessage())) return "Unexpected runtime exception";
@@ -220,9 +211,17 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         return null;
     }
 
-    private URI getPathValue(ServerWebExchange request) {
+    private URI getPathValue(WebRequest request) {
         if (request == null) return URI.create("about:blank");
-        return request.getRequest().getURI();
+        try {
+            String path = request.getDescription(false);
+            if (path != null && path.startsWith("uri=")) {
+                return URI.create(path.substring(4));
+            }
+            return URI.create(path != null ? path : "about:blank");
+        } catch (Exception e) {
+            return URI.create("about:blank");
+        }
     }
 
     private HttpHeaders buildHeaders(Throwable err) {
@@ -245,7 +244,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         return headers;
     }
 
-    public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, ServerWebExchange request) {
+    public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, WebRequest request) {
         if (throwable != null && isCasualChainEnabled()) {
             return Optional.of(customizeProblem(getProblemDetailWithCause(throwable), throwable, request));
         }

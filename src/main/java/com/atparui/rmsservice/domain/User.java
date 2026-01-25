@@ -2,7 +2,7 @@ package com.atparui.rmsservice.domain;
 
 import com.atparui.rmsservice.config.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.BatchSize;
+import org.hibernate.annotations.BatchSize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,14 +27,12 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Entity
 @Table(name = "jhi_user")
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "user")
 public class User extends AbstractAuditingEntity<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "id")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
     private String id;
 
     @NotNull

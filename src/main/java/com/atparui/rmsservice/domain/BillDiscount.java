@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A BillDiscount.
  */
-@Table("bill_discount")
+@Entity
+@Table(name = "bill_discount")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BillDiscount implements Serializable, Persistable<UUID> {
@@ -21,24 +23,24 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @Size(max = 50)
-    @Column("discount_code")
+    @Column(name = "discount_code")
     private String discountCode;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("discount_type")
+    @Column(name = "discount_type")
     private String discountType;
 
     @NotNull(message = "must not be null")
-    @Column("discount_value")
+    @Column(name = "discount_value")
     private BigDecimal discountValue;
 
     @NotNull(message = "must not be null")
-    @Column("discount_amount")
+    @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
     @org.springframework.data.annotation.Transient
@@ -52,10 +54,10 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Discount discount;
 
-    @Column("bill_id")
+    @Column(name = "bill_id")
     private UUID billId;
 
-    @Column("discount_id")
+    @Column(name = "discount_id")
     private UUID discountId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

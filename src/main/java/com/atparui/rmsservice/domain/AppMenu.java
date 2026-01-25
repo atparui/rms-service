@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "app_menu")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "appmenu")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppMenu implements Serializable {
 
@@ -29,48 +28,39 @@ public class AppMenu implements Serializable {
     @NotNull(message = "must not be null")
     @Size(max = 100)
     @Column(name = "menu_key")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String menuKey;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
     @Column(name = "label")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String label;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
     @Column(name = "type")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String type;
 
     @Size(max = 500)
     @Column(name = "route_path")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String routePath;
 
     @Size(max = 100)
     @Column(name = "icon")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String icon;
 
     @Column(name = "sort_order")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
     private Integer sortOrder;
 
     @Column(name = "is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean isActive;
 
     @NotNull(message = "must not be null")
     @Size(max = 10)
     @Column(name = "permission_logic")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String permissionLogic;
 
     @Size(max = 50)
     @Column(name = "app_key")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String appKey;
 
     @Column(name = "parent_id")

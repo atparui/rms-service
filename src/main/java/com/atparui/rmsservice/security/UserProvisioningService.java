@@ -2,6 +2,7 @@ package com.atparui.rmsservice.security;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ import com.atparui.rmsservice.repository.RmsUserRepository;
 import com.atparui.rmsservice.repository.UserRepository;
 import com.atparui.rmsservice.service.UserService;
 
-import reactor.core.publisher.Mono;
 
 /**
  * Ensures a user is provisioned locally (jhi_user + rms_user) on first authenticated call.
@@ -37,9 +37,9 @@ public class UserProvisioningService {
         this.userService = userService;
     }
 
-    public Mono<Void> provisionIfNeeded(org.springframework.security.core.Authentication authentication) {
+    public void provisionIfNeeded(org.springframework.security.core.Authentication authentication) {
         if (!(authentication instanceof AbstractAuthenticationToken authToken)) {
-            return Mono.empty();
+            return;
         }
 
         Map<String, Object> claims = extractClaims(authToken);
@@ -53,85 +53,58 @@ public class UserProvisioningService {
 
         if (externalUserId == null || username == null) {
             LOG.debug("Skipping provisioning: missing required claims (sub/preferred_username)");
-            return Mono.empty();
+            return;
         }
 
         String userId = externalUserId;
 
-        Mono<Void> ensureJhiUser = userRepository
-            .findById(userId)
-            .hasElement()
-            .flatMap(existsById -> {
-                if (existsById) {
-                    LOG.debug("jhi_user already exists by id={}, skipping insert", userId);
-                    return Mono.<Void>empty();
-                }
-                return userRepository
-                    .findOneByLogin(username)
-                    .hasElement()
-                    .flatMap(existsByLogin -> {
-                        if (existsByLogin) {
-                            LOG.debug("jhi_user already exists by login={}, skipping insert", username);
-                            return Mono.<Void>empty();
-                        }
-                        LOG.info("Provisioning jhi_user id={} login={} email={}", userId, username, email);
-                        return userService.getUserFromAuthentication(authToken).then();
-                    });
-            })
-            .onErrorResume(ex -> {
-                LOG.warn("Provision jhi_user skipped due to error for {}: {}", username, ex.getMessage());
-                return Mono.empty();
-            });
+        // Ensure jhi_user exists
+        try {
+            if (userRepository.findById(userId).isPresent()) {
+                LOG.debug("jhi_user already exists by id={}, skipping insert", userId);
+            } else if (userRepository.findOneByLogin(username).isPresent()) {
+                LOG.debug("jhi_user already exists by login={}, skipping insert", username);
+            } else {
+                LOG.info("Provisioning jhi_user id={} login={} email={}", userId, username, email);
+                userService.getUserFromAuthentication(authToken);
+            }
+        } catch (Exception ex) {
+            LOG.warn("Provision jhi_user skipped due to error for {}: {}", username, ex.getMessage());
+        }
 
-        Mono<Void> ensureRmsUser = Mono.defer(() ->
-            rmsUserRepository
-                .findByExternalUserId(externalUserId)
-                .flatMap(existing -> {
-                    LOG.debug("RMS user already exists for externalUserId={}, skipping insert", externalUserId);
-                    return Mono.<Void>empty();
-                })
-                .switchIfEmpty(
-                    Mono.defer(() -> {
-                        RmsUser rmsUser = new RmsUser();
-                        rmsUser.setId(UUID.randomUUID());
-                        rmsUser.setExternalUserId(externalUserId);
-                        rmsUser.setUsername(username);
-                        rmsUser.setEmail(email);
-                        rmsUser.setFirstName(firstName);
-                        rmsUser.setLastName(lastName);
-                        rmsUser.setDisplayName(displayName);
-                        rmsUser.setProfileImageUrl(imageUrl);
-                        rmsUser.setIsActive(Boolean.TRUE);
-                        rmsUser.setLastSyncAt(Instant.now());
-                        rmsUser.setSyncStatus("SYNCED");
-                        LOG.info(
-                            "Provisioning rms_user externalUserId={} username={} email={} firstName={} lastName={}",
-                            externalUserId,
-                            username,
-                            email,
-                            firstName,
-                            lastName
-                        );
-                        return rmsUserRepository
-                            .save(rmsUser)
-                            .doOnSuccess(saved -> LOG.debug("Provisioned RMS user for externalUserId={}", externalUserId))
-                            .onErrorResume(
-                                ex -> {
-                                    // Ignore duplicate errors in case of race/previous manual inserts
-                                    LOG.warn("Provision RMS user skipped due to insert error for {}: {}", externalUserId, ex.getMessage());
-                                    return Mono.empty();
-                                }
-                            )
-                            .then();
-                    })
-                )
-        );
-
-        return Mono.when(ensureJhiUser, ensureRmsUser)
-            .onErrorResume(ex -> {
-                LOG.error("User provisioning failed for {}: {}", username, ex.getMessage(), ex);
-                return Mono.empty();
-            });
+        // Ensure rms_user exists
+        try {
+            Optional<RmsUser> existingRmsUser = rmsUserRepository.findByExternalUserId(externalUserId);
+            if (existingRmsUser.isPresent()) {
+                LOG.debug("RMS user already exists for externalUserId={}, skipping insert", externalUserId);
+            } else {
+                RmsUser rmsUser = new RmsUser();
+                rmsUser.setId(UUID.randomUUID());
+                rmsUser.setExternalUserId(externalUserId);
+                rmsUser.setUsername(username);
+                rmsUser.setEmail(email);
+                rmsUser.setFirstName(firstName);
+                rmsUser.setLastName(lastName);
+                rmsUser.setDisplayName(displayName);
+                rmsUser.setProfileImageUrl(imageUrl);
+                rmsUser.setIsActive(Boolean.TRUE);
+                rmsUser.setLastSyncAt(Instant.now());
+                rmsUser.setSyncStatus("SYNCED");
+                LOG.info(
+                    "Provisioning rms_user externalUserId={} username={} email={} firstName={} lastName={}",
+                    externalUserId,
+                    username,
+                    email,
+                    firstName,
+                    lastName
+                );
+                rmsUserRepository.save(rmsUser);
+                LOG.debug("Provisioned RMS user for externalUserId={}", externalUserId);
+            }
+        } catch (Exception ex) {
+            // Ignore duplicate errors in case of race/previous manual inserts
+            LOG.warn("Provision RMS user skipped due to insert error for {}: {}", externalUserId, ex.getMessage());
+        }
     }
 
     private static Map<String, Object> extractClaims(AbstractAuthenticationToken authToken) {

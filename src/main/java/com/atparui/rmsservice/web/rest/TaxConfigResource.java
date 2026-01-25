@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.TaxConfigRepository;
 import com.atparui.rmsservice.service.TaxConfigService;
@@ -14,32 +15,30 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import org.springframework.web.util.ForwardedHeaderUtils;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.atparui.rmsservice.domain.TaxConfig}.
- */
 @RestController
 @RequestMapping("/api/tax-configs")
 public class TaxConfigResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaxConfigResource.class);
-
     private static final String ENTITY_NAME = "rmsserviceTaxConfig";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final TaxConfigService taxConfigService;
-
     private final TaxConfigRepository taxConfigRepository;
 
     public TaxConfigResource(TaxConfigService taxConfigService, TaxConfigRepository taxConfigRepository) {
@@ -47,45 +46,24 @@ public class TaxConfigResource {
         this.taxConfigRepository = taxConfigRepository;
     }
 
-    /**
-     * {@code POST  /tax-configs} : Create a new taxConfig.
-     *
-     * @param taxConfigDTO the taxConfigDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new taxConfigDTO, or with status {@code 400 (Bad Request)} if the taxConfig has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public Mono<ResponseEntity<TaxConfigDTO>> createTaxConfig(@Valid @RequestBody TaxConfigDTO taxConfigDTO) throws URISyntaxException {
+    public ResponseEntity<TaxConfigDTO> createTaxConfig(@Valid @RequestBody TaxConfigDTO taxConfigDTO) throws URISyntaxException {
         LOG.debug("REST request to save TaxConfig : {}", taxConfigDTO);
         if (taxConfigDTO.getId() != null) {
             throw new BadRequestAlertException("A new taxConfig cannot already have an ID", ENTITY_NAME, "idexists");
         }
         taxConfigDTO.setId(UUID.randomUUID());
-        return taxConfigService
+        TaxConfigDTO result = taxConfigService
             .save(taxConfigDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/tax-configs/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create tax config"));
+
+        return ResponseEntity.created(new URI("/api/tax-configs/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PUT  /tax-configs/:id} : Updates an existing taxConfig.
-     *
-     * @param id the id of the taxConfigDTO to save.
-     * @param taxConfigDTO the taxConfigDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated taxConfigDTO,
-     * or with status {@code 400 (Bad Request)} if the taxConfigDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the taxConfigDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<TaxConfigDTO>> updateTaxConfig(
+    public ResponseEntity<TaxConfigDTO> updateTaxConfig(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody TaxConfigDTO taxConfigDTO
     ) throws URISyntaxException {
@@ -97,37 +75,21 @@ public class TaxConfigResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return taxConfigRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!taxConfigRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return taxConfigService
-                    .update(taxConfigDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        TaxConfigDTO result = taxConfigService
+            .update(taxConfigDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PATCH  /tax-configs/:id} : Partial updates given fields of an existing taxConfig, field will ignore if it is null
-     *
-     * @param id the id of the taxConfigDTO to save.
-     * @param taxConfigDTO the taxConfigDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated taxConfigDTO,
-     * or with status {@code 400 (Bad Request)} if the taxConfigDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the taxConfigDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the taxConfigDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<TaxConfigDTO>> partialUpdateTaxConfig(
+    public ResponseEntity<TaxConfigDTO> partialUpdateTaxConfig(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody TaxConfigDTO taxConfigDTO
     ) throws URISyntaxException {
@@ -139,76 +101,51 @@ public class TaxConfigResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return taxConfigRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!taxConfigRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<TaxConfigDTO> result = taxConfigService.partialUpdate(taxConfigDTO);
+        TaxConfigDTO result = taxConfigService
+            .partialUpdate(taxConfigDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code GET  /tax-configs} : get all the taxConfigs.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of taxConfigs in body.
-     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<List<TaxConfigDTO>> getAllTaxConfigs() {
-        LOG.debug("REST request to get all TaxConfigs");
-        return taxConfigService.findAll().collectList();
+    public ResponseEntity<List<TaxConfigDTO>> getAllTaxConfigs(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        ServerHttpRequest request
+    ) {
+        LOG.debug("REST request to get a page of TaxConfigs");
+        long count = taxConfigService.countAll();
+        List<TaxConfigDTO> entities = taxConfigService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
-    /**
-     * {@code GET  /tax-configs} : get all the taxConfigs as a stream.
-     * @return the {@link Flux} of taxConfigs.
-     */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<TaxConfigDTO> getAllTaxConfigsAsStream() {
-        LOG.debug("REST request to get all TaxConfigs as a stream");
-        return taxConfigService.findAll();
-    }
-
-    /**
-     * {@code GET  /tax-configs/:id} : get the "id" taxConfig.
-     *
-     * @param id the id of the taxConfigDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the taxConfigDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<TaxConfigDTO>> getTaxConfig(@PathVariable("id") UUID id) {
+    public ResponseEntity<TaxConfigDTO> getTaxConfig(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get TaxConfig : {}", id);
-        Mono<TaxConfigDTO> taxConfigDTO = taxConfigService.findOne(id);
+        Optional<TaxConfigDTO> taxConfigDTO = taxConfigService.findOne(id);
         return ResponseUtil.wrapOrNotFound(taxConfigDTO);
     }
 
-    /**
-     * {@code DELETE  /tax-configs/:id} : delete the "id" taxConfig.
-     *
-     * @param id the id of the taxConfigDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteTaxConfig(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteTaxConfig(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete TaxConfig : {}", id);
-        return taxConfigService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        taxConfigService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

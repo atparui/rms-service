@@ -1,19 +1,20 @@
 package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
  * Internal repository interface for User operations that require custom database access.
  * This interface is public to allow access from test classes.
  */
 public interface UserRepositoryInternal {
-    Mono<Void> resetUserAuthorityMappings();
-    Mono<Void> deleteUserAuthorities(String userId);
-    Mono<Void> saveUserAuthority(String userId, String authority);
-    Mono<User> findOneWithAuthoritiesByLogin(String login);
-    Mono<User> create(User user);
-    Flux<User> findAllWithAuthorities(Pageable pageable);
+    void resetUserAuthorityMappings();
+    void deleteUserAuthorities(String userId);
+    void saveUserAuthority(String userId, String authority);
+    Optional<User> findOneWithAuthoritiesByLogin(String login);
+    User create(User user);
+    Page<User> findAllWithAuthorities(Pageable pageable);
 }

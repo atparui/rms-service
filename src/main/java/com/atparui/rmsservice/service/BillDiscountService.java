@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.BillDiscount;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BillDiscountRepository;
 import com.atparui.rmsservice.service.dto.BillDiscountDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.BillDiscount}.
  */
@@ -28,89 +31,57 @@ public class BillDiscountService {
         this.billDiscountRepository = billDiscountRepository;
         this.billDiscountMapper = billDiscountMapper;
     }
-
-    /**
-     * Save a billDiscount.
-     *
-     * @param billDiscountDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<BillDiscountDTO> save(BillDiscountDTO billDiscountDTO) {
+    @Transactional
+    public Optional<BillDiscountDTO> save(BillDiscountDTO billDiscountDTO) {
         LOG.debug("Request to save BillDiscount : {}", billDiscountDTO);
-        return billDiscountRepository.save(billDiscountMapper.toEntity(billDiscountDTO)).map(billDiscountMapper::toDto);
+        BillDiscount billDiscount = billDiscountMapper.toEntity(billDiscountDTO);
+        billDiscount = billDiscountRepository.save(billDiscount);
+        return Optional.of(billDiscountMapper.toDto(billDiscount));
     }
 
-    /**
-     * Update a billDiscount.
-     *
-     * @param billDiscountDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<BillDiscountDTO> update(BillDiscountDTO billDiscountDTO) {
+    @Transactional
+    public Optional<BillDiscountDTO> update(BillDiscountDTO billDiscountDTO) {
         LOG.debug("Request to update BillDiscount : {}", billDiscountDTO);
-        return billDiscountRepository.save(billDiscountMapper.toEntity(billDiscountDTO).setIsPersisted()).map(billDiscountMapper::toDto);
+        BillDiscount billDiscount = billDiscountMapper.toEntity(billDiscountDTO);
+        billDiscount = billDiscountRepository.save(billDiscount);
+        return Optional.of(billDiscountMapper.toDto(billDiscount));
     }
 
-    /**
-     * Partially update a billDiscount.
-     *
-     * @param billDiscountDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<BillDiscountDTO> partialUpdate(BillDiscountDTO billDiscountDTO) {
+    @Transactional
+    public Optional<BillDiscountDTO> partialUpdate(BillDiscountDTO billDiscountDTO) {
         LOG.debug("Request to partially update BillDiscount : {}", billDiscountDTO);
-
         return billDiscountRepository
             .findById(billDiscountDTO.getId())
             .map(existingBillDiscount -> {
                 billDiscountMapper.partialUpdate(existingBillDiscount, billDiscountDTO);
-
-                return existingBillDiscount;
+                return billDiscountRepository.save(existingBillDiscount);
             })
-            .flatMap(billDiscountRepository::save)
             .map(billDiscountMapper::toDto);
     }
 
-    /**
-     * Get all the billDiscounts.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<BillDiscountDTO> findAll() {
+    public List<BillDiscountDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all BillDiscounts");
-        return billDiscountRepository.findAll().map(billDiscountMapper::toDto);
+        Page<BillDiscount> page = billDiscountRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(billDiscountMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of billDiscounts available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return billDiscountRepository.count();
     }
 
-    /**
-     * Get one billDiscount by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<BillDiscountDTO> findOne(UUID id) {
+    public Optional<BillDiscountDTO> findOne(UUID id) {
         LOG.debug("Request to get BillDiscount : {}", id);
         return billDiscountRepository.findById(id).map(billDiscountMapper::toDto);
     }
 
-    /**
-     * Delete the billDiscount by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete BillDiscount : {}", id);
-        return billDiscountRepository.deleteById(id);
+        billDiscountRepository.deleteById(id);
     }
 }

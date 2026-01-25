@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BillTaxRepository;
 import com.atparui.rmsservice.service.BillTaxService;
@@ -15,14 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.atparui.rmsservice.domain.BillTax}.
@@ -32,14 +30,12 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
 public class BillTaxResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(BillTaxResource.class);
-
     private static final String ENTITY_NAME = "rmsserviceBillTax";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final BillTaxService billTaxService;
-
     private final BillTaxRepository billTaxRepository;
 
     public BillTaxResource(BillTaxService billTaxService, BillTaxRepository billTaxRepository) {
@@ -47,45 +43,24 @@ public class BillTaxResource {
         this.billTaxRepository = billTaxRepository;
     }
 
-    /**
-     * {@code POST  /bill-taxes} : Create a new billTax.
-     *
-     * @param billTaxDTO the billTaxDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new billTaxDTO, or with status {@code 400 (Bad Request)} if the billTax has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public Mono<ResponseEntity<BillTaxDTO>> createBillTax(@Valid @RequestBody BillTaxDTO billTaxDTO) throws URISyntaxException {
+    public ResponseEntity<BillTaxDTO> createBillTax(@Valid @RequestBody BillTaxDTO billTaxDTO) throws URISyntaxException {
         LOG.debug("REST request to save BillTax : {}", billTaxDTO);
         if (billTaxDTO.getId() != null) {
             throw new BadRequestAlertException("A new billTax cannot already have an ID", ENTITY_NAME, "idexists");
         }
         billTaxDTO.setId(UUID.randomUUID());
-        return billTaxService
+        BillTaxDTO result = billTaxService
             .save(billTaxDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/bill-taxes/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create bill tax"));
+
+        return ResponseEntity.created(new URI("/api/bill-taxes/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PUT  /bill-taxes/:id} : Updates an existing billTax.
-     *
-     * @param id the id of the billTaxDTO to save.
-     * @param billTaxDTO the billTaxDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated billTaxDTO,
-     * or with status {@code 400 (Bad Request)} if the billTaxDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the billTaxDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<BillTaxDTO>> updateBillTax(
+    public ResponseEntity<BillTaxDTO> updateBillTax(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody BillTaxDTO billTaxDTO
     ) throws URISyntaxException {
@@ -97,37 +72,21 @@ public class BillTaxResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billTaxRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billTaxRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return billTaxService
-                    .update(billTaxDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        BillTaxDTO result = billTaxService
+            .update(billTaxDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PATCH  /bill-taxes/:id} : Partial updates given fields of an existing billTax, field will ignore if it is null
-     *
-     * @param id the id of the billTaxDTO to save.
-     * @param billTaxDTO the billTaxDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated billTaxDTO,
-     * or with status {@code 400 (Bad Request)} if the billTaxDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the billTaxDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the billTaxDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<BillTaxDTO>> partialUpdateBillTax(
+    public ResponseEntity<BillTaxDTO> partialUpdateBillTax(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody BillTaxDTO billTaxDTO
     ) throws URISyntaxException {
@@ -139,76 +98,41 @@ public class BillTaxResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return billTaxRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!billTaxRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<BillTaxDTO> result = billTaxService.partialUpdate(billTaxDTO);
+        BillTaxDTO result = billTaxService
+            .partialUpdate(billTaxDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code GET  /bill-taxes} : get all the billTaxes.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of billTaxes in body.
-     */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<List<BillTaxDTO>> getAllBillTaxes() {
+    @GetMapping(value = "")
+    public ResponseEntity<List<BillTaxDTO>> getAllBillTaxes(
+        @org.springdoc.core.annotations.ParameterObject org.springframework.data.domain.Pageable pageable
+    ) {
         LOG.debug("REST request to get all BillTaxes");
-        return billTaxService.findAll().collectList();
+        List<BillTaxDTO> billTaxes = billTaxService.findAll(pageable);
+        return ResponseEntity.ok().body(billTaxes);
     }
 
-    /**
-     * {@code GET  /bill-taxes} : get all the billTaxes as a stream.
-     * @return the {@link Flux} of billTaxes.
-     */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<BillTaxDTO> getAllBillTaxesAsStream() {
-        LOG.debug("REST request to get all BillTaxes as a stream");
-        return billTaxService.findAll();
-    }
-
-    /**
-     * {@code GET  /bill-taxes/:id} : get the "id" billTax.
-     *
-     * @param id the id of the billTaxDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the billTaxDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<BillTaxDTO>> getBillTax(@PathVariable("id") UUID id) {
+    public ResponseEntity<BillTaxDTO> getBillTax(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get BillTax : {}", id);
-        Mono<BillTaxDTO> billTaxDTO = billTaxService.findOne(id);
+        Optional<BillTaxDTO> billTaxDTO = billTaxService.findOne(id);
         return ResponseUtil.wrapOrNotFound(billTaxDTO);
     }
 
-    /**
-     * {@code DELETE  /bill-taxes/:id} : delete the "id" billTax.
-     *
-     * @param id the id of the billTaxDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteBillTax(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteBillTax(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete BillTax : {}", id);
-        return billTaxService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
+        billTaxService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

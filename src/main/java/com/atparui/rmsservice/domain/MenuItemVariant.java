@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A MenuItemVariant.
  */
-@Table("menu_item_variant")
+@Entity
+@Table(name = "menu_item_variant")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MenuItemVariant implements Serializable, Persistable<UUID> {
@@ -21,29 +23,29 @@ public class MenuItemVariant implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("variant_name")
+    @Column(name = "variant_name")
     private String variantName;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("variant_code")
+    @Column(name = "variant_code")
     private String variantCode;
 
-    @Column("price_modifier")
+    @Column(name = "price_modifier")
     private BigDecimal priceModifier;
 
-    @Column("is_default")
+    @Column(name = "is_default")
     private Boolean isDefault;
 
-    @Column("display_order")
+    @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -53,7 +55,7 @@ public class MenuItemVariant implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "branch", "menuCategory" }, allowSetters = true)
     private MenuItem menuItem;
 
-    @Column("menu_item_id")
+    @Column(name = "menu_item_id")
     private UUID menuItemId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -1,4 +1,9 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.Shift;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.ShiftRepository;
 import com.atparui.rmsservice.service.dto.ShiftDTO;
@@ -9,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.Shift}.
  */
@@ -29,90 +31,57 @@ public class ShiftService {
         this.shiftRepository = shiftRepository;
         this.shiftMapper = shiftMapper;
     }
-
-    /**
-     * Save a shift.
-     *
-     * @param shiftDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<ShiftDTO> save(ShiftDTO shiftDTO) {
+    @Transactional
+    public Optional<ShiftDTO> save(ShiftDTO shiftDTO) {
         LOG.debug("Request to save Shift : {}", shiftDTO);
-        return shiftRepository.save(shiftMapper.toEntity(shiftDTO)).map(shiftMapper::toDto);
+        Shift shift = shiftMapper.toEntity(shiftDTO);
+        shift = shiftRepository.save(shift);
+        return Optional.of(shiftMapper.toDto(shift));
     }
 
-    /**
-     * Update a shift.
-     *
-     * @param shiftDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<ShiftDTO> update(ShiftDTO shiftDTO) {
+    @Transactional
+    public Optional<ShiftDTO> update(ShiftDTO shiftDTO) {
         LOG.debug("Request to update Shift : {}", shiftDTO);
-        return shiftRepository.save(shiftMapper.toEntity(shiftDTO).setIsPersisted()).map(shiftMapper::toDto);
+        Shift shift = shiftMapper.toEntity(shiftDTO);
+        shift = shiftRepository.save(shift);
+        return Optional.of(shiftMapper.toDto(shift));
     }
 
-    /**
-     * Partially update a shift.
-     *
-     * @param shiftDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<ShiftDTO> partialUpdate(ShiftDTO shiftDTO) {
+    @Transactional
+    public Optional<ShiftDTO> partialUpdate(ShiftDTO shiftDTO) {
         LOG.debug("Request to partially update Shift : {}", shiftDTO);
-
         return shiftRepository
             .findById(shiftDTO.getId())
             .map(existingShift -> {
                 shiftMapper.partialUpdate(existingShift, shiftDTO);
-
-                return existingShift;
+                return shiftRepository.save(existingShift);
             })
-            .flatMap(shiftRepository::save)
             .map(shiftMapper::toDto);
     }
 
-    /**
-     * Get all the shifts.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<ShiftDTO> findAll(Pageable pageable) {
+    public List<ShiftDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all Shifts");
-        return shiftRepository.findAllBy(pageable).map(shiftMapper::toDto);
+        Page<Shift> page = shiftRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(shiftMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of shifts available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return shiftRepository.count();
     }
 
-    /**
-     * Get one shift by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<ShiftDTO> findOne(UUID id) {
+    public Optional<ShiftDTO> findOne(UUID id) {
         LOG.debug("Request to get Shift : {}", id);
         return shiftRepository.findById(id).map(shiftMapper::toDto);
     }
 
-    /**
-     * Delete the shift by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete Shift : {}", id);
-        return shiftRepository.deleteById(id);
+        shiftRepository.deleteById(id);
     }
 }

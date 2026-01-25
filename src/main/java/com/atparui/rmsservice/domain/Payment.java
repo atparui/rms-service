@@ -7,72 +7,65 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Payment.
  */
-@Table("payment")
+@Entity
+@Table(name = "payment")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "payment")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Payment implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("payment_number")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "payment_number")
     private String paymentNumber;
 
     @NotNull(message = "must not be null")
-    @Column("amount")
+    @Column(name = "amount")
     private BigDecimal amount;
 
     @NotNull(message = "must not be null")
-    @Column("payment_date")
+    @Column(name = "payment_date")
     private Instant paymentDate;
 
     @Size(max = 255)
-    @Column("transaction_id")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "transaction_id")
     private String transactionId;
 
-    @Column("payment_gateway_response")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "payment_gateway_response")
     private String paymentGatewayResponse;
 
     @Size(max = 50)
-    @Column("status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "status")
     private String status;
 
     @Size(max = 255)
-    @Column("processed_by")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "processed_by")
     private String processedBy;
 
-    @Column("notes")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "notes")
     private String notes;
 
-    @Column("refunded_at")
+    @Column(name = "refunded_at")
     private Instant refundedAt;
 
     @Size(max = 255)
-    @Column("refunded_by")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "refunded_by")
     private String refundedBy;
 
-    @Column("refund_reason")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "refund_reason")
     private String refundReason;
 
     @org.springframework.data.annotation.Transient
@@ -85,10 +78,10 @@ public class Payment implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private PaymentMethod paymentMethod;
 
-    @Column("bill_id")
+    @Column(name = "bill_id")
     private UUID billId;
 
-    @Column("payment_method_id")
+    @Column(name = "payment_method_id")
     private UUID paymentMethodId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

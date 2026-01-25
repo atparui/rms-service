@@ -5,14 +5,16 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A PaymentMethod.
  */
-@Table("payment_method")
+@Entity
+@Table(name = "payment_method")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class PaymentMethod implements Serializable, Persistable<UUID> {
@@ -20,23 +22,23 @@ public class PaymentMethod implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("method_code")
+    @Column(name = "method_code")
     private String methodCode;
 
     @NotNull(message = "must not be null")
     @Size(max = 100)
-    @Column("method_name")
+    @Column(name = "method_name")
     private String methodName;
 
-    @Column("description")
+    @Column(name = "description")
     private String description;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient

@@ -1,7 +1,11 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.MenuItem;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.MenuItemRepository;
-import com.atparui.rmsservice.repository.search.MenuItemSearchRepository;
 import com.atparui.rmsservice.service.dto.MenuItemDTO;
 import com.atparui.rmsservice.service.mapper.MenuItemMapper;
 import java.util.UUID;
@@ -10,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.MenuItem}.
  */
@@ -25,223 +26,63 @@ public class MenuItemService {
     private final MenuItemRepository menuItemRepository;
 
     private final MenuItemMapper menuItemMapper;
-
-    private final MenuItemSearchRepository menuItemSearchRepository;
-
     public MenuItemService(
         MenuItemRepository menuItemRepository,
-        MenuItemMapper menuItemMapper,
-        MenuItemSearchRepository menuItemSearchRepository
+        MenuItemMapper menuItemMapper
     ) {
         this.menuItemRepository = menuItemRepository;
-        this.menuItemMapper = menuItemMapper;
-        this.menuItemSearchRepository = menuItemSearchRepository;
-    }
-
-    /**
-     * Save a menuItem.
-     *
-     * @param menuItemDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemDTO> save(MenuItemDTO menuItemDTO) {
+        this.menuItemMapper = menuItemMapper;    }
+    @Transactional
+    public Optional<MenuItemDTO> save(MenuItemDTO menuItemDTO) {
         LOG.debug("Request to save MenuItem : {}", menuItemDTO);
-        return menuItemRepository
-            .save(menuItemMapper.toEntity(menuItemDTO))
-            .flatMap(menuItemSearchRepository::save)
-            .map(menuItemMapper::toDto);
+        MenuItem menuItem = menuItemMapper.toEntity(menuItemDTO);
+        menuItem = menuItemRepository.save(menuItem);
+        return Optional.of(menuItemMapper.toDto(menuItem));
     }
 
-    /**
-     * Update a menuItem.
-     *
-     * @param menuItemDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemDTO> update(MenuItemDTO menuItemDTO) {
+    @Transactional
+    public Optional<MenuItemDTO> update(MenuItemDTO menuItemDTO) {
         LOG.debug("Request to update MenuItem : {}", menuItemDTO);
-        return menuItemRepository
-            .save(menuItemMapper.toEntity(menuItemDTO).setIsPersisted())
-            .flatMap(menuItemSearchRepository::save)
-            .map(menuItemMapper::toDto);
+        MenuItem menuItem = menuItemMapper.toEntity(menuItemDTO);
+        menuItem = menuItemRepository.save(menuItem);
+        return Optional.of(menuItemMapper.toDto(menuItem));
     }
 
-    /**
-     * Partially update a menuItem.
-     *
-     * @param menuItemDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<MenuItemDTO> partialUpdate(MenuItemDTO menuItemDTO) {
+    @Transactional
+    public Optional<MenuItemDTO> partialUpdate(MenuItemDTO menuItemDTO) {
         LOG.debug("Request to partially update MenuItem : {}", menuItemDTO);
-
         return menuItemRepository
             .findById(menuItemDTO.getId())
             .map(existingMenuItem -> {
                 menuItemMapper.partialUpdate(existingMenuItem, menuItemDTO);
-
-                return existingMenuItem;
-            })
-            .flatMap(menuItemRepository::save)
-            .flatMap(savedMenuItem -> {
-                menuItemSearchRepository.save(savedMenuItem);
-                return Mono.just(savedMenuItem);
+                return menuItemRepository.save(existingMenuItem);
             })
             .map(menuItemMapper::toDto);
     }
 
-    /**
-     * Get all the menuItems.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<MenuItemDTO> findAll(Pageable pageable) {
+    public List<MenuItemDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all MenuItems");
-        return menuItemRepository.findAllBy(pageable).map(menuItemMapper::toDto);
+        Page<MenuItem> page = menuItemRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(menuItemMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of menuItems available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return menuItemRepository.count();
     }
 
-    /**
-     * Returns the number of menuItems available in search repository.
-     *
-     */
-    public Mono<Long> searchCount() {
-        return menuItemSearchRepository.count();
-    }
-
-    /**
-     * Get one menuItem by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<MenuItemDTO> findOne(UUID id) {
+    public Optional<MenuItemDTO> findOne(UUID id) {
         LOG.debug("Request to get MenuItem : {}", id);
         return menuItemRepository.findById(id).map(menuItemMapper::toDto);
     }
 
-    /**
-     * Delete the menuItem by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete MenuItem : {}", id);
-        return menuItemRepository.deleteById(id).then(menuItemSearchRepository.deleteById(id));
-    }
-
-    /**
-     * Search for the menuItem corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public Flux<MenuItemDTO> search(String query, Pageable pageable) {
-        LOG.debug("Request to search for a page of MenuItems for query {}", query);
-        return menuItemSearchRepository.search(query, pageable).map(menuItemMapper::toDto);
-    }
-
-    // jhipster-needle-service-impl-add-method - JHipster will add methods here
-
-    /**
-     * Find available menu items by branch ID
-     *
-     * @param branchId the branch ID
-     * @return the list of available menu item DTOs
-     */
-    @Transactional(readOnly = true)
-    public Flux<MenuItemDTO> findAvailableByBranchId(UUID branchId) {
-        LOG.debug("Request to find available MenuItems by branch ID : {}", branchId);
-        return menuItemRepository.findAvailableByBranchId(branchId).map(menuItemMapper::toDto);
-    }
-
-    /**
-     * Find menu items by category ID
-     *
-     * @param categoryId the menu category ID
-     * @return the list of menu item DTOs
-     */
-    @Transactional(readOnly = true)
-    public Flux<MenuItemDTO> findByCategoryId(UUID categoryId) {
-        LOG.debug("Request to find MenuItems by category ID : {}", categoryId);
-        return menuItemRepository.findByMenuCategoryId(categoryId).map(menuItemMapper::toDto);
-    }
-
-    /**
-     * Find filtered menu items
-     *
-     * @param branchId the branch ID
-     * @param itemType the item type (EATABLE, BEVERAGE)
-     * @param cuisineType the cuisine type
-     * @param isVegetarian vegetarian filter
-     * @param isAlcoholic alcoholic filter
-     * @return the list of filtered menu item DTOs
-     */
-    @Transactional(readOnly = true)
-    public Flux<MenuItemDTO> findFiltered(UUID branchId, String itemType, String cuisineType, Boolean isVegetarian, Boolean isAlcoholic) {
-        LOG.debug(
-            "Request to find filtered MenuItems : {} - {} - {} - {} - {}",
-            branchId,
-            itemType,
-            cuisineType,
-            isVegetarian,
-            isAlcoholic
-        );
-        return menuItemRepository
-            .findByBranch(branchId)
-            .filter(menuItem -> {
-                if (itemType != null && !itemType.equals(menuItem.getItemType())) {
-                    return false;
-                }
-                if (cuisineType != null && !cuisineType.equals(menuItem.getCuisineType())) {
-                    return false;
-                }
-                if (isVegetarian != null && !isVegetarian.equals(menuItem.getIsVegetarian())) {
-                    return false;
-                }
-                if (isAlcoholic != null && !isAlcoholic.equals(menuItem.getIsAlcoholic())) {
-                    return false;
-                }
-                return true;
-            })
-            .map(menuItemMapper::toDto);
-    }
-
-    /**
-     * Update menu item availability
-     *
-     * @param id the id of the menu item
-     * @param isAvailable the availability status
-     * @return the updated menu item DTO
-     */
-    public Mono<MenuItemDTO> updateAvailability(UUID id, Boolean isAvailable) {
-        LOG.debug("Request to update MenuItem availability : {} - {}", id, isAvailable);
-        return menuItemRepository
-            .findById(id)
-            .switchIfEmpty(Mono.error(new RuntimeException("MenuItem not found")))
-            .map(menuItem -> {
-                menuItem.setIsAvailable(isAvailable);
-                return menuItem;
-            })
-            .flatMap(menuItemRepository::save)
-            .flatMap(savedMenuItem -> {
-                menuItemSearchRepository.save(savedMenuItem);
-                return Mono.just(savedMenuItem);
-            })
-            .map(menuItemMapper::toDto);
+        menuItemRepository.deleteById(id);
     }
 }

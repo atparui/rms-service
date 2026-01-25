@@ -1,4 +1,6 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.broker.KafkaConsumer;
 import org.slf4j.Logger;
@@ -6,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/rmsservice-kafka")
@@ -25,15 +25,15 @@ public class RmsserviceKafkaResource {
     }
 
     @PostMapping("/publish")
-    public Mono<ResponseEntity<Void>> publish(@RequestParam("message") String message) {
+    public ResponseEntity<Object> publish(@RequestParam("message") String message) {
         LOG.debug("REST request the message : {} to send to Kafka topic", message);
         streamBridge.send(PRODUCER_BINDING_NAME, message);
-        return Mono.just(ResponseEntity.noContent().build());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/consume")
-    public Flux<String> consume() {
+    public List<String> consume() {
         LOG.debug("REST request to consume records from Kafka topics");
-        return this.kafkaConsumer.getFlux();
+        return this.kafkaConsumer.getMessages();
     }
 }

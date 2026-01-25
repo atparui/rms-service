@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "menu_permission")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "menupermission")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MenuPermission implements Serializable {
 

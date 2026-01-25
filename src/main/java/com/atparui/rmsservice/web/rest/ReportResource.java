@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.service.ReportService;
 import com.atparui.rmsservice.service.dto.DailySummaryReportDTO;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 /**
  * REST controller for managing reports.
@@ -40,7 +40,7 @@ public class ReportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and sales report
      */
     @GetMapping("/sales")
-    public Mono<ResponseEntity<SalesReportDTO>> getSalesReport(
+    public ResponseEntity<SalesReportDTO> getSalesReport(
         @RequestParam UUID branchId,
         @RequestParam @org.springframework.format.annotation.DateTimeFormat(
             iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
@@ -50,7 +50,8 @@ public class ReportResource {
         ) Instant endDate
     ) {
         LOG.debug("REST request to get sales report : {} - {} to {}", branchId, startDate, endDate);
-        return reportService.getSalesReport(branchId, startDate, endDate).map(result -> ResponseEntity.ok().body(result));
+        Optional<SalesReportDTO> result = reportService.getSalesReport(branchId, startDate, endDate);
+        return ResponseEntity.ok().body(result.orElse(new SalesReportDTO()));
     }
 
     /**
@@ -61,13 +62,14 @@ public class ReportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and daily summary
      */
     @GetMapping("/daily-summary")
-    public Mono<ResponseEntity<DailySummaryReportDTO>> getDailySummary(
+    public ResponseEntity<DailySummaryReportDTO> getDailySummary(
         @RequestParam UUID branchId,
         @RequestParam @org.springframework.format.annotation.DateTimeFormat(
             iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE
         ) LocalDate date
     ) {
         LOG.debug("REST request to get daily summary : {} - {}", branchId, date);
-        return reportService.getDailySummary(branchId, date).map(result -> ResponseEntity.ok().body(result));
+        Optional<DailySummaryReportDTO> result = reportService.getDailySummary(branchId, date);
+        return ResponseEntity.ok().body(result.orElse(new DailySummaryReportDTO()));
     }
 }

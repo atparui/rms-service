@@ -5,14 +5,16 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A AppNavigationMenu.
  */
-@Table("app_navigation_menu")
+@Entity
+@Table(name = "app_navigation_menu")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppNavigationMenu implements Serializable, Persistable<UUID> {
@@ -20,39 +22,39 @@ public class AppNavigationMenu implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("menu_code")
+    @Column(name = "menu_code")
     private String menuCode;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("menu_name")
+    @Column(name = "menu_name")
     private String menuName;
 
-    @Column("description")
+    @Column(name = "description")
     private String description;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("menu_type")
+    @Column(name = "menu_type")
     private String menuType;
 
     @Size(max = 100)
-    @Column("icon")
+    @Column(name = "icon")
     private String icon;
 
     @Size(max = 500)
-    @Column("route_path")
+    @Column(name = "route_path")
     private String routePath;
 
-    @Column("display_order")
+    @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient

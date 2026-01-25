@@ -2,57 +2,46 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.Payment;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the Payment entity.
+ * Spring Data JPA repository for the Payment entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface PaymentRepository extends ReactiveCrudRepository<Payment, UUID>, PaymentRepositoryInternal {
-    Flux<Payment> findAllBy(Pageable pageable);
+public interface PaymentRepository extends JpaRepository<Payment, UUID> {
+    List<Payment> findAllBy(Pageable pageable);
 
-    @Query("SELECT * FROM payment entity WHERE entity.bill_id = :id")
-    Flux<Payment> findByBill(UUID id);
+    @Query(value = "SELECT * FROM payment entity WHERE entity.bill_id = :id", nativeQuery = true)
+    List<Payment> findByBill(UUID id);
 
-    @Query("SELECT * FROM payment entity WHERE entity.bill_id IS NULL")
-    Flux<Payment> findAllByBillIsNull();
+    @Query(value = "SELECT * FROM payment entity WHERE entity.bill_id IS NULL", nativeQuery = true)
+    List<Payment> findAllByBillIsNull();
 
-    @Query("SELECT * FROM payment entity WHERE entity.payment_method_id = :id")
-    Flux<Payment> findByPaymentMethod(UUID id);
+    @Query(value = "SELECT * FROM payment entity WHERE entity.payment_method_id = :id", nativeQuery = true)
+    List<Payment> findByPaymentMethod(UUID id);
 
-    @Query("SELECT * FROM payment entity WHERE entity.payment_method_id IS NULL")
-    Flux<Payment> findAllByPaymentMethodIsNull();
+    @Query(value = "SELECT * FROM payment entity WHERE entity.payment_method_id IS NULL", nativeQuery = true)
+    List<Payment> findAllByPaymentMethodIsNull();
 
-    @Query("SELECT * FROM payment entity WHERE entity.bill_id = :billId")
-    Flux<Payment> findByBillId(UUID billId);
-
-    @Override
-    <S extends Payment> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM payment entity WHERE entity.bill_id = :billId", nativeQuery = true)
+    List<Payment> findByBillId(UUID billId);
 
     @Override
-    Flux<Payment> findAll();
+    <S extends Payment> S save(S entity);
 
     @Override
-    Mono<Payment> findById(UUID id);
+    List<Payment> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<Payment> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface PaymentRepositoryInternal {
-    <S extends Payment> Mono<S> save(S entity);
-
-    Flux<Payment> findAllBy(Pageable pageable);
-
-    Flux<Payment> findAll();
-
-    Mono<Payment> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<Payment> findAllBy(Pageable pageable, Criteria criteria);
-}

@@ -1,4 +1,9 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.AppNavigationMenuItem;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.AppNavigationMenuItemRepository;
 import com.atparui.rmsservice.service.dto.AppNavigationMenuItemDTO;
@@ -9,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.AppNavigationMenuItem}.
  */
@@ -32,94 +34,57 @@ public class AppNavigationMenuItemService {
         this.appNavigationMenuItemRepository = appNavigationMenuItemRepository;
         this.appNavigationMenuItemMapper = appNavigationMenuItemMapper;
     }
-
-    /**
-     * Save a appNavigationMenuItem.
-     *
-     * @param appNavigationMenuItemDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuItemDTO> save(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuItemDTO> save(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
         LOG.debug("Request to save AppNavigationMenuItem : {}", appNavigationMenuItemDTO);
-        return appNavigationMenuItemRepository
-            .save(appNavigationMenuItemMapper.toEntity(appNavigationMenuItemDTO))
-            .map(appNavigationMenuItemMapper::toDto);
+        AppNavigationMenuItem appNavigationMenuItem = appNavigationMenuItemMapper.toEntity(appNavigationMenuItemDTO);
+        appNavigationMenuItem = appNavigationMenuItemRepository.save(appNavigationMenuItem);
+        return Optional.of(appNavigationMenuItemMapper.toDto(appNavigationMenuItem));
     }
 
-    /**
-     * Update a appNavigationMenuItem.
-     *
-     * @param appNavigationMenuItemDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuItemDTO> update(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuItemDTO> update(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
         LOG.debug("Request to update AppNavigationMenuItem : {}", appNavigationMenuItemDTO);
-        return appNavigationMenuItemRepository
-            .save(appNavigationMenuItemMapper.toEntity(appNavigationMenuItemDTO).setIsPersisted())
-            .map(appNavigationMenuItemMapper::toDto);
+        AppNavigationMenuItem appNavigationMenuItem = appNavigationMenuItemMapper.toEntity(appNavigationMenuItemDTO);
+        appNavigationMenuItem = appNavigationMenuItemRepository.save(appNavigationMenuItem);
+        return Optional.of(appNavigationMenuItemMapper.toDto(appNavigationMenuItem));
     }
 
-    /**
-     * Partially update a appNavigationMenuItem.
-     *
-     * @param appNavigationMenuItemDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<AppNavigationMenuItemDTO> partialUpdate(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
+    @Transactional
+    public Optional<AppNavigationMenuItemDTO> partialUpdate(AppNavigationMenuItemDTO appNavigationMenuItemDTO) {
         LOG.debug("Request to partially update AppNavigationMenuItem : {}", appNavigationMenuItemDTO);
-
         return appNavigationMenuItemRepository
             .findById(appNavigationMenuItemDTO.getId())
             .map(existingAppNavigationMenuItem -> {
                 appNavigationMenuItemMapper.partialUpdate(existingAppNavigationMenuItem, appNavigationMenuItemDTO);
-
-                return existingAppNavigationMenuItem;
+                return appNavigationMenuItemRepository.save(existingAppNavigationMenuItem);
             })
-            .flatMap(appNavigationMenuItemRepository::save)
             .map(appNavigationMenuItemMapper::toDto);
     }
 
-    /**
-     * Get all the appNavigationMenuItems.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<AppNavigationMenuItemDTO> findAll(Pageable pageable) {
+    public List<AppNavigationMenuItemDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all AppNavigationMenuItems");
-        return appNavigationMenuItemRepository.findAllBy(pageable).map(appNavigationMenuItemMapper::toDto);
+        Page<AppNavigationMenuItem> page = appNavigationMenuItemRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(appNavigationMenuItemMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of appNavigationMenuItems available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return appNavigationMenuItemRepository.count();
     }
 
-    /**
-     * Get one appNavigationMenuItem by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<AppNavigationMenuItemDTO> findOne(UUID id) {
+    public Optional<AppNavigationMenuItemDTO> findOne(UUID id) {
         LOG.debug("Request to get AppNavigationMenuItem : {}", id);
         return appNavigationMenuItemRepository.findById(id).map(appNavigationMenuItemMapper::toDto);
     }
 
-    /**
-     * Delete the appNavigationMenuItem by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete AppNavigationMenuItem : {}", id);
-        return appNavigationMenuItemRepository.deleteById(id);
+        appNavigationMenuItemRepository.deleteById(id);
     }
 }

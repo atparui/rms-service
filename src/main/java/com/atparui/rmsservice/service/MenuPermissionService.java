@@ -1,4 +1,9 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.MenuPermission;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.MenuPermissionRepository;
 import com.atparui.rmsservice.service.dto.MenuPermissionDTO;
@@ -10,9 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.MenuPermission}.
  */
@@ -29,52 +31,57 @@ public class MenuPermissionService {
         this.menuPermissionRepository = menuPermissionRepository;
         this.menuPermissionMapper = menuPermissionMapper;
     }
-
-    public Mono<MenuPermissionDTO> save(MenuPermissionDTO menuPermissionDTO) {
+    @Transactional
+    public Optional<MenuPermissionDTO> save(MenuPermissionDTO menuPermissionDTO) {
         LOG.debug("Request to save MenuPermission : {}", menuPermissionDTO);
-        return menuPermissionRepository.save(menuPermissionMapper.toEntity(menuPermissionDTO)).map(menuPermissionMapper::toDto);
+        MenuPermission menuPermission = menuPermissionMapper.toEntity(menuPermissionDTO);
+        menuPermission = menuPermissionRepository.save(menuPermission);
+        return Optional.of(menuPermissionMapper.toDto(menuPermission));
     }
 
-    public Mono<MenuPermissionDTO> update(MenuPermissionDTO menuPermissionDTO) {
+    @Transactional
+    public Optional<MenuPermissionDTO> update(MenuPermissionDTO menuPermissionDTO) {
         LOG.debug("Request to update MenuPermission : {}", menuPermissionDTO);
-        return menuPermissionRepository.save(menuPermissionMapper.toEntity(menuPermissionDTO).setIsPersisted()).map(menuPermissionMapper::toDto);
+        MenuPermission menuPermission = menuPermissionMapper.toEntity(menuPermissionDTO);
+        menuPermission = menuPermissionRepository.save(menuPermission);
+        return Optional.of(menuPermissionMapper.toDto(menuPermission));
     }
 
-    public Mono<MenuPermissionDTO> partialUpdate(MenuPermissionDTO menuPermissionDTO) {
+    @Transactional
+    public Optional<MenuPermissionDTO> partialUpdate(MenuPermissionDTO menuPermissionDTO) {
         LOG.debug("Request to partially update MenuPermission : {}", menuPermissionDTO);
         return menuPermissionRepository
             .findById(menuPermissionDTO.getId())
-            .map(existing -> {
-                menuPermissionMapper.partialUpdate(existing, menuPermissionDTO);
-                return existing;
+            .map(existingMenuPermission -> {
+                menuPermissionMapper.partialUpdate(existingMenuPermission, menuPermissionDTO);
+                return menuPermissionRepository.save(existingMenuPermission);
             })
-            .flatMap(menuPermissionRepository::save)
             .map(menuPermissionMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Flux<MenuPermissionDTO> findAll(Pageable pageable) {
+    public List<MenuPermissionDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all MenuPermissions");
-        return menuPermissionRepository.findAllBy(pageable).map(menuPermissionMapper::toDto);
+        Page<MenuPermission> page = menuPermissionRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(menuPermissionMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return menuPermissionRepository.count();
     }
 
     @Transactional(readOnly = true)
-    public Mono<MenuPermissionDTO> findOne(UUID id) {
+    public Optional<MenuPermissionDTO> findOne(UUID id) {
         LOG.debug("Request to get MenuPermission : {}", id);
         return menuPermissionRepository.findById(id).map(menuPermissionMapper::toDto);
     }
 
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete MenuPermission : {}", id);
-        return menuPermissionRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public Flux<com.atparui.rmsservice.domain.MenuPermission> findByMenuIds(Collection<UUID> menuIds) {
-        return menuPermissionRepository.findByAppMenuIdIn(menuIds);
+        menuPermissionRepository.deleteById(id);
     }
 }

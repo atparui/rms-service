@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A UserBranchRole.
  */
-@Table("user_branch_role")
+@Entity
+@Table(name = "user_branch_role")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UserBranchRole implements Serializable, Persistable<UUID> {
@@ -21,30 +23,30 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("role")
+    @Column(name = "role")
     private String role;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @NotNull(message = "must not be null")
-    @Column("assigned_at")
+    @Column(name = "assigned_at")
     private Instant assignedAt;
 
     @Size(max = 255)
-    @Column("assigned_by")
+    @Column(name = "assigned_by")
     private String assignedBy;
 
-    @Column("revoked_at")
+    @Column(name = "revoked_at")
     private Instant revokedAt;
 
     @Size(max = 255)
-    @Column("revoked_by")
+    @Column(name = "revoked_by")
     private String revokedBy;
 
     @org.springframework.data.annotation.Transient
@@ -57,10 +59,10 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @Column("user_id")
+    @Column(name = "user_id")
     private UUID userId;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

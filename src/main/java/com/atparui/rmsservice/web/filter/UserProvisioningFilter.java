@@ -1,21 +1,25 @@
 package com.atparui.rmsservice.web.filter;
 
 import com.atparui.rmsservice.security.UserProvisioningService;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
-import org.springframework.web.server.WebFilterChain;
-import reactor.core.publisher.Mono;
 
 /**
  * Ensures user provisioning occurs on the first authenticated call.
  * Runs after authentication so the SecurityContext is populated.
  */
 @Component
-public class UserProvisioningFilter implements WebFilter {
+public class UserProvisioningFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserProvisioningFilter.class);
 
@@ -26,13 +30,16 @@ public class UserProvisioningFilter implements WebFilter {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return exchange
-            .getPrincipal()
-            .cast(Authentication.class)
-            .flatMap(auth -> userProvisioningService.provisionIfNeeded(auth))
-            .doOnError(ex -> LOG.error("User provisioning failed: {}", ex.getMessage(), ex))
-            .onErrorResume(ex -> Mono.empty())
-            .then(chain.filter(exchange));
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                userProvisioningService.provisionIfNeeded(authentication);
+            }
+        } catch (Exception ex) {
+            LOG.error("User provisioning failed: {}", ex.getMessage(), ex);
+        }
+        chain.doFilter(request, response);
     }
 }

@@ -7,14 +7,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A CustomerLoyalty.
  */
-@Table("customer_loyalty")
+@Entity
+@Table(name = "customer_loyalty")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class CustomerLoyalty implements Serializable, Persistable<UUID> {
@@ -22,24 +24,24 @@ public class CustomerLoyalty implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("loyalty_points")
+    @Column(name = "loyalty_points")
     private BigDecimal loyaltyPoints;
 
     @Size(max = 50)
-    @Column("tier")
+    @Column(name = "tier")
     private String tier;
 
     @NotNull(message = "must not be null")
-    @Column("enrolled_at")
+    @Column(name = "enrolled_at")
     private Instant enrolledAt;
 
-    @Column("last_points_earned_at")
+    @Column(name = "last_points_earned_at")
     private Instant lastPointsEarnedAt;
 
-    @Column("is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -52,10 +54,10 @@ public class CustomerLoyalty implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private Restaurant restaurant;
 
-    @Column("customer_id")
+    @Column(name = "customer_id")
     private UUID customerId;
 
-    @Column("restaurant_id")
+    @Column(name = "restaurant_id")
     private UUID restaurantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

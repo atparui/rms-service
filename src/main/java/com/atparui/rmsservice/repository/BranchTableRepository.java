@@ -2,54 +2,43 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.BranchTable;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the BranchTable entity.
+ * Spring Data JPA repository for the BranchTable entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BranchTableRepository extends ReactiveCrudRepository<BranchTable, UUID>, BranchTableRepositoryInternal {
-    Flux<BranchTable> findAllBy(Pageable pageable);
+public interface BranchTableRepository extends JpaRepository<BranchTable, UUID> {
+    List<BranchTable> findAllBy(Pageable pageable);
 
-    @Query("SELECT * FROM branch_table entity WHERE entity.branch_id = :id")
-    Flux<BranchTable> findByBranch(UUID id);
+    @Query(value = "SELECT * FROM branch_table entity WHERE entity.branch_id = :id", nativeQuery = true)
+    List<BranchTable> findByBranch(UUID id);
 
-    @Query("SELECT * FROM branch_table entity WHERE entity.branch_id IS NULL")
-    Flux<BranchTable> findAllByBranchIsNull();
+    @Query(value = "SELECT * FROM branch_table entity WHERE entity.branch_id IS NULL", nativeQuery = true)
+    List<BranchTable> findAllByBranchIsNull();
 
-    @Query("SELECT * FROM branch_table entity WHERE entity.branch_id = :branchId AND entity.status = 'AVAILABLE'")
-    Flux<BranchTable> findAvailableByBranchId(UUID branchId);
+    @Query(value = "SELECT * FROM branch_table entity WHERE entity.branch_id = :branchId AND entity.status = 'AVAILABLE'", nativeQuery = true)
+    List<BranchTable> findAvailableByBranchId(UUID branchId);
 
-    @Query("SELECT * FROM branch_table entity WHERE entity.branch_id = :branchId AND entity.status = :status")
-    Flux<BranchTable> findByBranchIdAndStatus(UUID branchId, String status);
-
-    @Override
-    <S extends BranchTable> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM branch_table entity WHERE entity.branch_id = :branchId AND entity.status = :status", nativeQuery = true)
+    List<BranchTable> findByBranchIdAndStatus(UUID branchId, String status);
 
     @Override
-    Flux<BranchTable> findAll();
+    <S extends BranchTable> S save(S entity);
 
     @Override
-    Mono<BranchTable> findById(UUID id);
+    List<BranchTable> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<BranchTable> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface BranchTableRepositoryInternal {
-    <S extends BranchTable> Mono<S> save(S entity);
-
-    Flux<BranchTable> findAllBy(Pageable pageable);
-
-    Flux<BranchTable> findAll();
-
-    Mono<BranchTable> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<BranchTable> findAllBy(Pageable pageable, Criteria criteria);
-}

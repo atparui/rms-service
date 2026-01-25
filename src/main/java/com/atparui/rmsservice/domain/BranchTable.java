@@ -5,68 +5,60 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A BranchTable.
  */
-@Table("branch_table")
+@Entity
+@Table(name = "branch_table")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "branchtable")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BranchTable implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("table_number")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "table_number")
     private String tableNumber;
 
     @Size(max = 255)
-    @Column("table_name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "table_name")
     private String tableName;
 
     @NotNull(message = "must not be null")
-    @Column("capacity")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "capacity")
     private Integer capacity;
 
     @Size(max = 50)
-    @Column("floor")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "floor")
     private String floor;
 
     @Size(max = 100)
-    @Column("section")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "section")
     private String section;
 
     @Size(max = 50)
-    @Column("status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "status")
     private String status;
 
     @Size(max = 500)
-    @Column("qr_code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "qr_code")
     private String qrCode;
 
     @Size(max = 500)
-    @Column("qr_code_url")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "qr_code_url")
     private String qrCodeUrl;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -76,7 +68,7 @@ public class BranchTable implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @Column("branch_id")
+    @Column(name = "branch_id")
     private UUID branchId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

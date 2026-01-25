@@ -2,74 +2,65 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.Order;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the Order entity.
+ * Spring Data JPA repository for the Order entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface OrderRepository extends ReactiveCrudRepository<Order, UUID>, OrderRepositoryInternal {
-    Flux<Order> findAllBy(Pageable pageable);
+@JaversSpringDataAuditable
+public interface OrderRepository extends JpaRepository<Order, UUID> {
+    List<Order> findAllBy(Pageable pageable);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.branch_id = :id")
-    Flux<Order> findByBranch(UUID id);
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.branch_id = :id", nativeQuery = true)
+    List<Order> findByBranch(UUID id);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.branch_id IS NULL")
-    Flux<Order> findAllByBranchIsNull();
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.branch_id IS NULL", nativeQuery = true)
+    List<Order> findAllByBranchIsNull();
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.customer_id = :id")
-    Flux<Order> findByCustomer(UUID id);
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.customer_id = :id", nativeQuery = true)
+    List<Order> findByCustomer(UUID id);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.customer_id IS NULL")
-    Flux<Order> findAllByCustomerIsNull();
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.customer_id IS NULL", nativeQuery = true)
+    List<Order> findAllByCustomerIsNull();
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.user_id = :id")
-    Flux<Order> findByUser(UUID id);
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.user_id = :id", nativeQuery = true)
+    List<Order> findByUser(UUID id);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.user_id IS NULL")
-    Flux<Order> findAllByUserIsNull();
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.user_id IS NULL", nativeQuery = true)
+    List<Order> findAllByUserIsNull();
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.branch_table_id = :id")
-    Flux<Order> findByBranchTable(UUID id);
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.branch_table_id = :id", nativeQuery = true)
+    List<Order> findByBranchTable(UUID id);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.branch_table_id IS NULL")
-    Flux<Order> findAllByBranchTableIsNull();
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.branch_table_id IS NULL", nativeQuery = true)
+    List<Order> findAllByBranchTableIsNull();
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.branch_id = :branchId AND entity.status = :status")
-    Flux<Order> findByBranchIdAndStatus(UUID branchId, String status);
+    @Query(value = "SELECT * FROM jhi_order entity WHERE entity.branch_id = :branchId AND entity.status = :status", nativeQuery = true)
+    List<Order> findByBranchIdAndStatus(UUID branchId, String status);
 
     @Query(
         "SELECT * FROM jhi_order entity WHERE entity.branch_id = :branchId AND entity.order_date >= :startDate AND entity.order_date <= :endDate"
     )
-    Flux<Order> findByBranchIdAndOrderDateBetween(UUID branchId, java.time.Instant startDate, java.time.Instant endDate);
+    List<Order> findByBranchIdAndOrderDateBetween(UUID branchId, java.time.Instant startDate, java.time.Instant endDate);
 
     @Override
-    <S extends Order> Mono<S> save(S entity);
+    <S extends Order> S save(S entity);
 
     @Override
-    Flux<Order> findAll();
+    List<Order> findAll();
 
     @Override
-    Mono<Order> findById(UUID id);
+    Optional<Order> findById(UUID id);
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    void deleteById(UUID id);
 }
 
-interface OrderRepositoryInternal {
-    <S extends Order> Mono<S> save(S entity);
-
-    Flux<Order> findAllBy(Pageable pageable);
-
-    Flux<Order> findAll();
-
-    Mono<Order> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<Order> findAllBy(Pageable pageable, Criteria criteria);
-}

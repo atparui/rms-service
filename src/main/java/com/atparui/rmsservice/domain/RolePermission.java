@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "role_permission")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "rolepermission")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class RolePermission implements Serializable {
 
@@ -29,11 +28,9 @@ public class RolePermission implements Serializable {
     @NotNull(message = "must not be null")
     @Size(max = 50)
     @Column(name = "role")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String role;
 
     @Column(name = "is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean isActive;
 
     @Column(name = "permission_id")

@@ -1,4 +1,5 @@
 package com.atparui.rmsservice.web.rest;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.OrderRepository;
 import com.atparui.rmsservice.service.OrderService;
@@ -8,7 +9,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,28 +24,21 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.reactive.ResponseUtil;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import com.atparui.rmsservice.web.util.PaginationUtil;
+import com.atparui.rmsservice.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.atparui.rmsservice.domain.Order}.
- */
 @RestController
 @RequestMapping("/api/orders")
 public class OrderResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderResource.class);
-
     private static final String ENTITY_NAME = "rmsserviceOrder";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final OrderService orderService;
-
     private final OrderRepository orderRepository;
 
     public OrderResource(OrderService orderService, OrderRepository orderRepository) {
@@ -53,45 +46,24 @@ public class OrderResource {
         this.orderRepository = orderRepository;
     }
 
-    /**
-     * {@code POST  /orders} : Create a new order.
-     *
-     * @param orderDTO the orderDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new orderDTO, or with status {@code 400 (Bad Request)} if the order has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public Mono<ResponseEntity<OrderDTO>> createOrder(@Valid @RequestBody OrderDTO orderDTO) throws URISyntaxException {
+    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) throws URISyntaxException {
         LOG.debug("REST request to save Order : {}", orderDTO);
         if (orderDTO.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
         orderDTO.setId(UUID.randomUUID());
-        return orderService
+        OrderDTO result = orderService
             .save(orderDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity.created(new URI("/api/orders/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create order"));
+
+        return ResponseEntity.created(new URI("/api/orders/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PUT  /orders/:id} : Updates an existing order.
-     *
-     * @param id the id of the orderDTO to save.
-     * @param orderDTO the orderDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
-     * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the orderDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<OrderDTO>> updateOrder(
+    public ResponseEntity<OrderDTO> updateOrder(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody OrderDTO orderDTO
     ) throws URISyntaxException {
@@ -103,37 +75,21 @@ public class OrderResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return orderRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!orderRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                return orderService
-                    .update(orderDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
+        OrderDTO result = orderService
+            .update(orderDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code PATCH  /orders/:id} : Partial updates given fields of an existing order, field will ignore if it is null
-     *
-     * @param id the id of the orderDTO to save.
-     * @param orderDTO the orderDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
-     * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the orderDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the orderDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<OrderDTO>> partialUpdateOrder(
+    public ResponseEntity<OrderDTO> partialUpdateOrder(
         @PathVariable(value = "id", required = false) final UUID id,
         @NotNull @RequestBody OrderDTO orderDTO
     ) throws URISyntaxException {
@@ -145,216 +101,51 @@ public class OrderResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return orderRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (!orderRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
 
-                Mono<OrderDTO> result = orderService.partialUpdate(orderDTO);
+        OrderDTO result = orderService
+            .partialUpdate(orderDTO)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity.ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
-    /**
-     * {@code GET  /orders} : get all the orders.
-     *
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
-     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<OrderDTO>>> getAllOrders(
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         LOG.debug("REST request to get a page of Orders");
-        return orderService
-            .countAll()
-            .zipWith(orderService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity.ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        long count = orderService.countAll();
+        List<OrderDTO> entities = orderService.findAll(pageable);
+
+        return ResponseEntity.ok()
+            .headers(
+                PaginationUtil.generatePaginationHttpHeaders(
+                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    new PageImpl<>(entities, pageable, count)
+                )
+            )
+            .body(entities);
     }
 
-    /**
-     * {@code GET  /orders/:id} : get the "id" order.
-     *
-     * @param id the id of the orderDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the orderDTO, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<OrderDTO>> getOrder(@PathVariable("id") UUID id) {
+    public ResponseEntity<OrderDTO> getOrder(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Order : {}", id);
-        Mono<OrderDTO> orderDTO = orderService.findOne(id);
+        Optional<OrderDTO> orderDTO = orderService.findOne(id);
         return ResponseUtil.wrapOrNotFound(orderDTO);
     }
 
-    /**
-     * {@code DELETE  /orders/:id} : delete the "id" order.
-     *
-     * @param id the id of the orderDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteOrder(@PathVariable("id") UUID id) {
+    public ResponseEntity<Object> deleteOrder(@PathVariable("id") UUID id) {
         LOG.debug("REST request to delete Order : {}", id);
-        return orderService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
-    }
-
-    /**
-     * {@code SEARCH  /orders/_search?query=:query} : search for the order corresponding
-     * to the query.
-     *
-     * @param query the query of the order search.
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search")
-    public Mono<ResponseEntity<Flux<OrderDTO>>> searchOrders(
-        @RequestParam("query") String query,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
-    ) {
-        LOG.debug("REST request to search for a page of Orders for query {}", query);
-        return orderService
-            .searchCount()
-            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
-                PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                    page
-                )
-            )
-            .map(headers -> ResponseEntity.ok().headers(headers).body(orderService.search(query, pageable)));
-    }
-
-    // jhipster-needle-rest-add-get-method - JHipster will add get methods here
-
-    /**
-     * {@code GET /api/orders/branch/{branchId}/status/{status}} : Get orders by status
-     *
-     * @param branchId the branch ID
-     * @param status the order status
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of orders
-     */
-    @GetMapping("/branch/{branchId}/status/{status}")
-    public Mono<ResponseEntity<List<OrderDTO>>> getOrdersByStatus(@PathVariable UUID branchId, @PathVariable String status) {
-        LOG.debug("REST request to get orders by status : {} - {}", branchId, status);
-        return orderService.findByBranchIdAndStatus(branchId, status).collectList().map(result -> ResponseEntity.ok().body(result));
-    }
-
-    /**
-     * {@code GET /api/orders/branch/{branchId}/date-range} : Get orders by date range
-     *
-     * @param branchId the branch ID
-     * @param startDate the start date
-     * @param endDate the end date
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of orders
-     */
-    @GetMapping("/branch/{branchId}/date-range")
-    public Mono<ResponseEntity<List<OrderDTO>>> getOrdersByDateRange(
-        @PathVariable UUID branchId,
-        @RequestParam @org.springframework.format.annotation.DateTimeFormat(
-            iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
-        ) java.time.Instant startDate,
-        @RequestParam @org.springframework.format.annotation.DateTimeFormat(
-            iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
-        ) java.time.Instant endDate
-    ) {
-        LOG.debug("REST request to get orders by date range : {} - {} to {}", branchId, startDate, endDate);
-        return orderService
-            .findByBranchIdAndDateRange(branchId, startDate, endDate)
-            .collectList()
-            .map(result -> ResponseEntity.ok().body(result));
-    }
-
-    /**
-     * {@code GET /api/orders/{id}/with-items} : Get order with items
-     *
-     * @param id the id of the order
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and order with items DTO
-     */
-    @GetMapping("/{id}/with-items")
-    public Mono<ResponseEntity<com.atparui.rmsservice.service.dto.OrderWithItemsDTO>> getOrderWithItems(@PathVariable UUID id) {
-        LOG.debug("REST request to get order with items : {}", id);
-        return orderService
-            .findOrderWithItems(id)
-            .map(result -> ResponseEntity.ok().body(result))
-            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
-    }
-
-    // jhipster-needle-rest-add-post-method - JHipster will add post methods here
-
-    /**
-     * {@code POST /api/orders/create} : Create a new order
-     *
-     * @param orderRequest the order creation request
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and order DTO
-     */
-    @PostMapping("/create")
-    public Mono<ResponseEntity<OrderDTO>> createOrder(
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.OrderCreationRequestDTO orderRequest
-    ) {
-        LOG.debug("REST request to create order : {}", orderRequest);
-        return orderService.createOrder(orderRequest).map(result -> ResponseEntity.status(HttpStatus.CREATED).body(result));
-    }
-
-    // jhipster-needle-rest-add-put-method - JHipster will add put methods here
-
-    /**
-     * {@code PUT /api/orders/{id}/status} : Update order status
-     *
-     * @param id the id of the order
-     * @param request the status update request
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and updated order DTO
-     */
-    @PutMapping("/{id}/status")
-    public Mono<ResponseEntity<OrderDTO>> updateOrderStatus(
-        @PathVariable UUID id,
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.OrderStatusUpdateRequestDTO request
-    ) {
-        LOG.debug("REST request to update order status : {} - {}", id, request);
-        return orderService.updateStatus(id, request).map(result -> ResponseEntity.ok().body(result));
-    }
-
-    /**
-     * {@code PUT /api/orders/{id}/cancel} : Cancel an order
-     *
-     * @param id the id of the order
-     * @param request the cancellation request
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and cancelled order DTO
-     */
-    @PutMapping("/{id}/cancel")
-    public Mono<ResponseEntity<OrderDTO>> cancelOrder(
-        @PathVariable UUID id,
-        @Valid @RequestBody com.atparui.rmsservice.service.dto.OrderCancellationRequestDTO request
-    ) {
-        LOG.debug("REST request to cancel order : {} - {}", id, request);
-        return orderService.cancelOrder(id, request).map(result -> ResponseEntity.ok().body(result));
+        orderService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A OrderItem.
  */
-@Table("order_item")
+@Entity
+@Table(name = "order_item")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class OrderItem implements Serializable, Persistable<UUID> {
@@ -21,26 +23,26 @@ public class OrderItem implements Serializable, Persistable<UUID> {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
-    @Column("quantity")
+    @Column(name = "quantity")
     private Integer quantity;
 
     @NotNull(message = "must not be null")
-    @Column("unit_price")
+    @Column(name = "unit_price")
     private BigDecimal unitPrice;
 
     @NotNull(message = "must not be null")
-    @Column("item_total")
+    @Column(name = "item_total")
     private BigDecimal itemTotal;
 
-    @Column("special_instructions")
+    @Column(name = "special_instructions")
     private String specialInstructions;
 
     @Size(max = 50)
-    @Column("status")
+    @Column(name = "status")
     private String status;
 
     @org.springframework.data.annotation.Transient
@@ -58,13 +60,13 @@ public class OrderItem implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemVariant menuItemVariant;
 
-    @Column("order_id")
+    @Column(name = "order_id")
     private UUID orderId;
 
-    @Column("menu_item_id")
+    @Column(name = "menu_item_id")
     private UUID menuItemId;
 
-    @Column("menu_item_variant_id")
+    @Column(name = "menu_item_variant_id")
     private UUID menuItemVariantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

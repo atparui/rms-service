@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 /**
  * REST controller for managing application navigation menus (CMS)
@@ -37,20 +36,18 @@ public class AppNavigationMenuResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and navigation menu response DTO
      */
     @GetMapping("")
-    public Mono<ResponseEntity<AppNavigationMenuResponseDTO>> getNavigationMenu() {
+    public ResponseEntity<AppNavigationMenuResponseDTO> getNavigationMenu() {
         LOG.debug("REST request to get application navigation menu");
-        return SecurityUtils.getCurrentUserRoles()
-            .collectList()
-            .flatMap(roles -> {
-                if (roles.isEmpty()) {
-                    // If no roles found, try to get from request parameter or use default
-                    LOG.warn("No roles found for current user, using default roles");
-                    roles = List.of("ROLE_USER", "ROLE_ANONYMOUS");
-                }
-                return appNavigationMenuService.getNavigationMenuByRoles(roles);
-            })
+        List<String> roles = SecurityUtils.getCurrentUserRoles();
+        if (roles.isEmpty()) {
+            // If no roles found, use default
+            LOG.warn("No roles found for current user, using default roles");
+            roles = List.of("ROLE_USER", "ROLE_ANONYMOUS");
+        }
+        return appNavigationMenuService
+            .getNavigationMenuByRoles(roles)
             .map(result -> ResponseEntity.ok().body(result))
-            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+            .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -60,7 +57,7 @@ public class AppNavigationMenuResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and navigation menu response DTO
      */
     @GetMapping("/roles")
-    public Mono<ResponseEntity<AppNavigationMenuResponseDTO>> getNavigationMenuByRoles(@RequestParam(required = false) String roles) {
+    public ResponseEntity<AppNavigationMenuResponseDTO> getNavigationMenuByRoles(@RequestParam(required = false) String roles) {
         LOG.debug("REST request to get application navigation menu with roles : {}", roles);
         List<String> roleList = new ArrayList<>();
         if (roles != null && !roles.isEmpty()) {
@@ -71,22 +68,16 @@ public class AppNavigationMenuResource {
             }
         } else {
             // If no roles provided, try to get from security context
-            return SecurityUtils.getCurrentUserRoles()
-                .collectList()
-                .flatMap(securityRoles -> {
-                    if (securityRoles.isEmpty()) {
-                        LOG.warn("No roles found, using default roles");
-                        securityRoles = List.of("ROLE_USER", "ROLE_ANONYMOUS");
-                    }
-                    return appNavigationMenuService.getNavigationMenuByRoles(securityRoles);
-                })
-                .map(result -> ResponseEntity.ok().body(result))
-                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+            roleList = SecurityUtils.getCurrentUserRoles();
+            if (roleList.isEmpty()) {
+                LOG.warn("No roles found, using default roles");
+                roleList = List.of("ROLE_USER", "ROLE_ANONYMOUS");
+            }
         }
 
         return appNavigationMenuService
             .getNavigationMenuByRoles(roleList)
             .map(result -> ResponseEntity.ok().body(result))
-            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+            .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -1,4 +1,10 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.BillTax;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.BillTaxRepository;
 import com.atparui.rmsservice.service.dto.BillTaxDTO;
@@ -8,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.BillTax}.
  */
@@ -28,89 +31,57 @@ public class BillTaxService {
         this.billTaxRepository = billTaxRepository;
         this.billTaxMapper = billTaxMapper;
     }
-
-    /**
-     * Save a billTax.
-     *
-     * @param billTaxDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<BillTaxDTO> save(BillTaxDTO billTaxDTO) {
+    @Transactional
+    public Optional<BillTaxDTO> save(BillTaxDTO billTaxDTO) {
         LOG.debug("Request to save BillTax : {}", billTaxDTO);
-        return billTaxRepository.save(billTaxMapper.toEntity(billTaxDTO)).map(billTaxMapper::toDto);
+        BillTax billTax = billTaxMapper.toEntity(billTaxDTO);
+        billTax = billTaxRepository.save(billTax);
+        return Optional.of(billTaxMapper.toDto(billTax));
     }
 
-    /**
-     * Update a billTax.
-     *
-     * @param billTaxDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public Mono<BillTaxDTO> update(BillTaxDTO billTaxDTO) {
+    @Transactional
+    public Optional<BillTaxDTO> update(BillTaxDTO billTaxDTO) {
         LOG.debug("Request to update BillTax : {}", billTaxDTO);
-        return billTaxRepository.save(billTaxMapper.toEntity(billTaxDTO).setIsPersisted()).map(billTaxMapper::toDto);
+        BillTax billTax = billTaxMapper.toEntity(billTaxDTO);
+        billTax = billTaxRepository.save(billTax);
+        return Optional.of(billTaxMapper.toDto(billTax));
     }
 
-    /**
-     * Partially update a billTax.
-     *
-     * @param billTaxDTO the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Mono<BillTaxDTO> partialUpdate(BillTaxDTO billTaxDTO) {
+    @Transactional
+    public Optional<BillTaxDTO> partialUpdate(BillTaxDTO billTaxDTO) {
         LOG.debug("Request to partially update BillTax : {}", billTaxDTO);
-
         return billTaxRepository
             .findById(billTaxDTO.getId())
             .map(existingBillTax -> {
                 billTaxMapper.partialUpdate(existingBillTax, billTaxDTO);
-
-                return existingBillTax;
+                return billTaxRepository.save(existingBillTax);
             })
-            .flatMap(billTaxRepository::save)
             .map(billTaxMapper::toDto);
     }
 
-    /**
-     * Get all the billTaxes.
-     *
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
-    public Flux<BillTaxDTO> findAll() {
-        LOG.debug("Request to get all BillTaxes");
-        return billTaxRepository.findAll().map(billTaxMapper::toDto);
+    public List<BillTaxDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all BillTaxs");
+        Page<BillTax> page = billTaxRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(billTaxMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the number of billTaxes available.
-     * @return the number of entities in the database.
-     *
-     */
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return billTaxRepository.count();
     }
 
-    /**
-     * Get one billTax by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
-    public Mono<BillTaxDTO> findOne(UUID id) {
+    public Optional<BillTaxDTO> findOne(UUID id) {
         LOG.debug("Request to get BillTax : {}", id);
         return billTaxRepository.findById(id).map(billTaxMapper::toDto);
     }
 
-    /**
-     * Delete the billTax by id.
-     *
-     * @param id the id of the entity.
-     * @return a Mono to signal the deletion
-     */
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete BillTax : {}", id);
-        return billTaxRepository.deleteById(id);
+        billTaxRepository.deleteById(id);
     }
 }

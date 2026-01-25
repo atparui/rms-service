@@ -45,10 +45,10 @@ ssh:
       remote-port: ${SSH_TUNNEL_CONSUL_REMOTE_PORT:8500}
       local-port: ${SSH_TUNNEL_CONSUL_LOCAL_PORT:8500}
     # Elasticsearch Tunnel
-    elasticsearch:
-      remote-host: ${SSH_TUNNEL_ELASTICSEARCH_REMOTE_HOST:localhost}
-      remote-port: ${SSH_TUNNEL_ELASTICSEARCH_REMOTE_PORT:9200}
-      local-port: ${SSH_TUNNEL_ELASTICSEARCH_LOCAL_PORT:9200}
+#    elasticsearch:
+#      remote-host: ${SSH_TUNNEL_ELASTICSEARCH_REMOTE_HOST:localhost}
+#      remote-port: ${SSH_TUNNEL_ELASTICSEARCH_REMOTE_PORT:9200}
+#      local-port: ${SSH_TUNNEL_ELASTICSEARCH_LOCAL_PORT:9200}
     # Keycloak Tunnel
     keycloak:
       remote-host: ${SSH_TUNNEL_KEYCLOAK_REMOTE_HOST:localhost}
@@ -58,15 +58,17 @@ ssh:
 spring:
   # Database Configuration (Service uses SSH tunnel to remote database)
   # The tunnel forwards localhost:5434 -> remote-server:5435
+  # P6Spy enabled in local profile for SQL logging during development
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/rms-service}
-    username: ${SPRING_DATASOURCE_USERNAME:rms-service}
-    password: ${SPRING_DATASOURCE_PASSWORD:rms-service}
+    url: ${RMS_SERVICE_JDBC_URL:${SPRING_DATASOURCE_URL:jdbc:p6spy:postgresql://localhost:5434/rms-service}}
+    username: ${RMS_SERVICE_DB_USER:${SPRING_DATASOURCE_USERNAME:rms-service}}
+    password: ${RMS_SERVICE_DB_PASSWORD:${SPRING_DATASOURCE_PASSWORD:rms-service}}
 
   liquibase:
-    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5434/rms-service?currentSchema=public}
-    user: ${SPRING_LIQUIBASE_USER:rms-service}
-    password: ${SPRING_LIQUIBASE_PASSWORD:rms-service}
+    # Liquibase uses standard PostgreSQL URL (no p6spy)
+    url: ${RMS_SERVICE_LIQUIBASE_URL:${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5434/rms-service?currentSchema=public}}
+    user: ${RMS_SERVICE_DB_USER:${SPRING_LIQUIBASE_USER:rms-service}}
+    password: ${RMS_SERVICE_DB_PASSWORD:${SPRING_LIQUIBASE_PASSWORD:rms-service}}
     default-schema: ${SPRING_LIQUIBASE_DEFAULT_SCHEMA:public}
 
   # Infrastructure Services (all via SSH tunnels to localhost)
@@ -78,10 +80,10 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
-  elasticsearch:
-    uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
-
-# Custom R2DBC config variables (used by ServiceDatabaseConfig)
+#  elasticsearch:
+#    uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
+#
+## Custom config variables (used by ServiceDatabaseConfig)
 # These point to localhost because SSH tunnel forwards to remote
 DB_HOST: ${DB_HOST:localhost}
 DB_PORT: ${DB_PORT:5434}

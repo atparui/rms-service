@@ -16,18 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.DefaultProfileUtil;
-import tech.jhipster.config.JHipsterConstants;
+import com.atparui.rmsservice.config.ApplicationConstants;
 
 @SpringBootApplication(
-    exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JaversSqlAutoConfiguration.class }
+    exclude = { JaversSqlAutoConfiguration.class }
 )
-@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, MultiTenantProperties.class })
+@EnableConfigurationProperties({ ApplicationProperties.class, MultiTenantProperties.class })
 public class RmsserviceApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(RmsserviceApp.class);
@@ -49,16 +46,16 @@ public class RmsserviceApp {
     public void initApplication() {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
         if (
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
+            activeProfiles.contains(ApplicationConstants.SPRING_PROFILE_DEVELOPMENT) &&
+            activeProfiles.contains(ApplicationConstants.SPRING_PROFILE_PRODUCTION)
         ) {
             LOG.error(
                 "You have misconfigured your application! It should not run " + "with both the 'dev' and 'prod' profiles at the same time."
             );
         }
         if (
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)
+            activeProfiles.contains(ApplicationConstants.SPRING_PROFILE_DEVELOPMENT) &&
+            activeProfiles.contains(ApplicationConstants.SPRING_PROFILE_CLOUD)
         ) {
             LOG.error(
                 "You have misconfigured your application! It should not " + "run with both the 'dev' and 'cloud' profiles at the same time."

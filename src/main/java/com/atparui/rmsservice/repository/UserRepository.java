@@ -2,6 +2,7 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.User;
 import java.util.Optional;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
  * Spring Data JPA repository for the {@link User} entity.
  */
 @Repository
+@JaversSpringDataAuditable
 public interface UserRepository extends JpaRepository<User, String>, UserRepositoryInternal {
     Optional<User> findOneByLogin(String login);
 
@@ -22,14 +24,3 @@ public interface UserRepository extends JpaRepository<User, String>, UserReposit
     long count();
 }
 
-interface UserRepositoryInternal {
-    Optional<User> findOneWithAuthoritiesByLogin(String login);
-
-    Page<User> findAllWithAuthorities(Pageable pageable);
-
-    void resetUserAuthorityMappings();
-
-    void deleteUserAuthorities(String userId);
-
-    void saveUserAuthority(String userId, String authority);
-}

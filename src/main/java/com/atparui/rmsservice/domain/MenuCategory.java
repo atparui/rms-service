@@ -5,52 +5,47 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A MenuCategory.
  */
-@Table("menu_category")
+@Entity
+@Table(name = "menu_category")
 @JsonIgnoreProperties(value = { "new" })
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "menucategory")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MenuCategory implements Serializable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
     @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column("name")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "name")
     private String name;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column("code")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "code")
     private String code;
 
-    @Column("description")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "description")
     private String description;
 
-    @Column("display_order")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    @Column(name = "display_order")
     private Integer displayOrder;
 
     @Size(max = 500)
-    @Column("image_url")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column("is_active")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @org.springframework.data.annotation.Transient
@@ -59,7 +54,7 @@ public class MenuCategory implements Serializable, Persistable<UUID> {
     @org.springframework.data.annotation.Transient
     private Restaurant restaurant;
 
-    @Column("restaurant_id")
+    @Column(name = "restaurant_id")
     private UUID restaurantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

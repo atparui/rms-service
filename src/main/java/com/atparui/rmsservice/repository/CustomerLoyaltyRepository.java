@@ -2,52 +2,41 @@ package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.CustomerLoyalty;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * Spring Data R2DBC repository for the CustomerLoyalty entity.
+ * Spring Data JPA repository for the CustomerLoyalty entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CustomerLoyaltyRepository extends ReactiveCrudRepository<CustomerLoyalty, UUID>, CustomerLoyaltyRepositoryInternal {
-    @Query("SELECT * FROM customer_loyalty entity WHERE entity.customer_id = :id")
-    Flux<CustomerLoyalty> findByCustomer(UUID id);
+public interface CustomerLoyaltyRepository extends JpaRepository<CustomerLoyalty, UUID> {
+    @Query(value = "SELECT * FROM customer_loyalty entity WHERE entity.customer_id = :id", nativeQuery = true)
+    List<CustomerLoyalty> findByCustomer(UUID id);
 
-    @Query("SELECT * FROM customer_loyalty entity WHERE entity.customer_id IS NULL")
-    Flux<CustomerLoyalty> findAllByCustomerIsNull();
+    @Query(value = "SELECT * FROM customer_loyalty entity WHERE entity.customer_id IS NULL", nativeQuery = true)
+    List<CustomerLoyalty> findAllByCustomerIsNull();
 
-    @Query("SELECT * FROM customer_loyalty entity WHERE entity.restaurant_id = :id")
-    Flux<CustomerLoyalty> findByRestaurant(UUID id);
+    @Query(value = "SELECT * FROM customer_loyalty entity WHERE entity.restaurant_id = :id", nativeQuery = true)
+    List<CustomerLoyalty> findByRestaurant(UUID id);
 
-    @Query("SELECT * FROM customer_loyalty entity WHERE entity.restaurant_id IS NULL")
-    Flux<CustomerLoyalty> findAllByRestaurantIsNull();
-
-    @Override
-    <S extends CustomerLoyalty> Mono<S> save(S entity);
+    @Query(value = "SELECT * FROM customer_loyalty entity WHERE entity.restaurant_id IS NULL", nativeQuery = true)
+    List<CustomerLoyalty> findAllByRestaurantIsNull();
 
     @Override
-    Flux<CustomerLoyalty> findAll();
+    <S extends CustomerLoyalty> S save(S entity);
 
     @Override
-    Mono<CustomerLoyalty> findById(UUID id);
+    List<CustomerLoyalty> findAll();
 
     @Override
-    Mono<Void> deleteById(UUID id);
+    Optional<CustomerLoyalty> findById(UUID id);
+
+    @Override
+    void deleteById(UUID id);
 }
 
-interface CustomerLoyaltyRepositoryInternal {
-    <S extends CustomerLoyalty> Mono<S> save(S entity);
-
-    Flux<CustomerLoyalty> findAllBy(Pageable pageable);
-
-    Flux<CustomerLoyalty> findAll();
-
-    Mono<CustomerLoyalty> findById(UUID id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<CustomerLoyalty> findAllBy(Pageable pageable, Criteria criteria);
-}

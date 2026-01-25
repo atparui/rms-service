@@ -1,4 +1,9 @@
 package com.atparui.rmsservice.service;
+import org.springframework.data.domain.Page;
+import com.atparui.rmsservice.domain.AppMenu;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 import com.atparui.rmsservice.repository.AppMenuRepository;
 import com.atparui.rmsservice.service.dto.AppMenuDTO;
@@ -9,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Service Implementation for managing {@link com.atparui.rmsservice.domain.AppMenu}.
  */
@@ -28,47 +30,57 @@ public class AppMenuService {
         this.appMenuRepository = appMenuRepository;
         this.appMenuMapper = appMenuMapper;
     }
-
-    public Mono<AppMenuDTO> save(AppMenuDTO appMenuDTO) {
+    @Transactional
+    public Optional<AppMenuDTO> save(AppMenuDTO appMenuDTO) {
         LOG.debug("Request to save AppMenu : {}", appMenuDTO);
-        return appMenuRepository.save(appMenuMapper.toEntity(appMenuDTO)).map(appMenuMapper::toDto);
+        AppMenu appMenu = appMenuMapper.toEntity(appMenuDTO);
+        appMenu = appMenuRepository.save(appMenu);
+        return Optional.of(appMenuMapper.toDto(appMenu));
     }
 
-    public Mono<AppMenuDTO> update(AppMenuDTO appMenuDTO) {
+    @Transactional
+    public Optional<AppMenuDTO> update(AppMenuDTO appMenuDTO) {
         LOG.debug("Request to update AppMenu : {}", appMenuDTO);
-        return appMenuRepository.save(appMenuMapper.toEntity(appMenuDTO).setIsPersisted()).map(appMenuMapper::toDto);
+        AppMenu appMenu = appMenuMapper.toEntity(appMenuDTO);
+        appMenu = appMenuRepository.save(appMenu);
+        return Optional.of(appMenuMapper.toDto(appMenu));
     }
 
-    public Mono<AppMenuDTO> partialUpdate(AppMenuDTO appMenuDTO) {
+    @Transactional
+    public Optional<AppMenuDTO> partialUpdate(AppMenuDTO appMenuDTO) {
         LOG.debug("Request to partially update AppMenu : {}", appMenuDTO);
         return appMenuRepository
             .findById(appMenuDTO.getId())
-            .map(existing -> {
-                appMenuMapper.partialUpdate(existing, appMenuDTO);
-                return existing;
+            .map(existingAppMenu -> {
+                appMenuMapper.partialUpdate(existingAppMenu, appMenuDTO);
+                return appMenuRepository.save(existingAppMenu);
             })
-            .flatMap(appMenuRepository::save)
             .map(appMenuMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Flux<AppMenuDTO> findAll(Pageable pageable) {
+    public List<AppMenuDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all AppMenus");
-        return appMenuRepository.findAllBy(pageable).map(appMenuMapper::toDto);
+        Page<AppMenu> page = appMenuRepository.findAll(pageable);
+        return page.getContent().stream()
+            .map(appMenuMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    public Mono<Long> countAll() {
+    @Transactional(readOnly = true)
+    public long countAll() {
         return appMenuRepository.count();
     }
 
     @Transactional(readOnly = true)
-    public Mono<AppMenuDTO> findOne(UUID id) {
+    public Optional<AppMenuDTO> findOne(UUID id) {
         LOG.debug("Request to get AppMenu : {}", id);
         return appMenuRepository.findById(id).map(appMenuMapper::toDto);
     }
 
-    public Mono<Void> delete(UUID id) {
+    @Transactional
+    public void delete(UUID id) {
         LOG.debug("Request to delete AppMenu : {}", id);
-        return appMenuRepository.deleteById(id);
+        appMenuRepository.deleteById(id);
     }
 }
