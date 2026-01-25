@@ -1,12 +1,12 @@
 package com.atparui.rmsservice.repository;
 
 import com.atparui.rmsservice.domain.Authority;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data R2DBC repository for the Authority entity.
+ * Spring Data JPA repository for the Authority entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface AuthorityRepository extends R2dbcRepository<Authority, String> {}
+public interface AuthorityRepository extends JpaRepository<Authority, String> {}

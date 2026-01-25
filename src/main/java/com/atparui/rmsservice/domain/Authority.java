@@ -1,31 +1,33 @@
 package com.atparui.rmsservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Authority.
  */
-@Table("jhi_authority")
+@Entity
+@Table(name = "jhi_authority")
 @JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Authority implements Serializable, Persistable<String> {
+public class Authority implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @NotNull(message = "must not be null")
     @Size(max = 50)
     @Id
-    @Column("name")
+    @Column(name = "name")
     private String name;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -46,12 +48,6 @@ public class Authority implements Serializable, Persistable<String> {
     @Override
     public String getId() {
         return this.name;
-    }
-
-    @org.springframework.data.annotation.Transient
-    @Override
-    public boolean isNew() {
-        return !this.isPersisted;
     }
 
     public Authority setIsPersisted() {
