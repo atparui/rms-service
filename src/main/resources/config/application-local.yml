@@ -14,6 +14,8 @@ logging:
     com.atparui.rmsservice: DEBUG
     org.springframework.security.oauth2: DEBUG
     com.jcraft.jsch: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 # SSH Tunnel Configuration
 # Enable SSH tunnels to connect to all remote services
@@ -61,11 +63,6 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:rms-service}
     password: ${SPRING_DATASOURCE_PASSWORD:rms-service}
 
-  r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5434/rms-service}
-    username: ${SPRING_R2DBC_USERNAME:rms-service}
-    password: ${SPRING_R2DBC_PASSWORD:rms-service}
-
   liquibase:
     url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5434/rms-service?currentSchema=public}
     user: ${SPRING_LIQUIBASE_USER:rms-service}
@@ -102,7 +99,7 @@ security:
 
 management:
   health:
-    r2dbc:
+    db:
       enabled: true
   endpoints:
     web:

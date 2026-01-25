@@ -69,10 +69,7 @@ management:
       enabled: true
   # prettier-ignore - management.health and management.endpoint.health are different keys in Spring Boot
   health:
-    # R2DBC health check is enabled and will use the @Primary ConnectionFactory bean
-    # The ConnectionFactory is configured with the correct Docker service name
-    # (rms-postgresql) and will be used automatically by Spring Boot
-    r2dbc:
+    db:
       enabled: true
     mail:
       enabled: false # When using the MailService, configure an SMTP server and set this to true
@@ -112,7 +109,6 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
-      - org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
   application:
     name: rmsservice
   cloud:
@@ -181,7 +177,7 @@ spring:
     basename: i18n/messages
   main:
     allow-bean-definition-overriding: true
-  webflux:
+  mvc:
     problemdetails:
       enabled: true
   security:

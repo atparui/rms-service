@@ -18,13 +18,8 @@ logging:
     ROOT: INFO
     tech.jhipster: INFO
     com.atparui.rmsservice: INFO
-    org.springframework.data.r2dbc.core: DEBUG
-    org.springframework.data.r2dbc.repository.query: DEBUG
-    org.springframework.data.r2dbc: DEBUG
-    org.springframework.r2dbc.core: DEBUG
-    io.r2dbc.postgresql.QUERY: DEBUG
-    io.r2dbc.postgresql.PARAM: DEBUG
-    io.r2dbc.pool: WARN
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
 
 management:
   prometheus:
@@ -38,10 +33,7 @@ management:
     sampling:
       probability: 1.0 # report 100% of traces
   health:
-    # R2DBC health check is enabled and will use the @Primary ConnectionFactory bean
-    # The ConnectionFactory is configured with the correct Docker service name
-    # (rms-postgresql) and will be used automatically by Spring Boot
-    r2dbc:
+    db:
       enabled: true
 
 spring:
@@ -89,13 +81,17 @@ spring:
     password: ${SPRING_LIQUIBASE_PASSWORD:rms-service}
     # Explicitly set default schema name for Liquibase (required even for separate database)
     default-schema: ${SPRING_LIQUIBASE_DEFAULT_SCHEMA:public}
-  r2dbc:
-    # url, username, password should be set via environment variables (SPRING_R2DBC_URL, SPRING_R2DBC_USERNAME, SPRING_R2DBC_PASSWORD)
-    # Service uses separate database 'rms-service' (not a schema)
-    # Default values for local development (overridden by env vars in Docker)
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://rms-postgresql:5432/rms-service}
-    username: ${SPRING_R2DBC_USERNAME:rms-service}
-    password: ${SPRING_R2DBC_PASSWORD:rms-service}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://rms-postgresql:5432/rms-service}
+    username: ${SPRING_DATASOURCE_USERNAME:rms-service}
+    password: ${SPRING_DATASOURCE_PASSWORD:rms-service}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_MAX_POOL_SIZE:20}
+      minimum-idle: ${SPRING_DATASOURCE_MIN_IDLE:5}
+      pool-name: rms-service-pool
+      connection-timeout: ${SPRING_DATASOURCE_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${SPRING_DATASOURCE_IDLE_TIMEOUT:600000}
+      max-lifetime: ${SPRING_DATASOURCE_MAX_LIFETIME:1800000}
   thymeleaf:
     cache: true
 
