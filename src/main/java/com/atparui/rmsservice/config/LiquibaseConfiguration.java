@@ -25,20 +25,15 @@ public class LiquibaseConfiguration {
 
     private final Environment env;
 
-    @Value("${DB_HOST:rms-postgresql}")
-    private String dbHost;
+    // RMS-Service specific Liquibase properties for multi-tenant separation
+    @Value("${RMS_SERVICE_LIQUIBASE_URL:jdbc:postgresql://rms-postgresql:5432/rms-service?currentSchema=public}")
+    private String liquibaseUrl;
 
-    @Value("${DB_PORT:5432}")
-    private int dbPort;
+    @Value("${RMS_SERVICE_LIQUIBASE_USER:rms-service}")
+    private String liquibaseUsername;
 
-    @Value("${DB_USERNAME:rms-service}")
-    private String dbUsername;
-
-    @Value("${DB_PASSWORD:rms-service}")
-    private String dbPassword;
-
-    @Value("${DB_NAME:rms-service}")
-    private String dbName;
+    @Value("${RMS_SERVICE_LIQUIBASE_PASSWORD:rms-service}")
+    private String liquibasePassword;
 
     @Value("${spring.liquibase.enabled:true}")
     private boolean liquibaseEnabled;
@@ -65,11 +60,15 @@ public class LiquibaseConfiguration {
     }
 
     private DataSource createLiquibaseDataSource() {
-        // Build JDBC URL from properties
-        String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s", dbHost, dbPort, dbName);
+        LOG.info("Creating RMS-Service Liquibase DataSource with URL: {}, User: {}", liquibaseUrl, liquibaseUsername);
 
-        LOG.info("Creating Liquibase DataSource: {}@{}:{}/{}", dbUsername, dbHost, dbPort, dbName);
-
-        return DataSourceBuilder.create().url(jdbcUrl).username(dbUsername).password(dbPassword).build();
+        com.zaxxer.hikari.HikariDataSource dataSource = new com.zaxxer.hikari.HikariDataSource();
+        dataSource.setJdbcUrl(liquibaseUrl);
+        dataSource.setUsername(liquibaseUsername);
+        dataSource.setPassword(liquibasePassword);
+        dataSource.setPoolName("rms-service-liquibase-hikari"); // Unique name for rms-service
+        dataSource.setMaximumPoolSize(2); // Liquibase only needs a small pool
+        dataSource.setMinimumIdle(1);
+        return dataSource;
     }
 }
