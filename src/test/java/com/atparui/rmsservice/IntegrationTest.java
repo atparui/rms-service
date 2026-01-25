@@ -1,7 +1,6 @@
 package com.atparui.rmsservice;
 
 import com.atparui.rmsservice.config.AsyncSyncConfiguration;
-import com.atparui.rmsservice.config.EmbeddedElasticsearch;
 import com.atparui.rmsservice.config.EmbeddedKafka;
 import com.atparui.rmsservice.config.EmbeddedSQL;
 import com.atparui.rmsservice.config.JacksonConfiguration;
@@ -20,11 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(
     classes = { RmsserviceApp.class, JacksonConfiguration.class, AsyncSyncConfiguration.class, TestSecurityConfiguration.class }
 )
-@EmbeddedElasticsearch
 @EmbeddedSQL
 @EmbeddedKafka
 public @interface IntegrationTest {
-    // 5s is Spring's default https://github.com/spring-projects/spring-framework/blob/main/spring-test/src/main/java/org/springframework/test/web/reactive/server/DefaultWebTestClient.java#L106
     String DEFAULT_TIMEOUT = "PT5S";
 
     String DEFAULT_ENTITY_TIMEOUT = "PT5S";

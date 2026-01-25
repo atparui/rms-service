@@ -16,37 +16,17 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
 
     private Logger log = LoggerFactory.getLogger(TestContainersSpringContextCustomizerFactory.class);
 
-    private static ElasticsearchTestContainer elasticsearchBean;
-
     @Override
     public ContextCustomizer createContextCustomizer(Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
         return new ContextCustomizer() {
             @Override
             public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
-                ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-                TestPropertyValues testValues = TestPropertyValues.empty();
-                EmbeddedElasticsearch elasticsearchAnnotation = AnnotatedElementUtils.findMergedAnnotation(
-                    testClass,
-                    EmbeddedElasticsearch.class
-                );
-                if (null != elasticsearchAnnotation) {
-                    log.debug("detected the EmbeddedElasticsearch annotation on class {}", testClass.getName());
-                    log.info("Warming up the elastic database");
-                    if (null == elasticsearchBean) {
-                        elasticsearchBean = beanFactory.createBean(ElasticsearchTestContainer.class);
-                        beanFactory.registerSingleton(ElasticsearchTestContainer.class.getName(), elasticsearchBean);
-                        // ((DefaultListableBeanFactory)beanFactory).registerDisposableBean(ElasticsearchTestContainer.class.getName(), elasticsearchBean);
-                    }
-                    testValues = testValues.and(
-                        "spring.elasticsearch.uris=http://" + elasticsearchBean.getElasticsearchContainer().getHttpHostAddress()
-                    );
-                }
-                testValues.applyTo(context);
+                // No custom context configuration needed
             }
 
             @Override
             public int hashCode() {
-                return ElasticsearchTestContainer.class.getName().hashCode();
+                return TestContainersSpringContextCustomizerFactory.class.getName().hashCode();
             }
 
             @Override

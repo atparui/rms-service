@@ -7,7 +7,6 @@ import com.atparui.rmsservice.config.Constants;
 import com.atparui.rmsservice.domain.User;
 import com.atparui.rmsservice.repository.UserRepository;
 import com.atparui.rmsservice.repository.UserRepositoryInternal;
-import com.atparui.rmsservice.repository.search.UserSearchRepository;
 import com.atparui.rmsservice.security.AuthoritiesConstants;
 import com.atparui.rmsservice.service.dto.AdminUserDTO;
 import java.util.Collection;
@@ -50,14 +49,6 @@ class UserServiceIT {
     @Autowired
     private UserService userService;
 
-    /**
-     * This repository is mocked in the com.atparui.rmsservice.repository.search test package.
-     *
-     * @see com.atparui.rmsservice.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @MockitoSpyBean
-    private UserSearchRepository spiedUserSearchRepository;
-
     private User user;
 
     private Map<String, Object> userDetails;
@@ -84,14 +75,14 @@ class UserServiceIT {
 
     @AfterEach
     void cleanupAndCheck() {
-        ((UserRepositoryInternal) userRepository).resetUserAuthorityMappings().block();
-        userRepository.deleteAll().block();
+        ((UserRepositoryInternal) userRepository).resetUserAuthorityMappings();
+        userRepository.deleteAll();
     }
 
     @Test
     void testDefaultUserDetails() {
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLogin()).isEqualTo(DEFAULT_LOGIN);
         assertThat(userDTO.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
@@ -108,7 +99,7 @@ class UserServiceIT {
         userDetails.put("preferred_username", "TEST");
 
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLogin()).isEqualTo("test");
     }
@@ -119,7 +110,7 @@ class UserServiceIT {
         userDetails.put("locale", "en-US");
 
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
     }
@@ -129,7 +120,7 @@ class UserServiceIT {
         userDetails.put("locale", "it-IT");
 
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLangKey()).isEqualTo("it");
     }
@@ -139,7 +130,7 @@ class UserServiceIT {
         userDetails.put("locale", "en_US");
 
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLangKey()).isEqualTo("en");
     }
@@ -149,7 +140,7 @@ class UserServiceIT {
         userDetails.put("locale", "en-US");
 
         OAuth2AuthenticationToken authentication = createMockOAuth2AuthenticationToken(userDetails);
-        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication).block();
+        AdminUserDTO userDTO = userService.getUserFromAuthentication(authentication);
 
         assertThat(userDTO.getLangKey()).isEqualTo("en");
     }
