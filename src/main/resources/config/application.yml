@@ -109,6 +109,9 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
+  sql:
+    init:
+      mode: never
   application:
     name: rmsservice
   cloud:
