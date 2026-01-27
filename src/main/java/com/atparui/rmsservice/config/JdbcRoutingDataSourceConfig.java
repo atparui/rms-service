@@ -8,9 +8,9 @@ import java.util.Map;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -49,9 +49,13 @@ public class JdbcRoutingDataSourceConfig {
     }
 
     @Bean
+    public DataSource defaultDataSource() {
+        return buildDefaultDataSource();
+    }
+
+    @Bean
     @Primary
-    public DataSource dataSource(ObjectProvider<DataSource> defaultDataSourceProvider) {
-        DataSource defaultDs = defaultDataSourceProvider.getIfAvailable(this::buildDefaultDataSource);
+    public DataSource dataSource(@Qualifier("defaultDataSource") DataSource defaultDs) {
 
         AbstractRoutingDataSource routing = new AbstractRoutingDataSource() {
             @Override
