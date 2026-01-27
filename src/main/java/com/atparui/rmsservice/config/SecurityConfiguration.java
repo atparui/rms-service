@@ -5,7 +5,6 @@ import static org.springframework.security.oauth2.core.oidc.StandardClaimNames.P
 
 import com.atparui.rmsservice.security.AuthoritiesConstants;
 import com.atparui.rmsservice.security.SecurityUtils;
-import com.atparui.rmsservice.web.filter.UserProvisioningFilter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,12 +35,6 @@ public class SecurityConfiguration {
 
     @Value("${spring.security.content-security-policy:default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:}")
     private String contentSecurityPolicy;
-
-    private final UserProvisioningFilter userProvisioningFilter;
-
-    public SecurityConfiguration(UserProvisioningFilter userProvisioningFilter) {
-        this.userProvisioningFilter = userProvisioningFilter;
-    }
 
     @Bean
     public SecurityFilterChain springSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -78,8 +70,7 @@ public class SecurityConfiguration {
                     .anyRequest().authenticated()
             )
             .oauth2Client(withDefaults())
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-            .addFilterBefore(userProvisioningFilter, UsernamePasswordAuthenticationFilter.class);
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
 
