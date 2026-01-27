@@ -36,7 +36,8 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
     List<Bill> findAllByCustomerIsNull();
 
     @Query(
-        "SELECT * FROM bill entity WHERE entity.branch_id = :branchId AND entity.bill_date >= :startDate AND entity.bill_date <= :endDate"
+        value = "SELECT * FROM bill entity WHERE entity.branch_id = :branchId AND entity.bill_date >= :startDate AND entity.bill_date <= :endDate",
+        nativeQuery = true
     )
     List<Bill> findByBranchIdAndBillDateBetween(UUID branchId, java.time.Instant startDate, java.time.Instant endDate);
 
