@@ -106,8 +106,6 @@ management:
       application: ${spring.application.name}
 
 spring:
-  main:
-    allow-circular-references: true
   autoconfigure:
     exclude:
       - org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
@@ -179,6 +177,7 @@ spring:
     basename: i18n/messages
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   mvc:
     problemdetails:
       enabled: true
