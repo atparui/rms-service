@@ -27,11 +27,8 @@ public class DynamicJwtDecoder implements JwtDecoder {
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String defaultIssuerUri;
 
-    private final tech.jhipster.config.JHipsterProperties jHipsterProperties;
-
-    public DynamicJwtDecoder(tech.jhipster.config.JHipsterProperties jHipsterProperties) {
-        this.jHipsterProperties = jHipsterProperties;
-    }
+    @Value("${application.security.oauth2.audience:}")
+    private List<String> audiences;
 
     // Cache JWT decoders per issuer to avoid recreating them
     private final Cache<String, JwtDecoder> decoderCache = Caffeine.newBuilder()
@@ -112,7 +109,6 @@ public class DynamicJwtDecoder implements JwtDecoder {
             OAuth2TokenValidator<Jwt> tokenValidator = withIssuer;
 
             // Add audience validator if configured
-            java.util.List<String> audiences = jHipsterProperties.getSecurity().getOauth2().getAudience();
             if (audiences != null && !audiences.isEmpty()) {
                 OAuth2TokenValidator<Jwt> audienceValidator = new com.atparui.rmsservice.security.oauth2.AudienceValidator(audiences);
                 tokenValidator = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);

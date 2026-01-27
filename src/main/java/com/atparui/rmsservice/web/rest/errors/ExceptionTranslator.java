@@ -2,6 +2,9 @@ package com.atparui.rmsservice.web.rest.errors;
 
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
+import com.atparui.rmsservice.config.ApplicationConstants;
+import com.atparui.rmsservice.web.util.HeaderUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,19 +35,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import com.atparui.rmsservice.config.ApplicationConstants;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
-import com.atparui.rmsservice.web.util.HeaderUtil;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
  * The error response follows RFC7807 - Problem Details for HTTP APIs (https://tools.ietf.org/html/rfc7807).
  */
 @ControllerAdvice
-@Component("jhiExceptionTranslator")
+@Component("exceptionTranslator")
 public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private static final String FIELD_ERRORS_KEY = "fieldErrors";
@@ -54,7 +53,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExceptionTranslator.class);
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${spring.application.name:rmsservice}")
     private String applicationName;
 
     private final Environment env;
@@ -66,7 +65,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleAnyException(Throwable ex, WebRequest request) {
         LOG.debug("Converting Exception to Problem Details:", ex);
-        ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
+        CustomProblemDetail pdCause = wrapAndCustomizeProblem(ex, request);
         return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
     }
 
@@ -79,22 +78,22 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         HttpStatusCode statusCode,
         WebRequest request
     ) {
-        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, (WebRequest) request) : body;
-        return new ResponseEntity<>(body, updateContentType(headers), HttpStatusCode.valueOf(((ProblemDetailWithCause) body).getStatus()));
+        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, request) : body;
+        return new ResponseEntity<>(body, updateContentType(headers), HttpStatusCode.valueOf(((CustomProblemDetail) body).getStatus()));
     }
 
-    protected ProblemDetailWithCause wrapAndCustomizeProblem(Throwable ex, WebRequest request) {
+    protected CustomProblemDetail wrapAndCustomizeProblem(Throwable ex, WebRequest request) {
         return customizeProblem(getProblemDetailWithCause(ex), ex, request);
     }
 
-    private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
+    private CustomProblemDetail getProblemDetailWithCause(Throwable ex) {
         if (
-            ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
+            ex instanceof ErrorResponseException exp && exp.getBody() instanceof CustomProblemDetail problemDetailWithCause
         ) return problemDetailWithCause;
-        return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
+        return CustomProblemDetail.forStatus(toStatus(ex).value());
     }
 
-    protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, WebRequest request) {
+    protected CustomProblemDetail customizeProblem(CustomProblemDetail problem, Throwable err, WebRequest request) {
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
@@ -181,8 +180,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             return ErrorConstants.ERR_VALIDATION;
         } else if (err instanceof ConcurrencyFailureException || err.getCause() instanceof ConcurrencyFailureException) {
             return ErrorConstants.ERR_CONCURRENCY_FAILURE;
-        } else if (err instanceof MethodArgumentNotValidException) {
-            return ErrorConstants.ERR_VALIDATION;
         }
         return null;
     }
@@ -211,17 +208,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return null;
     }
 
-    private URI getPathValue(WebRequest request) {
-        if (request == null) return URI.create("about:blank");
-        try {
-            String path = request.getDescription(false);
-            if (path != null && path.startsWith("uri=")) {
-                return URI.create(path.substring(4));
-            }
-            return URI.create(path != null ? path : "about:blank");
-        } catch (Exception e) {
-            return URI.create("about:blank");
-        }
+    private String getPathValue(WebRequest request) {
+        if (request == null) return "about:blank";
+        return request.getDescription(false).replace("uri=", "");
     }
 
     private HttpHeaders buildHeaders(Throwable err) {
@@ -244,7 +233,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return headers;
     }
 
-    public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, WebRequest request) {
+    public Optional<CustomProblemDetail> buildCause(final Throwable throwable, WebRequest request) {
         if (throwable != null && isCasualChainEnabled()) {
             return Optional.of(customizeProblem(getProblemDetailWithCause(throwable), throwable, request));
         }
@@ -264,7 +253,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             "java.",
             "net.",
             "jakarta.",
-            "javax.",
             "com.",
             "io.",
             "de.",

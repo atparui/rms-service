@@ -1,10 +1,7 @@
 package com.atparui.rmsservice.web.rest.errors;
 
-import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
 
 @SuppressWarnings("java:S110") // Inheritance tree of classes should not be too deep
 public class BadRequestAlertException extends ErrorResponseException {
@@ -19,16 +16,14 @@ public class BadRequestAlertException extends ErrorResponseException {
         this(ErrorConstants.DEFAULT_TYPE, defaultMessage, entityName, errorKey);
     }
 
-    public BadRequestAlertException(URI type, String defaultMessage, String entityName, String errorKey) {
+    public BadRequestAlertException(java.net.URI type, String defaultMessage, String entityName, String errorKey) {
         super(
             HttpStatus.BAD_REQUEST,
-            ProblemDetailWithCauseBuilder.instance()
-                .withStatus(HttpStatus.BAD_REQUEST.value())
+            CustomProblemDetail.forStatus(HttpStatus.BAD_REQUEST)
                 .withType(type)
                 .withTitle(defaultMessage)
                 .withProperty("message", "error." + errorKey)
-                .withProperty("params", entityName)
-                .build(),
+                .withProperty("params", entityName),
             null
         );
         this.entityName = entityName;
@@ -43,7 +38,7 @@ public class BadRequestAlertException extends ErrorResponseException {
         return errorKey;
     }
 
-    public ProblemDetailWithCause getProblemDetailWithCause() {
-        return (ProblemDetailWithCause) this.getBody();
+    public CustomProblemDetail getProblemDetailWithCause() {
+        return (CustomProblemDetail) this.getBody();
     }
 }

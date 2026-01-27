@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import tech.jhipster.async.ExceptionHandlingAsyncTaskExecutor;
 
 @Configuration
 @EnableAsync
@@ -38,6 +37,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setMaxPoolSize(taskExecutionProperties.getPool().getMaxSize());
         executor.setQueueCapacity(taskExecutionProperties.getPool().getQueueCapacity());
         executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
+        executor.initialize(); // Initialize the executor before using it (required in Spring Boot 4.x)
         return new ExceptionHandlingAsyncTaskExecutor(executor);
     }
 

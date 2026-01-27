@@ -5,28 +5,27 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import com.atparui.rmsservice.config.ApplicationConstants;
-import tech.jhipster.config.JHipsterProperties;
-import tech.jhipster.config.apidoc.customizer.JHipsterOpenApiCustomizer;
 
 @Configuration
 @Profile(ApplicationConstants.SPRING_PROFILE_API_DOCS)
 public class OpenApiConfiguration {
 
-    public static final String API_FIRST_PACKAGE = "com.atparui.rmsservice.web.api";
+    /**
+     * Package containing REST controllers for API documentation.
+     */
+    public static final String API_REST_PACKAGE = "com.atparui.rmsservice.web.rest";
 
+    /**
+     * Creates a grouped OpenAPI configuration for RMS REST endpoints.
+     * Scans all @RestController classes in com.atparui.rmsservice.web.rest package.
+     */
     @Bean
     @ConditionalOnMissingBean(name = "apiFirstGroupedOpenAPI")
-    public GroupedOpenApi apiFirstGroupedOpenAPI(
-        JHipsterOpenApiCustomizer jhipsterOpenApiCustomizer,
-        JHipsterProperties jHipsterProperties
-    ) {
-        JHipsterProperties.ApiDocs properties = jHipsterProperties.getApiDocs();
+    public GroupedOpenApi apiFirstGroupedOpenAPI() {
         return GroupedOpenApi.builder()
             .group("openapi")
-            .addOpenApiCustomizer(jhipsterOpenApiCustomizer)
-            .packagesToScan(API_FIRST_PACKAGE)
-            .pathsToMatch(properties.getDefaultIncludePattern())
+            .packagesToScan(API_REST_PACKAGE)
+            .pathsToMatch("/api/**", "/management/**")
             .build();
     }
 }
