@@ -22,7 +22,8 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID> {
     List<Discount> findAllByRestaurantIsNull();
 
     @Query(
-        "SELECT * FROM discount entity WHERE entity.restaurant_id = :restaurantId AND entity.is_active = true AND (entity.valid_from <= CURRENT_DATE AND (entity.valid_to IS NULL OR entity.valid_to >= CURRENT_DATE))"
+        value = "SELECT * FROM discount entity WHERE entity.restaurant_id = :restaurantId AND entity.is_active = true AND (entity.valid_from <= CURRENT_DATE AND (entity.valid_to IS NULL OR entity.valid_to >= CURRENT_DATE))",
+        nativeQuery = true
     )
     List<Discount> findActiveByRestaurantId(UUID restaurantId);
 

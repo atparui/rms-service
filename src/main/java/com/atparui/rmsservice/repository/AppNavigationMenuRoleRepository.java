@@ -34,12 +34,14 @@ public interface AppNavigationMenuRoleRepository
     List<AppNavigationMenuRole> findByRole(String role);
 
     @Query(
-        "SELECT * FROM app_navigation_menu_role entity WHERE entity.app_navigation_menu_id = :menuId AND entity.role = :role AND entity.is_active = true"
+        value = "SELECT * FROM app_navigation_menu_role entity WHERE entity.app_navigation_menu_id = :menuId AND entity.role = :role AND entity.is_active = true",
+        nativeQuery = true
     )
     Optional<AppNavigationMenuRole> findByMenuIdAndRole(UUID menuId, String role);
 
     @Query(
-        "SELECT * FROM app_navigation_menu_role entity WHERE entity.app_navigation_menu_item_id = :itemId AND entity.role = :role AND entity.is_active = true"
+        value = "SELECT * FROM app_navigation_menu_role entity WHERE entity.app_navigation_menu_item_id = :itemId AND entity.role = :role AND entity.is_active = true",
+        nativeQuery = true
     )
     Optional<AppNavigationMenuRole> findByMenuItemIdAndRole(UUID itemId, String role);
 

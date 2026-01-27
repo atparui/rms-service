@@ -47,7 +47,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByBranchIdAndStatus(UUID branchId, String status);
 
     @Query(
-        "SELECT * FROM jhi_order entity WHERE entity.branch_id = :branchId AND entity.order_date >= :startDate AND entity.order_date <= :endDate"
+        value = "SELECT * FROM jhi_order entity WHERE entity.branch_id = :branchId AND entity.order_date >= :startDate AND entity.order_date <= :endDate",
+        nativeQuery = true
     )
     List<Order> findByBranchIdAndOrderDateBetween(UUID branchId, java.time.Instant startDate, java.time.Instant endDate);
 
