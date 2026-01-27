@@ -18,8 +18,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
-import tech.jhipster.config.DefaultProfileUtil;
 import com.atparui.rmsservice.config.ApplicationConstants;
+import com.atparui.rmsservice.config.ProfileUtil;
 
 @SpringBootApplication(
     exclude = { JaversSqlAutoConfiguration.class }
@@ -72,7 +72,7 @@ public class RmsserviceApp {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         SpringApplication app = new SpringApplication(RmsserviceApp.class);
-        DefaultProfileUtil.addDefaultProfile(app);
+        ProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         logApplicationStartup(env);
     }
