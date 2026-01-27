@@ -9,6 +9,7 @@ import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/audit")
+@ConditionalOnBean(Javers.class)
 public class AuditResource {
 
     private static final Logger log = LoggerFactory.getLogger(AuditResource.class);
