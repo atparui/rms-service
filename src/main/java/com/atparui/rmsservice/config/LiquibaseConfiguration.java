@@ -26,13 +26,13 @@ public class LiquibaseConfiguration {
     private final Environment env;
 
     // RMS-Service specific Liquibase properties for multi-tenant separation
-    @Value("${RMS_SERVICE_LIQUIBASE_URL:jdbc:postgresql://rms-postgresql:5432/rms-service?currentSchema=public}")
+    @Value("${spring.liquibase.url:jdbc:postgresql://db:5432/rms-service?currentSchema=public}")
     private String liquibaseUrl;
 
-    @Value("${RMS_SERVICE_LIQUIBASE_USER:rms-service}")
+    @Value("${spring.liquibase.user:rms-service}")
     private String liquibaseUsername;
 
-    @Value("${RMS_SERVICE_LIQUIBASE_PASSWORD:rms-service}")
+    @Value("${spring.liquibase.password:rms-service}")
     private String liquibasePassword;
 
     @Value("${spring.liquibase.enabled:true}")
