@@ -181,6 +181,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
+    web-application-type: servlet
   mvc:
     problemdetails:
       enabled: true
