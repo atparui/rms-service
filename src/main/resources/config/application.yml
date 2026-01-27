@@ -106,6 +106,8 @@ management:
       application: ${spring.application.name}
 
 spring:
+  main:
+    allow-circular-references: true
   autoconfigure:
     exclude:
       - org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
