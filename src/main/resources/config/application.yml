@@ -330,4 +330,9 @@ javers:
   # New object snapshot (initial state)
   newObjectSnapshot: true
 
+springdoc:
+  show-actuator: true
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
 # application:
