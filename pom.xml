@@ -81,7 +81,7 @@
         <openapi-generator-maven-plugin.version>7.13.0</openapi-generator-maven-plugin.version>
         <profile.api-docs/>
         <profile.e2e/>
-        <profile.no-liquibase/>
+        <!-- Liquibase enabled by default for all profiles -->
         <profile.test/>
         <profile.tls/>
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
