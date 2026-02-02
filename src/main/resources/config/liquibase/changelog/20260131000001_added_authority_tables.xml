@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added platform authority tables (synced from Keycloak via Tenant Management Service)
+        
+        Note: These are PLATFORM authorities (ROLE_ADMIN, ROLE_USER, etc.)
+        Application-specific roles like MANAGER, WAITER, CHEF remain in user_branch_role table
+    -->
+    <changeSet id="20260131000001-1" author="system">
+        <comment>Create authority and user_authority tables for platform-level access control</comment>
+        
+        <!-- Authority Table -->
+        <createTable tableName="authority">
+            <column name="name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- User Authority Join Table -->
+        <createTable tableName="user_authority">
+            <column name="user_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="user_id, authority_name" tableName="user_authority"/>
+
+        <addForeignKeyConstraint baseColumnNames="authority_name"
+                                 baseTableName="user_authority"
+                                 constraintName="fk_user_authority_name"
+                                 referencedColumnNames="name"
+                                 referencedTableName="authority"/>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_authority"
+                                 constraintName="fk_user_authority_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"/>
+
+        <!-- Load default authorities -->
+        <insert tableName="authority">
+            <column name="name" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_MANAGER"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

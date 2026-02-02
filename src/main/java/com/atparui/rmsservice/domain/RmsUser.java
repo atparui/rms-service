@@ -1,14 +1,14 @@
 package com.atparui.rmsservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -72,6 +72,15 @@ public class RmsUser implements Serializable, Persistable<UUID> {
 
     @Column(name = "sync_error")
     private String syncError;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_authority",
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "name")
+    )
+    private Set<Authority> authorities = new HashSet<>();
 
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
@@ -255,6 +264,19 @@ public class RmsUser implements Serializable, Persistable<UUID> {
 
     public RmsUser setIsPersisted() {
         this.isPersisted = true;
+        return this;
+    }
+
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
+    public RmsUser authorities(Set<Authority> authorities) {
+        this.setAuthorities(authorities);
         return this;
     }
 

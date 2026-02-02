@@ -5,32 +5,30 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A Authority.
+ * A platform authority (role) synced from Keycloak.
+ * Examples: ROLE_ADMIN, ROLE_USER, ROLE_MANAGER
+ * 
+ * Note: This is different from application-specific roles in UserBranchRole
+ * (which include MANAGER, WAITER, CHEF, etc.)
  */
 @Entity
-@Table(name = "jhi_authority")
+@Table(name = "authority")
 @JsonIgnoreProperties(value = { "new", "id" })
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Authority implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "must not be null")
+    @NotNull
     @Size(max = 50)
     @Id
-    @Column(name = "name")
+    @Column(name = "name", length = 50)
     private String name;
-
-    @Transient
-    private boolean isPersisted;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public String getName() {
         return this.name;
@@ -44,17 +42,6 @@ public class Authority implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getId() {
-        return this.name;
-    }
-
-    public Authority setIsPersisted() {
-        this.isPersisted = true;
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -72,11 +59,8 @@ public class Authority implements Serializable {
         return Objects.hashCode(getName());
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Authority{" +
-            "name=" + getName() +
-            "}";
+        return "Authority{" + "name=" + getName() + "}";
     }
 }
