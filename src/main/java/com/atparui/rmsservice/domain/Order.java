@@ -16,7 +16,7 @@ import org.springframework.data.domain.Persistable;
  * A Order.
  */
 @Entity
-@Table(name = "jhi_order")
+@Table(name = "orders")
 @JsonIgnoreProperties(value = { "new" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Order implements Serializable, Persistable<UUID> {

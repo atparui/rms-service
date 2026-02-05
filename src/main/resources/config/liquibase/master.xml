@@ -78,5 +78,8 @@
     <!-- MIGRATION: Remove old JHipster tables, use RMS tables only -->
     <include file="config/liquibase/changelog/20260206000001_remove_jhipster_tables.xml" relativeToChangelogFile="false"/>
     
+    <!-- MIGRATION: Rename jhi_order to orders, drop unused JHipster test tables -->
+    <include file="config/liquibase/changelog/20260205000001_rename_order_table_remove_jhipster_test_tables.xml" relativeToChangelogFile="false"/>
+    
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
