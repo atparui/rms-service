@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Migrate existing role values in user_branch_role to match restaurant_role format.
+        This removes the ROLE_ prefix and maps to standard role names.
+        Must run BEFORE the FK constraint is added.
+    -->
+    <changeSet id="20260205115000-1" author="rms-team">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="user_branch_role"/>
+            <columnExists tableName="user_branch_role" columnName="role"/>
+        </preConditions>
+        <comment>Migrate user_branch_role.role values from ROLE_* format to match restaurant_role.name format</comment>
+        
+        <!-- Remove ROLE_ prefix and map to standard roles -->
+        <sql>
+            UPDATE user_branch_role SET role = 'MANAGER' WHERE role = 'ROLE_MANAGER';
+            UPDATE user_branch_role SET role = 'CHEF' WHERE role = 'ROLE_CHEF';
+            UPDATE user_branch_role SET role = 'WAITER' WHERE role = 'ROLE_WAITER';
+            UPDATE user_branch_role SET role = 'BARTENDER' WHERE role = 'ROLE_BARTENDER';
+            UPDATE user_branch_role SET role = 'CASHIER' WHERE role = 'ROLE_CASHIER';
+            UPDATE user_branch_role SET role = 'HOST' WHERE role = 'ROLE_HOST';
+            UPDATE user_branch_role SET role = 'LINE_COOK' WHERE role IN ('ROLE_BAKER', 'ROLE_RUNNER', 'ROLE_SUPPORT');
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260205115000-2" author="rms-team">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="restaurant_role"/>
+        </preConditions>
+        <comment>Add missing roles to restaurant_role that exist in user_branch_role</comment>
+        
+        <!-- Add any roles that were in the old system but not in the new seed -->
+        <insert tableName="restaurant_role">
+            <column name="name" value="ROLE_SUPPORT"/>
+            <column name="display_name" value="Support Staff"/>
+            <column name="description" value="General support and utility role"/>
+            <column name="is_active" valueBoolean="false"/>
+            <column name="sort_order" valueNumeric="99"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

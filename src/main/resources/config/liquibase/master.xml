@@ -46,6 +46,9 @@
     <!-- RESTAURANT ROLE: Define valid roles for restaurant staff (MUST be before constraints) -->
     <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>
     
+    <!-- MIGRATE EXISTING ROLE DATA: Update user_branch_role to match new role format (MUST be after restaurant_role creation, before constraints) -->
+    <include file="config/liquibase/changelog/20260205115000_migrate_user_branch_role_values.xml" relativeToChangelogFile="false"/>
+    
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251228051047_added_entity_constraints_Branch.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051049_added_entity_constraints_UserBranchRole.xml" relativeToChangelogFile="false"/>

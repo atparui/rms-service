@@ -470,7 +470,11 @@
 
     <!-- Navigation & Permissions -->
     <changeSet id="20260205130000-25" author="rms-team">
-        <comment>Add cascading rules to AppNavigationMenuItem FK</comment>
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="app_navigation_menu_item"/>
+        </preConditions>
+        
+        <comment>Add cascading rules to AppNavigationMenuItem FK (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="app_navigation_menu_item" constraintName="fk_app_navigation_menu_item__parent_menu_id"/>
         <addForeignKeyConstraint baseColumnNames="parent_menu_id"
@@ -482,7 +486,11 @@
     </changeSet>
 
     <changeSet id="20260205130000-26" author="rms-team">
-        <comment>Add cascading rules and missing FK to AppNavigationMenuRole</comment>
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="app_navigation_menu_role"/>
+        </preConditions>
+        
+        <comment>Add cascading rules and missing FK to AppNavigationMenuRole (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_id"/>
         <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_item_id"/>
