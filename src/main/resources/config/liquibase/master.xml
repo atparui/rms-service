@@ -42,6 +42,10 @@
     <include file="config/liquibase/changelog/20251228051113_added_entity_Payment.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260123090000_added_entity_AppMenuPermission.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260123093000_seed_app_menu_permissions.xml" relativeToChangelogFile="false"/>
+    
+    <!-- RESTAURANT ROLE: Define valid roles for restaurant staff (MUST be before constraints) -->
+    <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>
+    
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251228051047_added_entity_constraints_Branch.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251228051049_added_entity_constraints_UserBranchRole.xml" relativeToChangelogFile="false"/>
@@ -71,9 +75,6 @@
     <include file="config/liquibase/changelog/20260123090001_added_entity_constraints_AppMenuPermission.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <include file="config/liquibase/changelog/20250125000001_create_javers_tables.xml" relativeToChangelogFile="false"/>
-    
-    <!-- RESTAURANT ROLE: Define valid roles for restaurant staff -->
-    <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>
     
     <!-- FK CASCADING RULES: Add onDelete/onUpdate rules to all foreign keys for referential integrity -->
     <include file="config/liquibase/changelog/20260205130000_add_cascading_rules_to_all_foreign_keys.xml" relativeToChangelogFile="false"/>
