@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -76,9 +77,11 @@ public class Customer implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private RmsUser user;
 
@@ -269,6 +272,7 @@ public class Customer implements Serializable, Persistable<UUID> {
         this.isActive = isActive;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {

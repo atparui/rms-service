@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -68,6 +69,7 @@ public class Payment implements Serializable, Persistable<UUID> {
     @Column(name = "refund_reason")
     private String refundReason;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -75,6 +77,7 @@ public class Payment implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "order", "branch", "customer" }, allowSetters = true)
     private Bill bill;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private PaymentMethod paymentMethod;
 
@@ -242,6 +245,7 @@ public class Payment implements Serializable, Persistable<UUID> {
         this.refundReason = refundReason;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {

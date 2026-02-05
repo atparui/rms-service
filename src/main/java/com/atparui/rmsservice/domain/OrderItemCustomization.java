@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -37,6 +38,7 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -108,6 +110,7 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
         this.totalPrice = totalPrice != null ? totalPrice.stripTrailingZeros() : null;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {

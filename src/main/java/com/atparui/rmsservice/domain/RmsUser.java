@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.*;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**

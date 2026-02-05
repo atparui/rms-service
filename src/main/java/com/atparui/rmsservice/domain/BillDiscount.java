@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -43,6 +44,7 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
     @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -127,6 +129,7 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
         this.discountAmount = discountAmount != null ? discountAmount.stripTrailingZeros() : null;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {

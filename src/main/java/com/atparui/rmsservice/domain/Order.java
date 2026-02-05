@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -84,7 +85,7 @@ public class Order implements Serializable, Persistable<UUID> {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
-    @jakarta.persistence.Transient
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -96,6 +97,7 @@ public class Order implements Serializable, Persistable<UUID> {
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true)
     private Customer customer;
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private RmsUser user;
 
@@ -338,6 +340,7 @@ public class Order implements Serializable, Persistable<UUID> {
         this.cancellationReason = cancellationReason;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {
