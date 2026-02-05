@@ -512,11 +512,11 @@
     </changeSet>
 
     <changeSet id="20260205130000-27" author="rms-team">
-        <comment>Add cascading rules to AppMenuPermission FKs (if exists)</comment>
-        
         <preConditions onFail="MARK_RAN">
-            <foreignKeyConstraintExists foreignKeyName="fk_menu_permission__app_menu_id"/>
+            <tableExists tableName="menu_permission"/>
         </preConditions>
+        
+        <comment>Add cascading rules to AppMenuPermission FKs (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="menu_permission" constraintName="fk_menu_permission__app_menu_id"/>
         <dropForeignKeyConstraint baseTableName="menu_permission" constraintName="fk_menu_permission__permission_id"/>
@@ -537,11 +537,11 @@
     </changeSet>
 
     <changeSet id="20260205130000-28" author="rms-team">
-        <comment>Add cascading rules and missing FK to RolePermission (if exists)</comment>
-        
         <preConditions onFail="MARK_RAN">
-            <foreignKeyConstraintExists foreignKeyName="fk_role_permission__permission_id"/>
+            <tableExists tableName="role_permission"/>
         </preConditions>
+        
+        <comment>Add cascading rules and missing FK to RolePermission (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="role_permission" constraintName="fk_role_permission__permission_id"/>
         
