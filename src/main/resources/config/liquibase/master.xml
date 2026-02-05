@@ -74,7 +74,9 @@
     
     <!-- RESTAURANT ROLE: Define valid roles for restaurant staff -->
     <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260205120001_add_foreign_key_user_branch_role_to_restaurant_role.xml" relativeToChangelogFile="false"/>
+    
+    <!-- FK CASCADING RULES: Add onDelete/onUpdate rules to all foreign keys for referential integrity -->
+    <include file="config/liquibase/changelog/20260205130000_add_cascading_rules_to_all_foreign_keys.xml" relativeToChangelogFile="false"/>
     
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

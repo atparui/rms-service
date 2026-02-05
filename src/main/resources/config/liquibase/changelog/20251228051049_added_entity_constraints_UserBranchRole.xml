@@ -8,13 +8,14 @@
     <!--
         Added the constraints for entity UserBranchRole.
     -->
-    <changeSet id="20251228051049-2" author="jhipster">
+    <changeSet id="20251228051049-2" author="rms-team">
 
         <addForeignKeyConstraint baseColumnNames="user_id"
                                  baseTableName="user_branch_role"
                                  constraintName="fk_user_branch_role__user_id"
                                  referencedColumnNames="id"
                                  referencedTableName="rms_user"
+                                 onDelete="CASCADE"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="branch_id"
@@ -22,6 +23,16 @@
                                  constraintName="fk_user_branch_role__branch_id"
                                  referencedColumnNames="id"
                                  referencedTableName="branch"
+                                 onDelete="CASCADE"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="role"
+                                 baseTableName="user_branch_role"
+                                 constraintName="fk_user_branch_role__role_name"
+                                 referencedColumnNames="name"
+                                 referencedTableName="restaurant_role"
+                                 onDelete="RESTRICT"
+                                 onUpdate="CASCADE"
                                  />
     </changeSet>
 </databaseChangeLog>

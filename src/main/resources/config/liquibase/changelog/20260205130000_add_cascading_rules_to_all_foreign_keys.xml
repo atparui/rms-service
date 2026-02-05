@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Add onDelete/onUpdate rules to ALL existing foreign keys for proper referential integrity.
+        
+        Strategy:
+        - CASCADE: Child records (order_item, bill_item, etc.) deleted with parent
+        - RESTRICT: Reference data (cannot delete if referenced)
+        - SET NULL: Optional relationships (nullable FKs)
+    -->
+
+    <!-- Core Entities -->
+    <changeSet id="20260205130000-1" author="rms-team">
+        <comment>Add cascading rules to Branch FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="branch" constraintName="fk_branch__restaurant_id"/>
+        <addForeignKeyConstraint baseColumnNames="restaurant_id"
+                                 baseTableName="branch"
+                                 constraintName="fk_branch__restaurant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="restaurant"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- User Management -->
+    <changeSet id="20260205130000-2" author="rms-team">
+        <comment>Add cascading rules to UserSyncLog FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="user_sync_log" constraintName="fk_user_sync_log__user_id"/>
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_sync_log"
+                                 constraintName="fk_user_sync_log__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Branch & Table Management -->
+    <changeSet id="20260205130000-3" author="rms-team">
+        <comment>Add cascading rules to Shift FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="shift" constraintName="fk_shift__branch_id"/>
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="shift"
+                                 constraintName="fk_shift__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-4" author="rms-team">
+        <comment>Add cascading rules to BranchTable FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="branch_table" constraintName="fk_branch_table__branch_id"/>
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="branch_table"
+                                 constraintName="fk_branch_table__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-5" author="rms-team">
+        <comment>Add cascading rules to TableAssignment FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="table_assignment" constraintName="fk_table_assignment__branch_table_id"/>
+        <dropForeignKeyConstraint baseTableName="table_assignment" constraintName="fk_table_assignment__shift_id"/>
+        <dropForeignKeyConstraint baseTableName="table_assignment" constraintName="fk_table_assignment__supervisor_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_table_id"
+                                 baseTableName="table_assignment"
+                                 constraintName="fk_table_assignment__branch_table_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch_table"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="shift_id"
+                                 baseTableName="table_assignment"
+                                 constraintName="fk_table_assignment__shift_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="shift"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="supervisor_id"
+                                 baseTableName="table_assignment"
+                                 constraintName="fk_table_assignment__supervisor_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-6" author="rms-team">
+        <comment>Add cascading rules to TableWaiterAssignment FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="table_waiter_assignment" constraintName="fk_table_waiter_assignment__table_assignment_id"/>
+        <dropForeignKeyConstraint baseTableName="table_waiter_assignment" constraintName="fk_table_waiter_assignment__waiter_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="table_assignment_id"
+                                 baseTableName="table_waiter_assignment"
+                                 constraintName="fk_table_waiter_assignment__table_assignment_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="table_assignment"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="waiter_id"
+                                 baseTableName="table_waiter_assignment"
+                                 constraintName="fk_table_waiter_assignment__waiter_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Menu Management -->
+    <changeSet id="20260205130000-7" author="rms-team">
+        <comment>Add cascading rules to MenuCategory FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="menu_category" constraintName="fk_menu_category__restaurant_id"/>
+        <addForeignKeyConstraint baseColumnNames="restaurant_id"
+                                 baseTableName="menu_category"
+                                 constraintName="fk_menu_category__restaurant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="restaurant"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-8" author="rms-team">
+        <comment>Add cascading rules to MenuItem FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="menu_item" constraintName="fk_menu_item__branch_id"/>
+        <dropForeignKeyConstraint baseTableName="menu_item" constraintName="fk_menu_item__menu_category_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="menu_item"
+                                 constraintName="fk_menu_item__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="menu_category_id"
+                                 baseTableName="menu_item"
+                                 constraintName="fk_menu_item__menu_category_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_category"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-9" author="rms-team">
+        <comment>Add cascading rules to MenuItemVariant FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="menu_item_variant" constraintName="fk_menu_item_variant__menu_item_id"/>
+        <addForeignKeyConstraint baseColumnNames="menu_item_id"
+                                 baseTableName="menu_item_variant"
+                                 constraintName="fk_menu_item_variant__menu_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-10" author="rms-team">
+        <comment>Add cascading rules to MenuItemAddon FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="menu_item_addon" constraintName="fk_menu_item_addon__menu_item_id"/>
+        <addForeignKeyConstraint baseColumnNames="menu_item_id"
+                                 baseTableName="menu_item_addon"
+                                 constraintName="fk_menu_item_addon__menu_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-11" author="rms-team">
+        <comment>Add cascading rules to Inventory FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="inventory" constraintName="fk_inventory__branch_id"/>
+        <dropForeignKeyConstraint baseTableName="inventory" constraintName="fk_inventory__menu_item_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="inventory"
+                                 constraintName="fk_inventory__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="menu_item_id"
+                                 baseTableName="inventory"
+                                 constraintName="fk_inventory__menu_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Customer Management -->
+    <changeSet id="20260205130000-12" author="rms-team">
+        <comment>Add cascading rules to Customer FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="customer" constraintName="fk_customer__user_id"/>
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="customer"
+                                 constraintName="fk_customer__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-13" author="rms-team">
+        <comment>Add cascading rules to CustomerLoyalty FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="customer_loyalty" constraintName="fk_customer_loyalty__customer_id"/>
+        <dropForeignKeyConstraint baseTableName="customer_loyalty" constraintName="fk_customer_loyalty__restaurant_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="customer_id"
+                                 baseTableName="customer_loyalty"
+                                 constraintName="fk_customer_loyalty__customer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customer"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="restaurant_id"
+                                 baseTableName="customer_loyalty"
+                                 constraintName="fk_customer_loyalty__restaurant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="restaurant"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Order Management -->
+    <changeSet id="20260205130000-14" author="rms-team">
+        <comment>Add cascading rules to Orders FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="orders" constraintName="fk_orders__branch_id"/>
+        <dropForeignKeyConstraint baseTableName="orders" constraintName="fk_orders__customer_id"/>
+        <dropForeignKeyConstraint baseTableName="orders" constraintName="fk_orders__user_id"/>
+        <dropForeignKeyConstraint baseTableName="orders" constraintName="fk_orders__branch_table_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="RESTRICT"/>
+        
+        <addForeignKeyConstraint baseColumnNames="customer_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__customer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customer"
+                                 onDelete="SET NULL"/>
+        
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rms_user"
+                                 onDelete="SET NULL"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_table_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__branch_table_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch_table"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-15" author="rms-team">
+        <comment>Add cascading rules to OrderItem FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="order_item" constraintName="fk_order_item__order_id"/>
+        <dropForeignKeyConstraint baseTableName="order_item" constraintName="fk_order_item__menu_item_id"/>
+        <dropForeignKeyConstraint baseTableName="order_item" constraintName="fk_order_item__menu_item_variant_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="order_id"
+                                 baseTableName="order_item"
+                                 constraintName="fk_order_item__order_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="orders"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="menu_item_id"
+                                 baseTableName="order_item"
+                                 constraintName="fk_order_item__menu_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item"
+                                 onDelete="RESTRICT"/>
+        
+        <addForeignKeyConstraint baseColumnNames="menu_item_variant_id"
+                                 baseTableName="order_item"
+                                 constraintName="fk_order_item__menu_item_variant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item_variant"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-16" author="rms-team">
+        <comment>Add cascading rules to OrderItemCustomization FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="order_item_customization" constraintName="fk_order_item_customization__order_item_id"/>
+        <dropForeignKeyConstraint baseTableName="order_item_customization" constraintName="fk_order_item_customization__menu_item_addon_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="order_item_id"
+                                 baseTableName="order_item_customization"
+                                 constraintName="fk_order_item_customization__order_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="order_item"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="menu_item_addon_id"
+                                 baseTableName="order_item_customization"
+                                 constraintName="fk_order_item_customization__menu_item_addon_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_item_addon"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-17" author="rms-team">
+        <comment>Add cascading rules to OrderStatusHistory FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="order_status_history" constraintName="fk_order_status_history__order_id"/>
+        <addForeignKeyConstraint baseColumnNames="order_id"
+                                 baseTableName="order_status_history"
+                                 constraintName="fk_order_status_history__order_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="orders"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Billing & Payment -->
+    <changeSet id="20260205130000-18" author="rms-team">
+        <comment>Add cascading rules to Bill FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="bill" constraintName="fk_bill__order_id"/>
+        <dropForeignKeyConstraint baseTableName="bill" constraintName="fk_bill__branch_id"/>
+        <dropForeignKeyConstraint baseTableName="bill" constraintName="fk_bill__customer_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="order_id"
+                                 baseTableName="bill"
+                                 constraintName="fk_bill__order_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="orders"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="bill"
+                                 constraintName="fk_bill__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"
+                                 onDelete="RESTRICT"/>
+        
+        <addForeignKeyConstraint baseColumnNames="customer_id"
+                                 baseTableName="bill"
+                                 constraintName="fk_bill__customer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customer"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-19" author="rms-team">
+        <comment>Add cascading rules to BillItem FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="bill_item" constraintName="fk_bill_item__bill_id"/>
+        <dropForeignKeyConstraint baseTableName="bill_item" constraintName="fk_bill_item__order_item_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="bill_id"
+                                 baseTableName="bill_item"
+                                 constraintName="fk_bill_item__bill_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="bill"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="order_item_id"
+                                 baseTableName="bill_item"
+                                 constraintName="fk_bill_item__order_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="order_item"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-20" author="rms-team">
+        <comment>Add cascading rules to BillTax FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="bill_tax" constraintName="fk_bill_tax__bill_id"/>
+        <dropForeignKeyConstraint baseTableName="bill_tax" constraintName="fk_bill_tax__tax_config_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="bill_id"
+                                 baseTableName="bill_tax"
+                                 constraintName="fk_bill_tax__bill_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="bill"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="tax_config_id"
+                                 baseTableName="bill_tax"
+                                 constraintName="fk_bill_tax__tax_config_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tax_config"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-21" author="rms-team">
+        <comment>Add cascading rules to BillDiscount FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="bill_discount" constraintName="fk_bill_discount__bill_id"/>
+        <dropForeignKeyConstraint baseTableName="bill_discount" constraintName="fk_bill_discount__discount_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="bill_id"
+                                 baseTableName="bill_discount"
+                                 constraintName="fk_bill_discount__bill_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="bill"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="discount_id"
+                                 baseTableName="bill_discount"
+                                 constraintName="fk_bill_discount__discount_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="discount"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-22" author="rms-team">
+        <comment>Add cascading rules to Payment FKs</comment>
+        
+        <dropForeignKeyConstraint baseTableName="payment" constraintName="fk_payment__bill_id"/>
+        <dropForeignKeyConstraint baseTableName="payment" constraintName="fk_payment__payment_method_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="bill_id"
+                                 baseTableName="payment"
+                                 constraintName="fk_payment__bill_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="bill"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="payment_method_id"
+                                 baseTableName="payment"
+                                 constraintName="fk_payment__payment_method_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="payment_method"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- Configuration Tables -->
+    <changeSet id="20260205130000-23" author="rms-team">
+        <comment>Add cascading rules to TaxConfig FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="tax_config" constraintName="fk_tax_config__restaurant_id"/>
+        <addForeignKeyConstraint baseColumnNames="restaurant_id"
+                                 baseTableName="tax_config"
+                                 constraintName="fk_tax_config__restaurant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="restaurant"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-24" author="rms-team">
+        <comment>Add cascading rules to Discount FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="discount" constraintName="fk_discount__restaurant_id"/>
+        <addForeignKeyConstraint baseColumnNames="restaurant_id"
+                                 baseTableName="discount"
+                                 constraintName="fk_discount__restaurant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="restaurant"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Navigation & Permissions -->
+    <changeSet id="20260205130000-25" author="rms-team">
+        <comment>Add cascading rules to AppNavigationMenuItem FK</comment>
+        
+        <dropForeignKeyConstraint baseTableName="app_navigation_menu_item" constraintName="fk_app_navigation_menu_item__parent_menu_id"/>
+        <addForeignKeyConstraint baseColumnNames="parent_menu_id"
+                                 baseTableName="app_navigation_menu_item"
+                                 constraintName="fk_app_navigation_menu_item__parent_menu_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_navigation_menu"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-26" author="rms-team">
+        <comment>Add cascading rules and missing FK to AppNavigationMenuRole</comment>
+        
+        <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_id"/>
+        <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_item_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="app_navigation_menu_id"
+                                 baseTableName="app_navigation_menu_role"
+                                 constraintName="fk_app_navigation_menu_role__app_navigation_menu_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_navigation_menu"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="app_navigation_menu_item_id"
+                                 baseTableName="app_navigation_menu_role"
+                                 constraintName="fk_app_navigation_menu_role__app_navigation_menu_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_navigation_menu_item"
+                                 onDelete="CASCADE"/>
+        
+        <!-- Add missing FK to restaurant_role -->
+        <addForeignKeyConstraint baseColumnNames="role"
+                                 baseTableName="app_navigation_menu_role"
+                                 constraintName="fk_app_navigation_menu_role__role_name"
+                                 referencedColumnNames="name"
+                                 referencedTableName="restaurant_role"
+                                 onDelete="RESTRICT"
+                                 onUpdate="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-27" author="rms-team">
+        <comment>Add cascading rules to AppMenuPermission FKs (if exists)</comment>
+        
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_menu_permission__app_menu_id"/>
+        </preConditions>
+        
+        <dropForeignKeyConstraint baseTableName="menu_permission" constraintName="fk_menu_permission__app_menu_id"/>
+        <dropForeignKeyConstraint baseTableName="menu_permission" constraintName="fk_menu_permission__permission_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="app_menu_id"
+                                 baseTableName="menu_permission"
+                                 constraintName="fk_menu_permission__app_menu_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_menu"
+                                 onDelete="CASCADE"/>
+        
+        <addForeignKeyConstraint baseColumnNames="permission_id"
+                                 baseTableName="menu_permission"
+                                 constraintName="fk_menu_permission__permission_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="permission"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20260205130000-28" author="rms-team">
+        <comment>Add cascading rules and missing FK to RolePermission (if exists)</comment>
+        
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_role_permission__permission_id"/>
+        </preConditions>
+        
+        <dropForeignKeyConstraint baseTableName="role_permission" constraintName="fk_role_permission__permission_id"/>
+        
+        <addForeignKeyConstraint baseColumnNames="permission_id"
+                                 baseTableName="role_permission"
+                                 constraintName="fk_role_permission__permission_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="permission"
+                                 onDelete="CASCADE"/>
+        
+        <!-- Add missing FK to restaurant_role -->
+        <addForeignKeyConstraint baseColumnNames="role"
+                                 baseTableName="role_permission"
+                                 constraintName="fk_role_permission__role_name"
+                                 referencedColumnNames="name"
+                                 referencedTableName="restaurant_role"
+                                 onDelete="RESTRICT"
+                                 onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
