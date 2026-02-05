@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity RestaurantRole.
+        
+        This table defines valid roles for restaurant staff.
+        Replaces the hardcoded string approach in user_branch_role.
+    -->
+    <changeSet id="20260205120000-1" author="rms-team">
+        <createTable tableName="restaurant_role">
+            <column name="name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="display_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="${datetimeType}" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Seed standard restaurant roles -->
+    <changeSet id="20260205120000-2" author="rms-team">
+        <comment>Load standard restaurant roles</comment>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="MANAGER"/>
+            <column name="display_name" value="Manager"/>
+            <column name="description" value="Restaurant manager with full access to branch operations"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="ASSISTANT_MANAGER"/>
+            <column name="display_name" value="Assistant Manager"/>
+            <column name="description" value="Assistant manager with elevated privileges"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="CHEF"/>
+            <column name="display_name" value="Chef"/>
+            <column name="description" value="Head chef responsible for kitchen operations"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="SOUS_CHEF"/>
+            <column name="display_name" value="Sous Chef"/>
+            <column name="description" value="Second-in-command in the kitchen"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="LINE_COOK"/>
+            <column name="display_name" value="Line Cook"/>
+            <column name="description" value="Cook responsible for specific station in kitchen"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="WAITER"/>
+            <column name="display_name" value="Waiter/Waitress"/>
+            <column name="description" value="Server responsible for taking orders and serving customers"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="HOST"/>
+            <column name="display_name" value="Host/Hostess"/>
+            <column name="description" value="Greets and seats customers, manages reservations"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="CASHIER"/>
+            <column name="display_name" value="Cashier"/>
+            <column name="description" value="Handles payments and cash register operations"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="BARTENDER"/>
+            <column name="display_name" value="Bartender"/>
+            <column name="description" value="Prepares and serves beverages"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="BUSSER"/>
+            <column name="display_name" value="Busser"/>
+            <column name="description" value="Cleans and resets tables"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="DELIVERY_DRIVER"/>
+            <column name="display_name" value="Delivery Driver"/>
+            <column name="description" value="Delivers orders to customers"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+        
+        <insert tableName="restaurant_role">
+            <column name="name" value="DISHWASHER"/>
+            <column name="display_name" value="Dishwasher"/>
+            <column name="description" value="Cleans dishes, utensils, and kitchen equipment"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

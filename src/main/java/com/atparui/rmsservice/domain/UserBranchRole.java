@@ -32,6 +32,11 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     @Column(name = "role")
     private String role;
 
+    @Transient
+    @org.springframework.data.annotation.Transient
+    @JsonIgnoreProperties(value = {}, allowSetters = true)
+    private RestaurantRole restaurantRole;
+
     @Column(name = "is_active")
     private Boolean isActive;
 
@@ -94,6 +99,20 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public RestaurantRole getRestaurantRole() {
+        return this.restaurantRole;
+    }
+
+    public void setRestaurantRole(RestaurantRole restaurantRole) {
+        this.restaurantRole = restaurantRole;
+        this.role = restaurantRole != null ? restaurantRole.getName() : null;
+    }
+
+    public UserBranchRole restaurantRole(RestaurantRole restaurantRole) {
+        this.setRestaurantRole(restaurantRole);
+        return this;
     }
 
     public Boolean getIsActive() {

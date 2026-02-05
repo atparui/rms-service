@@ -72,5 +72,9 @@
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <include file="config/liquibase/changelog/20250125000001_create_javers_tables.xml" relativeToChangelogFile="false"/>
     
+    <!-- RESTAURANT ROLE: Define valid roles for restaurant staff -->
+    <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260205120001_add_foreign_key_user_branch_role_to_restaurant_role.xml" relativeToChangelogFile="false"/>
+    
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

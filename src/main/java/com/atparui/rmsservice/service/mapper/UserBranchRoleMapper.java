@@ -34,9 +34,11 @@ public interface UserBranchRoleMapper extends EntityMapper<UserBranchRoleDTO, Us
     }
 
     // Ignore FK ID fields - they're auto-managed by entity setters
+    // Ignore restaurantRole - it's a transient lookup field loaded separately
     @Override
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "restaurantRole", ignore = true)
     UserBranchRole toEntity(UserBranchRoleDTO dto);
 
     @Override
@@ -44,5 +46,6 @@ public interface UserBranchRoleMapper extends EntityMapper<UserBranchRoleDTO, Us
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "restaurantRole", ignore = true)
     void partialUpdate(@MappingTarget UserBranchRole entity, UserBranchRoleDTO dto);
 }
