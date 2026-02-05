@@ -14,7 +14,7 @@
                                  baseTableName="order_status_history"
                                  constraintName="fk_order_status_history__order_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="jhi_order"
+                                 referencedTableName="orders"
                                  />
     </changeSet>
 </databaseChangeLog>

@@ -72,14 +72,5 @@
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <include file="config/liquibase/changelog/20250125000001_create_javers_tables.xml" relativeToChangelogFile="false"/>
     
-    <!-- USER-AUTHORITY: Platform authority tables synced with Keycloak -->
-    <include file="config/liquibase/changelog/20260131000001_added_authority_tables.xml" relativeToChangelogFile="false"/>
-    
-    <!-- MIGRATION: Remove old JHipster tables, use RMS tables only -->
-    <include file="config/liquibase/changelog/20260206000001_remove_jhipster_tables.xml" relativeToChangelogFile="false"/>
-    
-    <!-- MIGRATION: Rename jhi_order to orders, drop unused JHipster test tables -->
-    <include file="config/liquibase/changelog/20260205000001_rename_order_table_remove_jhipster_test_tables.xml" relativeToChangelogFile="false"/>
-    
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

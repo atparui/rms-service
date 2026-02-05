@@ -8,32 +8,32 @@
     <!--
         Added the constraints for entity Order.
     -->
-    <changeSet id="20251228051102-2" author="jhipster">
+    <changeSet id="20251228051102-2" author="rms-team">
 
         <addForeignKeyConstraint baseColumnNames="branch_id"
-                                 baseTableName="jhi_order"
-                                 constraintName="fk_jhi_order__branch_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__branch_id"
                                  referencedColumnNames="id"
                                  referencedTableName="branch"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="customer_id"
-                                 baseTableName="jhi_order"
-                                 constraintName="fk_jhi_order__customer_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__customer_id"
                                  referencedColumnNames="id"
                                  referencedTableName="customer"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="jhi_order"
-                                 constraintName="fk_jhi_order__user_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__user_id"
                                  referencedColumnNames="id"
                                  referencedTableName="rms_user"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="branch_table_id"
-                                 baseTableName="jhi_order"
-                                 constraintName="fk_jhi_order__branch_table_id"
+                                 baseTableName="orders"
+                                 constraintName="fk_orders__branch_table_id"
                                  referencedColumnNames="id"
                                  referencedTableName="branch_table"
                                  />

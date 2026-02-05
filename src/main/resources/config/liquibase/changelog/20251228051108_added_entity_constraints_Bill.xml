@@ -14,7 +14,7 @@
                                  baseTableName="bill"
                                  constraintName="fk_bill__order_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="jhi_order"
+                                 referencedTableName="orders"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="branch_id"
