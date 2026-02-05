@@ -23,17 +23,21 @@ public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
 
     public OAuth2TokenValidatorResult validate(Jwt jwt) {
         List<String> audience = jwt.getAudience();
+        // Allow tokens without audience claim (trusted issuer)
         if (audience == null || audience.isEmpty()) {
-            // Allow tokens without audience claim - they're from a trusted issuer
-            // This is common for tokens from gateway realm that don't include audience
             LOG.debug("JWT token has no audience claim, allowing token from trusted issuer");
             return OAuth2TokenValidatorResult.success();
         }
         if (audience.stream().anyMatch(allowedAudience::contains)) {
             return OAuth2TokenValidatorResult.success();
-        } else {
-            LOG.warn("Invalid audience: {}", audience);
-            return OAuth2TokenValidatorResult.failure(error);
         }
+        // OIDC: client ID is often in azp (authorized party); accept if azp is in allowed list (web/mobile app clients)
+        String azp = jwt.getClaimAsString("azp");
+        if (azp != null && allowedAudience.contains(azp)) {
+            LOG.debug("JWT azp {} is in allowed list, accepting", azp);
+            return OAuth2TokenValidatorResult.success();
+        }
+        LOG.warn("Invalid audience: {} (azp: {})", audience, azp);
+        return OAuth2TokenValidatorResult.failure(error);
     }
 }

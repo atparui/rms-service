@@ -271,9 +271,12 @@ app:
     timestamp: ${build.timestamp:${maven.build.timestamp:unknown}}
   security:
     oauth2:
+      # Allow gateway + tenant app clients (web and mobile); tokens may have aud or azp set to client_id
       audience:
         - account
         - api://default
+        - rms-demo-web
+        - rms-demo-mobile
 
 # jhipster-needle-add-application-yaml-document
 ---

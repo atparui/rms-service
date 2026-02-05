@@ -107,6 +107,7 @@ public class JdbcRoutingDataSourceConfig {
     }
 
     @Bean
+    @org.springframework.context.annotation.Primary
     public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean emf) {
         return new JpaTransactionManager(emf.getObject());
     }
