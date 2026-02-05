@@ -16,7 +16,7 @@
 
     <changeSet id="20260206000001-1" author="system">
         <comment>Migrate any existing jhi_user data to rms_user (if needed)</comment>
-        
+
         <sql>
             -- Only migrate if jhi_user has data that's not in rms_user
             -- This is a safety measure in case there's any orphaned data
@@ -28,8 +28,6 @@
                 first_name, 
                 last_name, 
                 is_active, 
-                created_at, 
-                created_by,
                 last_sync_at,
                 sync_status
             )
@@ -41,8 +39,6 @@
                 first_name,
                 last_name,
                 activated,
-                created_date,
-                created_by,
                 NOW(),
                 'MIGRATED'
             FROM jhi_user
