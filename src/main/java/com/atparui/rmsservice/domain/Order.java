@@ -84,6 +84,7 @@ public class Order implements Serializable, Persistable<UUID> {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
+    @jakarta.persistence.Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 

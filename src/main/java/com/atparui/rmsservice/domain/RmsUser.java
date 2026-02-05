@@ -82,6 +82,7 @@ public class RmsUser implements Serializable, Persistable<UUID> {
     )
     private Set<Authority> authorities = new HashSet<>();
 
+    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -256,6 +257,7 @@ public class RmsUser implements Serializable, Persistable<UUID> {
         this.syncError = syncError;
     }
 
+    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {

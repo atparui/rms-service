@@ -40,6 +40,7 @@ public class TableWaiterAssignment implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @jakarta.persistence.Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
