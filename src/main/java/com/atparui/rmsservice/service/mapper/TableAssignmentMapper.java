@@ -40,4 +40,19 @@ public interface TableAssignmentMapper extends EntityMapper<TableAssignmentDTO, 
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "branchTableId", ignore = true)
+    @Mapping(target = "shiftId", ignore = true)
+    @Mapping(target = "supervisorId", ignore = true)
+    TableAssignment toEntity(TableAssignmentDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "branchTableId", ignore = true)
+    @Mapping(target = "shiftId", ignore = true)
+    @Mapping(target = "supervisorId", ignore = true)
+    void partialUpdate(@MappingTarget TableAssignment entity, TableAssignmentDTO dto);
 }

@@ -40,4 +40,19 @@ public interface BillMapper extends EntityMapper<BillDTO, Bill> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "orderId", ignore = true)
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "customerId", ignore = true)
+    Bill toEntity(BillDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "orderId", ignore = true)
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "customerId", ignore = true)
+    void partialUpdate(@MappingTarget Bill entity, BillDTO dto);
 }

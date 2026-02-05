@@ -24,4 +24,15 @@ public interface TaxConfigMapper extends EntityMapper<TaxConfigDTO, TaxConfig> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "restaurantId", ignore = true)
+    TaxConfig toEntity(TaxConfigDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "restaurantId", ignore = true)
+    void partialUpdate(@MappingTarget TaxConfig entity, TaxConfigDTO dto);
 }

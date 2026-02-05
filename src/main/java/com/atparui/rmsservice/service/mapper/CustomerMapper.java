@@ -24,4 +24,15 @@ public interface CustomerMapper extends EntityMapper<CustomerDTO, Customer> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "userId", ignore = true)
+    Customer toEntity(CustomerDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "userId", ignore = true)
+    void partialUpdate(@MappingTarget Customer entity, CustomerDTO dto);
 }

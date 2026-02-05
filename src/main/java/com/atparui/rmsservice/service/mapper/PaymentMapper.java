@@ -32,4 +32,17 @@ public interface PaymentMapper extends EntityMapper<PaymentDTO, Payment> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "billId", ignore = true)
+    @Mapping(target = "paymentMethodId", ignore = true)
+    Payment toEntity(PaymentDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "billId", ignore = true)
+    @Mapping(target = "paymentMethodId", ignore = true)
+    void partialUpdate(@MappingTarget Payment entity, PaymentDTO dto);
 }

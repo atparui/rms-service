@@ -32,4 +32,17 @@ public interface BillTaxMapper extends EntityMapper<BillTaxDTO, BillTax> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "billId", ignore = true)
+    @Mapping(target = "taxConfigId", ignore = true)
+    BillTax toEntity(BillTaxDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "billId", ignore = true)
+    @Mapping(target = "taxConfigId", ignore = true)
+    void partialUpdate(@MappingTarget BillTax entity, BillTaxDTO dto);
 }

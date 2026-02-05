@@ -13,6 +13,7 @@ import com.atparui.rmsservice.service.dto.RmsUserDTO;
 import java.util.Objects;
 import java.util.UUID;
 import org.mapstruct.*;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * Mapper for the entity {@link Order} and its DTO {@link OrderDTO}.
@@ -24,6 +25,23 @@ public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
     @Mapping(target = "user", source = "user", qualifiedByName = "rmsUserId")
     @Mapping(target = "branchTable", source = "branchTable", qualifiedByName = "branchTableId")
     OrderDTO toDto(Order s);
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "branchTableId", ignore = true)
+    Order toEntity(OrderDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "branchTableId", ignore = true)
+    void partialUpdate(@MappingTarget Order entity, OrderDTO dto);
 
     @Named("branchId")
     @BeanMapping(ignoreByDefault = true)

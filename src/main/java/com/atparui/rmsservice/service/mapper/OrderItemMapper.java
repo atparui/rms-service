@@ -40,4 +40,19 @@ public interface OrderItemMapper extends EntityMapper<OrderItemDTO, OrderItem> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "orderId", ignore = true)
+    @Mapping(target = "menuItemId", ignore = true)
+    @Mapping(target = "menuItemVariantId", ignore = true)
+    OrderItem toEntity(OrderItemDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "orderId", ignore = true)
+    @Mapping(target = "menuItemId", ignore = true)
+    @Mapping(target = "menuItemVariantId", ignore = true)
+    void partialUpdate(@MappingTarget OrderItem entity, OrderItemDTO dto);
 }
