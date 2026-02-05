@@ -1,9 +1,12 @@
 package com.atparui.rmsservice.security;
 
 import com.atparui.rmsservice.domain.RmsUser;
+import com.atparui.rmsservice.domain.UserSyncLog;
 import com.atparui.rmsservice.repository.RmsUserRepository;
-import com.atparui.rmsservice.service.UserService;
+import com.atparui.rmsservice.repository.UserSyncLogRepository;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,29 +22,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Provision local users on first successful authentication.
+ * Provision users in tenant-specific RMS database on successful authentication.
  *
- * Constraint preserved:
- * - A row in rms_user must not exist without the corresponding jhi_user row.
- *
- * Implementation notes:
- * - No servlet Filter (avoids early JPA init + bean cycles).
- * - Uses ObjectProvider to avoid forcing repository initialization during context startup.
+ * Implementation:
+ * - Creates/updates user in rms_user table (tenant-specific database)
+ * - No dependency on JHipster jhi_user table
+ * - Roles managed via user_branch_role (branch-tied roles pattern)
+ * - Logs sync activity in user_sync_log table
  */
 @Component
 public class UserProvisioningAuthSuccessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserProvisioningAuthSuccessListener.class);
 
-    private final ObjectProvider<UserService> userServiceProvider;
     private final ObjectProvider<RmsUserRepository> rmsUserRepositoryProvider;
+    private final ObjectProvider<UserSyncLogRepository> userSyncLogRepositoryProvider;
 
     public UserProvisioningAuthSuccessListener(
-        ObjectProvider<UserService> userServiceProvider,
-        ObjectProvider<RmsUserRepository> rmsUserRepositoryProvider
+        ObjectProvider<RmsUserRepository> rmsUserRepositoryProvider,
+        ObjectProvider<UserSyncLogRepository> userSyncLogRepositoryProvider
     ) {
-        this.userServiceProvider = userServiceProvider;
         this.rmsUserRepositoryProvider = rmsUserRepositoryProvider;
+        this.userSyncLogRepositoryProvider = userSyncLogRepositoryProvider;
     }
 
     @EventListener(AuthenticationSuccessEvent.class)
@@ -58,57 +60,121 @@ public class UserProvisioningAuthSuccessListener {
         String firstName = stringClaim(claims, "given_name", stringClaim(claims, "name", null));
         String lastName = stringClaim(claims, "family_name", null);
         String imageUrl = stringClaim(claims, "picture", null);
+        String tenantId = stringClaim(claims, "tenant_id", null);
 
         if (externalUserId == null || username == null) {
             LOG.debug("Skipping provisioning: missing required claims (sub/preferred_username)");
             return;
         }
 
-        // 1) Ensure jhi_user exists (UserService already handles find-or-create)
-        UserService userService = userServiceProvider.getIfAvailable();
-        if (userService == null) {
-            LOG.warn("UserService not available; cannot provision jhi_user/rms_user");
-            return;
-        }
-        try {
-            userService.getUserFromAuthentication(authToken);
-        } catch (Exception ex) {
-            LOG.warn("Failed to provision/sync jhi_user for {}: {}", username, ex.getMessage());
-            return; // preserve constraint: don't create rms_user if jhi_user failed
-        }
-
-        // 2) Ensure rms_user exists (only after jhi_user exists)
         RmsUserRepository rmsRepo = rmsUserRepositoryProvider.getIfAvailable();
         if (rmsRepo == null) {
             LOG.warn("RmsUserRepository not available; cannot provision rms_user");
             return;
         }
 
-        Optional<RmsUser> existing = rmsRepo.findByExternalUserId(externalUserId);
-        if (existing.isPresent()) {
+        try {
+            // Find or create RMS user in tenant database
+            Optional<RmsUser> existingOpt = rmsRepo.findByExternalUserId(externalUserId);
+            RmsUser rmsUser;
+            boolean isNewUser = false;
+
+            if (existingOpt.isPresent()) {
+                // Update existing user
+                rmsUser = existingOpt.get();
+                rmsUser.setUsername(username);
+                rmsUser.setEmail(email);
+                rmsUser.setFirstName(firstName);
+                rmsUser.setLastName(lastName);
+                rmsUser.setDisplayName(buildDisplayName(firstName, lastName, username));
+                rmsUser.setProfileImageUrl(imageUrl);
+                rmsUser.setLastSyncAt(Instant.now());
+                rmsUser.setSyncStatus("SYNCED");
+                LOG.debug("Updating existing rms_user: {}", username);
+            } else {
+                // Create new user
+                rmsUser = new RmsUser();
+                rmsUser.setId(UUID.randomUUID());
+                rmsUser.setExternalUserId(externalUserId);
+                rmsUser.setUsername(username);
+                rmsUser.setEmail(email);
+                rmsUser.setFirstName(firstName);
+                rmsUser.setLastName(lastName);
+                rmsUser.setDisplayName(buildDisplayName(firstName, lastName, username));
+                rmsUser.setProfileImageUrl(imageUrl);
+                rmsUser.setIsActive(Boolean.TRUE);
+                rmsUser.setLastSyncAt(Instant.now());
+                rmsUser.setSyncStatus("SYNCED");
+                rmsUser.setCreatedAt(Instant.now());
+                rmsUser.setCreatedBy(username);
+                isNewUser = true;
+                LOG.info("Creating new rms_user: externalUserId={}, username={}, tenantId={}", 
+                    externalUserId, username, tenantId);
+            }
+
+            rmsUser = rmsRepo.save(rmsUser);
+            
+            // Log sync activity
+            logSyncActivity(rmsUser.getId(), externalUserId, username, isNewUser, claims);
+            
+            LOG.info("Provisioned rms_user in tenant database: externalUserId={}, username={}, isNew={}", 
+                externalUserId, username, isNewUser);
+
+        } catch (Exception ex) {
+            LOG.error("Failed to provision rms_user for {}: {}", username, ex.getMessage(), ex);
+        }
+    }
+
+    private void logSyncActivity(UUID userId, String externalUserId, String username, boolean isNewUser, Map<String, Object> claims) {
+        UserSyncLogRepository syncLogRepo = userSyncLogRepositoryProvider.getIfAvailable();
+        if (syncLogRepo == null) {
             return;
         }
 
-        RmsUser rmsUser = new RmsUser();
-        rmsUser.setId(UUID.randomUUID());
-        rmsUser.setExternalUserId(externalUserId);
-        rmsUser.setUsername(username);
-        rmsUser.setEmail(email);
-        rmsUser.setFirstName(firstName);
-        rmsUser.setLastName(lastName);
-        rmsUser.setDisplayName(buildDisplayName(firstName, lastName, username));
-        rmsUser.setProfileImageUrl(imageUrl);
-        rmsUser.setIsActive(Boolean.TRUE);
-        rmsUser.setLastSyncAt(Instant.now());
-        rmsUser.setSyncStatus("SYNCED");
-
         try {
-            rmsRepo.save(rmsUser);
-            LOG.info("Provisioned rms_user externalUserId={} username={}", externalUserId, username);
+            UserSyncLog syncLog = new UserSyncLog();
+            syncLog.setId(UUID.randomUUID());
+            syncLog.setUserId(userId);
+            syncLog.setExternalUserId(externalUserId);
+            syncLog.setSyncStatus("SUCCESS");
+            syncLog.setSyncType(isNewUser ? "CREATE" : "UPDATE");
+            syncLog.setSyncedAt(Instant.now());
+            syncLog.setSourceSystem("KEYCLOAK");
+            
+            // Extract roles from JWT
+            List<String> roles = extractRoles(claims);
+            if (!roles.isEmpty()) {
+                syncLog.setSyncDetails("Roles from JWT: " + String.join(", ", roles));
+            }
+            
+            syncLogRepo.save(syncLog);
         } catch (Exception ex) {
-            // ignore duplicates / races
-            LOG.warn("Provision rms_user skipped for {}: {}", externalUserId, ex.getMessage());
+            LOG.warn("Failed to create sync log for {}: {}", username, ex.getMessage());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> extractRoles(Map<String, Object> claims) {
+        // Try to extract roles from various JWT claim structures
+        Object rolesObj = claims.get("roles");
+        if (rolesObj instanceof Collection) {
+            return ((Collection<?>) rolesObj).stream()
+                .map(Object::toString)
+                .filter(s -> s.startsWith("ROLE_"))
+                .toList();
+        }
+        
+        Object realmAccess = claims.get("realm_access");
+        if (realmAccess instanceof Map) {
+            Object realmRoles = ((Map<?, ?>) realmAccess).get("roles");
+            if (realmRoles instanceof Collection) {
+                return ((Collection<?>) realmRoles).stream()
+                    .map(Object::toString)
+                    .toList();
+            }
+        }
+        
+        return List.of();
     }
 
     private static Map<String, Object> extractClaims(AbstractAuthenticationToken authToken) {
@@ -136,4 +202,3 @@ public class UserProvisioningAuthSuccessListener {
         return username;
     }
 }
-

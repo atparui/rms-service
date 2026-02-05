@@ -75,5 +75,8 @@
     <!-- USER-AUTHORITY: Platform authority tables synced with Keycloak -->
     <include file="config/liquibase/changelog/20260131000001_added_authority_tables.xml" relativeToChangelogFile="false"/>
     
+    <!-- MIGRATION: Remove old JHipster tables, use RMS tables only -->
+    <include file="config/liquibase/changelog/20260206000001_remove_jhipster_tables.xml" relativeToChangelogFile="false"/>
+    
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

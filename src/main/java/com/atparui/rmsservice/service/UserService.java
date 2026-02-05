@@ -153,6 +153,13 @@ public class UserService {
             authorityRepository.save(authority);
         }
 
+        // Reload all authorities from database to ensure they are managed entities
+        Set<Authority> managedAuthorities = new HashSet<>();
+        for (String authorityName : userAuthorities) {
+            authorityRepository.findById(authorityName).ifPresent(managedAuthorities::add);
+        }
+        user.setAuthorities(managedAuthorities);
+
         // Find or create user
         Optional<User> existingUserOpt = userRepository.findOneByLogin(user.getLogin());
         if (existingUserOpt.isEmpty()) {
