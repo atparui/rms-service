@@ -490,7 +490,7 @@
             <tableExists tableName="app_navigation_menu_role"/>
         </preConditions>
         
-        <comment>Add cascading rules and missing FK to AppNavigationMenuRole (if table exists)</comment>
+        <comment>Add cascading rules and FK to restaurant_role for AppNavigationMenuRole (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_id"/>
         <dropForeignKeyConstraint baseTableName="app_navigation_menu_role" constraintName="fk_app_navigation_menu_role__app_navigation_menu_item_id"/>
@@ -509,7 +509,7 @@
                                  referencedTableName="app_navigation_menu_item"
                                  onDelete="CASCADE"/>
         
-        <!-- Add missing FK to restaurant_role -->
+        <!-- Link role to restaurant_role table for referential integrity -->
         <addForeignKeyConstraint baseColumnNames="role"
                                  baseTableName="app_navigation_menu_role"
                                  constraintName="fk_app_navigation_menu_role__role_name"
@@ -549,7 +549,7 @@
             <tableExists tableName="role_permission"/>
         </preConditions>
         
-        <comment>Add cascading rules and missing FK to RolePermission (if table exists)</comment>
+        <comment>Add cascading rules and FK to restaurant_role for RolePermission (if table exists)</comment>
         
         <dropForeignKeyConstraint baseTableName="role_permission" constraintName="fk_role_permission__permission_id"/>
         
@@ -560,7 +560,7 @@
                                  referencedTableName="permission"
                                  onDelete="CASCADE"/>
         
-        <!-- Add missing FK to restaurant_role -->
+        <!-- Link role to restaurant_role table for referential integrity -->
         <addForeignKeyConstraint baseColumnNames="role"
                                  baseTableName="role_permission"
                                  constraintName="fk_role_permission__role_name"

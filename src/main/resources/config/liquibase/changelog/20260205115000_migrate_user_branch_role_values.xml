@@ -16,34 +16,21 @@
             <tableExists tableName="user_branch_role"/>
             <columnExists tableName="user_branch_role" columnName="role"/>
         </preConditions>
-        <comment>Migrate user_branch_role.role values from ROLE_* format to match restaurant_role.name format</comment>
+        <comment>Ensure user_branch_role.role values have ROLE_ prefix to match restaurant_role.name format</comment>
         
-        <!-- Remove ROLE_ prefix and map to standard roles -->
+        <!-- Ensure ROLE_ prefix is present -->
         <sql>
-            UPDATE user_branch_role SET role = 'MANAGER' WHERE role = 'ROLE_MANAGER';
-            UPDATE user_branch_role SET role = 'CHEF' WHERE role = 'ROLE_CHEF';
-            UPDATE user_branch_role SET role = 'WAITER' WHERE role = 'ROLE_WAITER';
-            UPDATE user_branch_role SET role = 'BARTENDER' WHERE role = 'ROLE_BARTENDER';
-            UPDATE user_branch_role SET role = 'CASHIER' WHERE role = 'ROLE_CASHIER';
-            UPDATE user_branch_role SET role = 'HOST' WHERE role = 'ROLE_HOST';
-            UPDATE user_branch_role SET role = 'LINE_COOK' WHERE role IN ('ROLE_BAKER', 'ROLE_RUNNER', 'ROLE_SUPPORT');
+            -- Add ROLE_ prefix if missing (handle both old formats)
+            UPDATE user_branch_role SET role = 'ROLE_MANAGER' WHERE role IN ('MANAGER', 'ROLE_MANAGER');
+            UPDATE user_branch_role SET role = 'ROLE_CHEF' WHERE role IN ('CHEF', 'ROLE_CHEF');
+            UPDATE user_branch_role SET role = 'ROLE_WAITER' WHERE role IN ('WAITER', 'ROLE_WAITER', 'ROLE_RUNNER', 'ROLE_SUPPORT');
+            UPDATE user_branch_role SET role = 'ROLE_BARTENDER' WHERE role IN ('BARTENDER', 'ROLE_BARTENDER');
+            UPDATE user_branch_role SET role = 'ROLE_CASHIER' WHERE role IN ('CASHIER', 'ROLE_CASHIER');
+            UPDATE user_branch_role SET role = 'ROLE_HOST' WHERE role IN ('HOST', 'ROLE_HOST');
+            UPDATE user_branch_role SET role = 'ROLE_DELIVERY_DRIVER' WHERE role IN ('DELIVERY_DRIVER', 'ROLE_DELIVERY_DRIVER', 'ROLE_BAKER');
         </sql>
     </changeSet>
 
-    <changeSet id="20260205115000-2" author="rms-team">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="restaurant_role"/>
-        </preConditions>
-        <comment>Add missing roles to restaurant_role that exist in user_branch_role</comment>
-        
-        <!-- Add any roles that were in the old system but not in the new seed -->
-        <insert tableName="restaurant_role">
-            <column name="name" value="ROLE_SUPPORT"/>
-            <column name="display_name" value="Support Staff"/>
-            <column name="description" value="General support and utility role"/>
-            <column name="is_active" valueBoolean="false"/>
-            <column name="sort_order" valueNumeric="99"/>
-        </insert>
-    </changeSet>
+    <!-- Changeset 2 removed - no longer needed as all roles are now in the main seed -->
 
 </databaseChangeLog>
