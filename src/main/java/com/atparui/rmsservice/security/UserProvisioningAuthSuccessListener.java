@@ -91,26 +91,24 @@ public class UserProvisioningAuthSuccessListener {
                 rmsUser.setLastSyncAt(Instant.now());
                 rmsUser.setSyncStatus("SYNCED");
                 LOG.debug("Updating existing rms_user: {}", username);
-            } else {
-                // Create new user
-                rmsUser = new RmsUser();
-                rmsUser.setId(UUID.randomUUID());
-                rmsUser.setExternalUserId(externalUserId);
-                rmsUser.setUsername(username);
-                rmsUser.setEmail(email);
-                rmsUser.setFirstName(firstName);
-                rmsUser.setLastName(lastName);
-                rmsUser.setDisplayName(buildDisplayName(firstName, lastName, username));
-                rmsUser.setProfileImageUrl(imageUrl);
-                rmsUser.setIsActive(Boolean.TRUE);
-                rmsUser.setLastSyncAt(Instant.now());
-                rmsUser.setSyncStatus("SYNCED");
-                rmsUser.setCreatedAt(Instant.now());
-                rmsUser.setCreatedBy(username);
-                isNewUser = true;
-                LOG.info("Creating new rms_user: externalUserId={}, username={}, tenantId={}", 
-                    externalUserId, username, tenantId);
-            }
+                } else {
+                    // Create new user
+                    rmsUser = new RmsUser();
+                    rmsUser.setId(UUID.randomUUID());
+                    rmsUser.setExternalUserId(externalUserId);
+                    rmsUser.setUsername(username);
+                    rmsUser.setEmail(email);
+                    rmsUser.setFirstName(firstName);
+                    rmsUser.setLastName(lastName);
+                    rmsUser.setDisplayName(buildDisplayName(firstName, lastName, username));
+                    rmsUser.setProfileImageUrl(imageUrl);
+                    rmsUser.setIsActive(Boolean.TRUE);
+                    rmsUser.setLastSyncAt(Instant.now());
+                    rmsUser.setSyncStatus("SYNCED");
+                    isNewUser = true;
+                    LOG.info("Creating new rms_user: externalUserId={}, username={}, tenantId={}",
+                        externalUserId, username, tenantId);
+                }
 
             rmsUser = rmsRepo.save(rmsUser);
             
@@ -139,14 +137,14 @@ public class UserProvisioningAuthSuccessListener {
             syncLog.setSyncStatus("SUCCESS");
             syncLog.setSyncType(isNewUser ? "CREATE" : "UPDATE");
             syncLog.setSyncedAt(Instant.now());
-            syncLog.setSourceSystem("KEYCLOAK");
-            
-            // Extract roles from JWT
+            syncLog.setSyncedBy("KEYCLOAK");
+
+            // Extract roles from JWT and store in response_payload
             List<String> roles = extractRoles(claims);
             if (!roles.isEmpty()) {
-                syncLog.setSyncDetails("Roles from JWT: " + String.join(", ", roles));
+                syncLog.setResponsePayload("Roles from JWT: " + String.join(", ", roles));
             }
-            
+
             syncLogRepo.save(syncLog);
         } catch (Exception ex) {
             LOG.warn("Failed to create sync log for {}: {}", username, ex.getMessage());
