@@ -45,7 +45,7 @@ public class UserProvisioningAuthSuccessListener {
     }
 
     @EventListener(AuthenticationSuccessEvent.class)
-    @Transactional
+    @Transactional("transactionManager")
     public void onAuthSuccess(AuthenticationSuccessEvent event) {
         if (!(event.getAuthentication() instanceof AbstractAuthenticationToken authToken)) {
             return;
