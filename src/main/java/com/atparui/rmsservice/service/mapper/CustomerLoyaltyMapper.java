@@ -32,4 +32,17 @@ public interface CustomerLoyaltyMapper extends EntityMapper<CustomerLoyaltyDTO, 
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "restaurantId", ignore = true)
+    CustomerLoyalty toEntity(CustomerLoyaltyDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "restaurantId", ignore = true)
+    void partialUpdate(@MappingTarget CustomerLoyalty entity, CustomerLoyaltyDTO dto);
 }

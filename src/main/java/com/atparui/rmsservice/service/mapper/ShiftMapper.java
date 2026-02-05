@@ -24,4 +24,15 @@ public interface ShiftMapper extends EntityMapper<ShiftDTO, Shift> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "branchId", ignore = true)
+    Shift toEntity(ShiftDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "branchId", ignore = true)
+    void partialUpdate(@MappingTarget Shift entity, ShiftDTO dto);
 }

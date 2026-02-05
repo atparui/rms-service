@@ -32,4 +32,17 @@ public interface OrderItemCustomizationMapper extends EntityMapper<OrderItemCust
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "orderItemId", ignore = true)
+    @Mapping(target = "menuItemAddonId", ignore = true)
+    OrderItemCustomization toEntity(OrderItemCustomizationDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "orderItemId", ignore = true)
+    @Mapping(target = "menuItemAddonId", ignore = true)
+    void partialUpdate(@MappingTarget OrderItemCustomization entity, OrderItemCustomizationDTO dto);
 }

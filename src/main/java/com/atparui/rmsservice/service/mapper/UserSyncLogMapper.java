@@ -24,4 +24,15 @@ public interface UserSyncLogMapper extends EntityMapper<UserSyncLogDTO, UserSync
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "userId", ignore = true)
+    UserSyncLog toEntity(UserSyncLogDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "userId", ignore = true)
+    void partialUpdate(@MappingTarget UserSyncLog entity, UserSyncLogDTO dto);
 }

@@ -24,4 +24,15 @@ public interface BranchTableMapper extends EntityMapper<BranchTableDTO, BranchTa
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "branchId", ignore = true)
+    BranchTable toEntity(BranchTableDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "branchId", ignore = true)
+    void partialUpdate(@MappingTarget BranchTable entity, BranchTableDTO dto);
 }

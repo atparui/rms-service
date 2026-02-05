@@ -81,7 +81,7 @@ public class UserProvisioningAuthSuccessListener {
 
             if (existingOpt.isPresent()) {
                 // Update existing user
-                rmsUser = existingOpt.get();
+                rmsUser = existingOpt.orElseThrow();
                 rmsUser.setUsername(username);
                 rmsUser.setEmail(email);
                 rmsUser.setFirstName(firstName);

@@ -24,4 +24,15 @@ public interface MenuItemVariantMapper extends EntityMapper<MenuItemVariantDTO, 
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "menuItemId", ignore = true)
+    MenuItemVariant toEntity(MenuItemVariantDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "menuItemId", ignore = true)
+    void partialUpdate(@MappingTarget MenuItemVariant entity, MenuItemVariantDTO dto);
 }

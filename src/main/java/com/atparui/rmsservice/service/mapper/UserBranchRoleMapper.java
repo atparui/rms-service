@@ -32,4 +32,17 @@ public interface UserBranchRoleMapper extends EntityMapper<UserBranchRoleDTO, Us
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "branchId", ignore = true)
+    UserBranchRole toEntity(UserBranchRoleDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "branchId", ignore = true)
+    void partialUpdate(@MappingTarget UserBranchRole entity, UserBranchRoleDTO dto);
 }

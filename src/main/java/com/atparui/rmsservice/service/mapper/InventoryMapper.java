@@ -32,4 +32,17 @@ public interface InventoryMapper extends EntityMapper<InventoryDTO, Inventory> {
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "menuItemId", ignore = true)
+    Inventory toEntity(InventoryDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "branchId", ignore = true)
+    @Mapping(target = "menuItemId", ignore = true)
+    void partialUpdate(@MappingTarget Inventory entity, InventoryDTO dto);
 }

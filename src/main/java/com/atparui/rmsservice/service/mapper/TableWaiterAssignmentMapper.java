@@ -32,4 +32,17 @@ public interface TableWaiterAssignmentMapper extends EntityMapper<TableWaiterAss
     default String map(UUID value) {
         return Objects.toString(value, null);
     }
+
+    // Ignore FK ID fields - they're auto-managed by entity setters
+    @Override
+    @Mapping(target = "tableAssignmentId", ignore = true)
+    @Mapping(target = "waiterId", ignore = true)
+    TableWaiterAssignment toEntity(TableWaiterAssignmentDTO dto);
+
+    @Override
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "tableAssignmentId", ignore = true)
+    @Mapping(target = "waiterId", ignore = true)
+    void partialUpdate(@MappingTarget TableWaiterAssignment entity, TableWaiterAssignmentDTO dto);
 }
