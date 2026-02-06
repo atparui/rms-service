@@ -75,16 +75,24 @@ public class TenantJdbcConnectionManager {
             dbUrl = "jdbc:" + dbUrl;
         }
 
-        URI dbUri = URI.create(dbUrl.replace("jdbc:", ""));
+        // Strip jdbc: and p6spy: prefixes to get the actual database URL for parsing
+        String parseableUrl = dbUrl.replace("jdbc:", "").replace("p6spy:", "");
+
+        URI dbUri = URI.create(parseableUrl);
 
         String host = dbUri.getHost();
         int port = dbUri.getPort() > 0 ? dbUri.getPort() : 5432;
-        String database = dbUri.getPath().replaceFirst("/", "");
+        String database = dbUri.getPath() != null ? dbUri.getPath().replaceFirst("/", "") : "";
         String query = dbUri.getQuery();
 
-        // Build JDBC URL
+        // Build JDBC URL - use original dbUrl if it has p6spy prefix, otherwise use postgresql directly
         StringBuilder jdbcUrl = new StringBuilder();
-        jdbcUrl.append("jdbc:postgresql://").append(host).append(":").append(port).append("/").append(database);
+        if (config.getDatabaseUrl().contains("p6spy:")) {
+            jdbcUrl.append("jdbc:p6spy:postgresql://");
+        } else {
+            jdbcUrl.append("jdbc:postgresql://");
+        }
+        jdbcUrl.append(host).append(":").append(port).append("/").append(database);
         if (query != null && !query.isEmpty()) {
             jdbcUrl.append("?").append(query);
         }
