@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Value;
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Value("${spring.security.content-security-policy:default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:}")
     private String contentSecurityPolicy;
@@ -82,7 +84,10 @@ public class SecurityConfiguration {
             new Converter<Jwt, Collection<GrantedAuthority>>() {
                 @Override
                 public Collection<GrantedAuthority> convert(Jwt jwt) {
-                    return SecurityUtils.extractAuthorityFromClaims(jwt.getClaims());
+                    log.info("JwtAuthenticationConverter: Converting JWT to authorities. Claims keys: {}", jwt.getClaims().keySet());
+                    Collection<GrantedAuthority> authorities = SecurityUtils.extractAuthorityFromClaims(jwt.getClaims());
+                    log.info("JwtAuthenticationConverter: Extracted authorities: {}", authorities);
+                    return authorities;
                 }
             }
         );

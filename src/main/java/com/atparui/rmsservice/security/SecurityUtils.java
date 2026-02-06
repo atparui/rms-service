@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +21,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public final class SecurityUtils {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityUtils.class);
+    
     public static final String CLAIMS_NAMESPACE = "https://www.jhipster.tech/";
 
     private SecurityUtils() {}
@@ -144,7 +148,10 @@ public final class SecurityUtils {
      * @return a list of authorities
      */
     public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-        return extractRolesFromClaims(claims)
+        LOG.info("extractAuthorityFromClaims called with claims: {}", claims.keySet());
+        List<String> roles = extractRolesFromClaims(claims);
+        LOG.info("extractedRoles: {}", roles);
+        return roles
             .stream()
             .map(role -> (GrantedAuthority) new org.springframework.security.core.authority.SimpleGrantedAuthority(role))
             .collect(Collectors.toList());
@@ -152,10 +159,13 @@ public final class SecurityUtils {
 
     @SuppressWarnings("unchecked")
     private static List<String> extractRolesFromClaims(Map<String, Object> claims) {
+        LOG.debug("extractRolesFromClaims called with claims keys: {}", claims.keySet());
+        
         // Try to get roles from different claim locations
         // 1. Check for "groups" claim (common in Keycloak)
         Object groups = claims.get("groups");
         if (groups instanceof List) {
+            LOG.debug("Found 'groups' claim: {}", groups);
             return ((List<Object>) groups).stream()
                 .map(Object::toString)
                 .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
@@ -187,6 +197,46 @@ public final class SecurityUtils {
                 .map(Object::toString)
                 .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase())
                 .collect(Collectors.toList());
+        }
+
+        // 5. Check for "realm_access.roles" (Keycloak standard location)
+        Object realmAccess = claims.get("realm_access");
+        LOG.debug("realm_access claim: {}", realmAccess);
+        if (realmAccess instanceof Map) {
+            Object realmRoles = ((Map<String, Object>) realmAccess).get("roles");
+            LOG.debug("realm_access.roles: {}", realmRoles);
+            if (realmRoles instanceof List) {
+                List<String> extractedRoles = ((List<Object>) realmRoles).stream()
+                    .map(Object::toString)
+                    .filter(role -> role.startsWith("ROLE_")) // Only keep roles with ROLE_ prefix
+                    .collect(Collectors.toList());
+                LOG.debug("Extracted roles from realm_access: {}", extractedRoles);
+                if (!extractedRoles.isEmpty()) {
+                    return extractedRoles;
+                }
+            }
+        }
+
+        // 6. Check for "resource_access" (Keycloak client-specific roles)
+        Object resourceAccess = claims.get("resource_access");
+        if (resourceAccess instanceof Map) {
+            Map<String, Object> resourceMap = (Map<String, Object>) resourceAccess;
+            // Try common client IDs
+            for (String clientId : List.of("web_app", "account", "rms-service", "rms-demo-web")) {
+                Object clientAccess = resourceMap.get(clientId);
+                if (clientAccess instanceof Map) {
+                    Object clientRoles = ((Map<String, Object>) clientAccess).get("roles");
+                    if (clientRoles instanceof List) {
+                        List<String> extracted = ((List<Object>) clientRoles).stream()
+                            .map(Object::toString)
+                            .filter(role -> role.startsWith("ROLE_"))
+                            .collect(Collectors.toList());
+                        if (!extracted.isEmpty()) {
+                            return extracted;
+                        }
+                    }
+                }
+            }
         }
 
         // Default to ROLE_USER if no roles found
