@@ -40,14 +40,14 @@ public class TableWaiterAssignment implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branchTable", "shift", "supervisor" }, allowSetters = true)
     private TableAssignment tableAssignment;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private RmsUser waiter;
 
     @Column(name = "table_assignment_id")
@@ -123,7 +123,7 @@ public class TableWaiterAssignment implements Serializable, Persistable<UUID> {
         this.isActive = isActive;
     }
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

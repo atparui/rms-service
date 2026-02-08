@@ -33,7 +33,7 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     private String role;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = {}, allowSetters = true)
     private RestaurantRole restaurantRole;
 
@@ -56,14 +56,14 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     private String revokedBy;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private RmsUser user;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
@@ -181,7 +181,7 @@ public class UserBranchRole implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

@@ -46,15 +46,15 @@ public class CustomerLoyalty implements Serializable, Persistable<UUID> {
     private Boolean isActive;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true)
     private Customer customer;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private Restaurant restaurant;
 
     @Column(name = "customer_id")
@@ -144,7 +144,7 @@ public class CustomerLoyalty implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

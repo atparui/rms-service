@@ -78,11 +78,11 @@ public class Customer implements Serializable, Persistable<UUID> {
     private Boolean isActive;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private RmsUser user;
 
     @Column(name = "user_id")
@@ -273,7 +273,7 @@ public class Customer implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

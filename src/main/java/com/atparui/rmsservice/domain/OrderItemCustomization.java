@@ -39,14 +39,14 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     private BigDecimal totalPrice;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "order", "menuItem", "menuItemVariant" }, allowSetters = true)
     private OrderItem orderItem;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemAddon menuItemAddon;
 
@@ -111,7 +111,7 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

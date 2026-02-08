@@ -67,11 +67,11 @@ public class AppNavigationMenuItem implements Serializable, Persistable<UUID> {
     private Boolean isActive;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private AppNavigationMenu parentMenu;
 
     @Column(name = "parent_menu_id")
@@ -223,7 +223,7 @@ public class AppNavigationMenuItem implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

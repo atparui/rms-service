@@ -42,19 +42,19 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
     private Boolean isActive;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private BranchTable branchTable;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private Shift shift;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private RmsUser supervisor;
 
     @Column(name = "branch_table_id")
@@ -134,7 +134,7 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

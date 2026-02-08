@@ -35,14 +35,14 @@ public class AppNavigationMenuRole implements Serializable, Persistable<UUID> {
     private Boolean isActive;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private AppNavigationMenu appNavigationMenu;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "parentMenu" }, allowSetters = true)
     private AppNavigationMenuItem appNavigationMenuItem;
 
@@ -94,7 +94,7 @@ public class AppNavigationMenuRole implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

@@ -84,21 +84,21 @@ public class Order implements Serializable, Persistable<UUID> {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true)
     private Customer customer;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private RmsUser user;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private BranchTable branchTable;
 
@@ -337,7 +337,7 @@ public class Order implements Serializable, Persistable<UUID> {
         this.cancellationReason = cancellationReason;
     }
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

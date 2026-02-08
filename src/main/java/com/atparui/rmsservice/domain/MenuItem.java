@@ -82,14 +82,14 @@ public class MenuItem implements Serializable, Persistable<UUID> {
     private Integer displayOrder;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private MenuCategory menuCategory;
 
@@ -310,7 +310,7 @@ public class MenuItem implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

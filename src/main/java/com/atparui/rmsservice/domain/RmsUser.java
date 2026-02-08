@@ -82,7 +82,7 @@ public class RmsUser implements Serializable, Persistable<UUID> {
     )
     private Set<Authority> authorities = new HashSet<>();
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -256,7 +256,7 @@ public class RmsUser implements Serializable, Persistable<UUID> {
         this.syncError = syncError;
     }
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

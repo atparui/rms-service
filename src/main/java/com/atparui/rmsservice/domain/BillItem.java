@@ -45,14 +45,14 @@ public class BillItem implements Serializable, Persistable<UUID> {
     private BigDecimal itemTotal;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "order", "branch", "customer" }, allowSetters = true)
     private Bill bill;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "order", "menuItem", "menuItemVariant" }, allowSetters = true)
     private OrderItem orderItem;
 
@@ -130,7 +130,7 @@ public class BillItem implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

@@ -47,18 +47,18 @@ public class OrderItem implements Serializable, Persistable<UUID> {
     private String status;
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     private boolean isPersisted;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branch", "customer", "user", "branchTable" }, allowSetters = true)
     private Order order;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "branch", "menuCategory" }, allowSetters = true)
     private MenuItem menuItem;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemVariant menuItemVariant;
 
@@ -152,7 +152,7 @@ public class OrderItem implements Serializable, Persistable<UUID> {
     }
 
     @Transient
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;
