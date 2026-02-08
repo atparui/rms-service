@@ -151,14 +151,12 @@ public class BranchResource {
     /**
      * {@code GET  /branches} : get all the branches.
      *
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param pageable the pagination information
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of branches in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BranchDTO>> getAllBranches(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get a page of Branches");
         long count = branchService.countAll();
@@ -208,14 +206,12 @@ public class BranchResource {
      *
      * @param query the query of the branch search.
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
      * @return the result of the search.
      */
     @GetMapping("/_search")
     public ResponseEntity<List<BranchDTO>> searchBranches(
         @RequestParam("query") String query,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to search for a page of Branches for query {}", query);
         // Search functionality removed (Elasticsearch was removed)
