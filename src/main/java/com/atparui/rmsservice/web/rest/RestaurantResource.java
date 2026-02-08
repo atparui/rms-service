@@ -20,10 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.HeaderUtil;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 import com.atparui.rmsservice.web.util.ResponseUtil;
@@ -116,8 +115,7 @@ public class RestaurantResource {
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RestaurantDTO>> getAllRestaurants(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get a page of Restaurants");
         long count = restaurantService.countAll();
@@ -126,7 +124,7 @@ public class RestaurantResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromCurrentRequest(),
                     new PageImpl<>(entities, pageable, count)
                 )
             )
