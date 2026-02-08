@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -38,15 +37,14 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "order", "menuItem", "menuItemVariant" }, allowSetters = true)
     private OrderItem orderItem;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemAddon menuItemAddon;
 
@@ -110,8 +108,7 @@ public class OrderItemCustomization implements Serializable, Persistable<UUID> {
         this.totalPrice = totalPrice != null ? totalPrice.stripTrailingZeros() : null;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

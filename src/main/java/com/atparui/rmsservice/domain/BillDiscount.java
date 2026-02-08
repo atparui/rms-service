@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -44,15 +43,14 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
     @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "order", "branch", "customer" }, allowSetters = true)
     private Bill bill;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Discount discount;
 
@@ -129,8 +127,7 @@ public class BillDiscount implements Serializable, Persistable<UUID> {
         this.discountAmount = discountAmount != null ? discountAmount.stripTrailingZeros() : null;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

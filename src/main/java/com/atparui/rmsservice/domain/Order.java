@@ -84,21 +84,21 @@ public class Order implements Serializable, Persistable<UUID> {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true)
     private Customer customer;
 
-    @Transient
+    @jakarta.persistence.Transient
     private RmsUser user;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private BranchTable branchTable;
 
@@ -337,7 +337,7 @@ public class Order implements Serializable, Persistable<UUID> {
         this.cancellationReason = cancellationReason;
     }
 
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

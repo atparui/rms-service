@@ -40,14 +40,14 @@ public class TableWaiterAssignment implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branchTable", "shift", "supervisor" }, allowSetters = true)
     private TableAssignment tableAssignment;
 
-    @Transient
+    @jakarta.persistence.Transient
     private RmsUser waiter;
 
     @Column(name = "table_assignment_id")
@@ -123,7 +123,7 @@ public class TableWaiterAssignment implements Serializable, Persistable<UUID> {
         this.isActive = isActive;
     }
 
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

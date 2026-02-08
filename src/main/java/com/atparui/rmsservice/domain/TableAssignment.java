@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -41,20 +40,18 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private BranchTable branchTable;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branch" }, allowSetters = true)
     private Shift shift;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private RmsUser supervisor;
 
     @Column(name = "branch_table_id")
@@ -133,8 +130,7 @@ public class TableAssignment implements Serializable, Persistable<UUID> {
         this.isActive = isActive;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

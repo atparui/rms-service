@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -46,19 +45,18 @@ public class OrderItem implements Serializable, Persistable<UUID> {
     @Column(name = "status")
     private String status;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branch", "customer", "user", "branchTable" }, allowSetters = true)
     private Order order;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "branch", "menuCategory" }, allowSetters = true)
     private MenuItem menuItem;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "menuItem" }, allowSetters = true)
     private MenuItemVariant menuItemVariant;
 
@@ -151,8 +149,7 @@ public class OrderItem implements Serializable, Persistable<UUID> {
         this.status = status;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

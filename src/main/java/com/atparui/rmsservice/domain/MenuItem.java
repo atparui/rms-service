@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -81,15 +80,14 @@ public class MenuItem implements Serializable, Persistable<UUID> {
     @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private Branch branch;
 
-    @Transient
+    @jakarta.persistence.Transient
     @JsonIgnoreProperties(value = { "restaurant" }, allowSetters = true)
     private MenuCategory menuCategory;
 
@@ -309,8 +307,7 @@ public class MenuItem implements Serializable, Persistable<UUID> {
         this.displayOrder = displayOrder;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

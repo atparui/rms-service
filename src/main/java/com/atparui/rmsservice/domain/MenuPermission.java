@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class MenuPermission implements Serializable {
     @Column(name = "permission_id")
     private UUID permissionId;
 
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

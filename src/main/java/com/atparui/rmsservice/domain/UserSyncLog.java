@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -58,12 +57,10 @@ public class UserSyncLog implements Serializable, Persistable<UUID> {
     @Column(name = "synced_by")
     private String syncedBy;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private RmsUser user;
 
     @Column(name = "user_id")
@@ -188,8 +185,7 @@ public class UserSyncLog implements Serializable, Persistable<UUID> {
         this.syncedBy = syncedBy;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;

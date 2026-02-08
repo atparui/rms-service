@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -58,8 +57,7 @@ public class AppNavigationMenu implements Serializable, Persistable<UUID> {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     private boolean isPersisted;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -181,8 +179,7 @@ public class AppNavigationMenu implements Serializable, Persistable<UUID> {
         this.isActive = isActive;
     }
 
-    @Transient
-    @Transient
+    @jakarta.persistence.Transient
     @Override
     public boolean isNew() {
         return !this.isPersisted;
