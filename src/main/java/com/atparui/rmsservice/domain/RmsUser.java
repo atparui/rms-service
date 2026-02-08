@@ -73,14 +73,8 @@ public class RmsUser implements Serializable, Persistable<UUID> {
     @Column(name = "sync_error")
     private String syncError;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_authority",
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "name")
-    )
-    private Set<Authority> authorities = new HashSet<>();
+    // NOTE: We don't use authorities collection - RMS uses user_branch_role system instead
+    // Removed @ManyToMany authorities field to avoid querying non-existent user_authority table
 
     @jakarta.persistence.Transient
     private boolean isPersisted;
@@ -267,18 +261,8 @@ public class RmsUser implements Serializable, Persistable<UUID> {
         return this;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
-    }
-
-    public RmsUser authorities(Set<Authority> authorities) {
-        this.setAuthorities(authorities);
-        return this;
-    }
+    // NOTE: We don't use authorities collection - RMS uses user_branch_role system instead
+    // Removed @ManyToMany authorities field and methods to avoid querying non-existent user_authority table
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
