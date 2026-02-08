@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.HeaderUtil;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 import com.atparui.rmsservice.web.util.ResponseUtil;
@@ -219,16 +220,17 @@ public class BranchResource {
         LOG.debug("REST request to search for a page of Branches for query {}", query);
         // Search functionality removed (Elasticsearch was removed)
         // Return empty list with proper pagination headers
-        List<BranchDTO> results = new ArrayList<>();
-        PageImpl<BranchDTO> page = new PageImpl<>(results, pageable, 0);
+       
+        long count = branchService.countAll();
+        List<BranchDTO> entities = branchService.findAll(pageable);
 
         return ResponseEntity.ok()
             .headers(
-                PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                    page
+               PaginationUtil.generatePaginationHttpHeaders(
+                    ServletUriComponentsBuilder.fromCurrentRequest(),
+                    new PageImpl<>(entities, pageable, count)
                 )
             )
-            .body(results);
+            .body(entities);
     }
 }
