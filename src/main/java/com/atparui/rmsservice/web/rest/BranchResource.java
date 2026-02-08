@@ -166,8 +166,8 @@ public class BranchResource {
 
         return ResponseEntity.ok()
             .headers(
-                PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+               PaginationUtil.generatePaginationHttpHeaders(
+                    ServletUriComponentsBuilder.fromCurrentRequest(),
                     new PageImpl<>(entities, pageable, count)
                 )
             )
