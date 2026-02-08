@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.*;
-import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -74,10 +73,15 @@ public class RmsUser implements Serializable, Persistable<UUID> {
     @Column(name = "sync_error")
     private String syncError;
 
-    // NOTE: We don't use authorities collection - RMS uses user_branch_role system instead
-    // Removed @ManyToMany authorities field to avoid querying non-existent user_authority table
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_authority",
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "name")
+    )
+    private Set<Authority> authorities = new HashSet<>();
 
-    @Transient
     @org.springframework.data.annotation.Transient
     private boolean isPersisted;
 
@@ -252,7 +256,6 @@ public class RmsUser implements Serializable, Persistable<UUID> {
         this.syncError = syncError;
     }
 
-    @Transient
     @org.springframework.data.annotation.Transient
     @Override
     public boolean isNew() {
@@ -264,8 +267,18 @@ public class RmsUser implements Serializable, Persistable<UUID> {
         return this;
     }
 
-    // NOTE: We don't use authorities collection - RMS uses user_branch_role system instead
-    // Removed @ManyToMany authorities field and methods to avoid querying non-existent user_authority table
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
+    public RmsUser authorities(Set<Authority> authorities) {
+        this.setAuthorities(authorities);
+        return this;
+    }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
