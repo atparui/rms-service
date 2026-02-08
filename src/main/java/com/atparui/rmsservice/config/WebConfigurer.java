@@ -37,35 +37,14 @@ public class WebConfigurer implements WebMvcConfigurer {
     @Value("${application.cors.allow-credentials:true}")
     private boolean allowCredentials;
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        
-        if (StringUtils.hasText(allowedOrigins)) {
-            LOG.debug("Registering CORS filter with origins: {}", allowedOrigins);
-            config.setAllowCredentials(allowCredentials);
-            
-            Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .forEach(config::addAllowedOrigin);
-            
-            Arrays.stream(allowedMethods.split(","))
-                .map(String::trim)
-                .forEach(config::addAllowedMethod);
-            
-            Arrays.stream(allowedHeaders.split(","))
-                .map(String::trim)
-                .forEach(config::addAllowedHeader);
-            
-            source.registerCorsConfiguration("/api/**", config);
-            source.registerCorsConfiguration("/management/**", config);
-            source.registerCorsConfiguration("/v3/api-docs", config);
-            source.registerCorsConfiguration("/swagger-ui/**", config);
-        }
-        
-        return new CorsFilter(source);
-    }
+    // CORS is handled by the API Gateway (console)
+    // Backend services behind the gateway should NOT have CORS filters
+    // to avoid conflicts and because they're only called internally by the gateway
+    //
+    // @Bean
+    // public CorsFilter corsFilter() {
+    //     ...
+    // }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
