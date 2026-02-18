@@ -6,6 +6,7 @@ import com.atparui.rmsservice.service.BranchTableService;
 import com.atparui.rmsservice.service.dto.BranchTableDTO;
 import com.atparui.rmsservice.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.HeaderUtil;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 import com.atparui.rmsservice.web.util.ResponseUtil;
@@ -153,13 +154,13 @@ public class BranchTableResource {
      * {@code GET  /branch-tables} : get all the branchTables.
      *
      * @param pageable the pagination information.
-     * @param request  a {@link ServerHttpRequest} request.
+     * @param request  a {@link HttpServletRequest} request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of branchTables in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BranchTableDTO>> getAllBranchTables(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        HttpServletRequest request
     ) {
         LOG.debug("REST request to get a page of BranchTables");
         long count = branchTableService.countAll();
@@ -168,7 +169,7 @@ public class BranchTableResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     new PageImpl<>(entities, pageable, count)
                 )
             )
@@ -209,14 +210,14 @@ public class BranchTableResource {
      *
      * @param query    the query of the branchTable search.
      * @param pageable the pagination information.
-     * @param request  a {@link ServerHttpRequest} request.
+     * @param request  a {@link HttpServletRequest} request.
      * @return the result of the search.
      */
     @GetMapping("/_search")
     public ResponseEntity<List<BranchTableDTO>> searchBranchTables(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        HttpServletRequest request
     ) {
         LOG.debug("REST request to search for a page of BranchTables for query {}", query);
         // Search functionality removed (Elasticsearch was removed)
@@ -227,7 +228,7 @@ public class BranchTableResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     page
                 )
             )

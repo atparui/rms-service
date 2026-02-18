@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.HeaderUtil;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 import com.atparui.rmsservice.web.util.ResponseUtil;
@@ -152,13 +153,13 @@ public class BillResource {
      * {@code GET  /bills} : get all the bills.
      *
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request the HTTP request (for building pagination links).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bills in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BillDTO>> getAllBills(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        HttpServletRequest request
     ) {
         LOG.debug("REST request to get a page of Bills");
         long count = billService.countAll();
@@ -167,7 +168,7 @@ public class BillResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     new PageImpl<>(entities, pageable, count)
                 )
             )
@@ -208,14 +209,14 @@ public class BillResource {
      *
      * @param query the query of the bill search.
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request the HTTP request (for building pagination links).
      * @return the result of the search.
      */
     @GetMapping("/_search")
     public ResponseEntity<List<BillDTO>> searchBills(
         @RequestParam("query") String query,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        HttpServletRequest request
     ) {
         LOG.debug("REST request to search for a page of Bills for query {}", query);
         // Search functionality removed (Elasticsearch was removed)
@@ -226,7 +227,7 @@ public class BillResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     page
                 )
             )

@@ -3,6 +3,7 @@ import java.util.Optional;
 
 import com.atparui.rmsservice.service.UserService;
 import com.atparui.rmsservice.service.dto.UserDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 
 @RestController
@@ -30,13 +31,13 @@ public class PublicUserResource {
     /**
      * {@code GET /users} : get all users with only public information - calling this method is allowed for anyone.
      *
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request a {@link HttpServletRequest} request.
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body all users.
      */
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllPublicUsers(
-        ServerHttpRequest request,
+        HttpServletRequest request,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get all public User names");
@@ -48,7 +49,7 @@ public class PublicUserResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     page
                 )
             )

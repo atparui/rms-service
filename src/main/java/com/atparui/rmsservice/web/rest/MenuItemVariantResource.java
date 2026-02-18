@@ -6,6 +6,7 @@ import com.atparui.rmsservice.service.MenuItemVariantService;
 import com.atparui.rmsservice.service.dto.MenuItemVariantDTO;
 import com.atparui.rmsservice.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.atparui.rmsservice.web.util.HeaderUtil;
 import com.atparui.rmsservice.web.util.PaginationUtil;
 import com.atparui.rmsservice.web.util.ResponseUtil;
@@ -117,7 +118,7 @@ public class MenuItemVariantResource {
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MenuItemVariantDTO>> getAllMenuItemVariants(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        HttpServletRequest request
     ) {
         LOG.debug("REST request to get a page of MenuItemVariants");
         long count = menuItemVariantService.countAll();
@@ -126,7 +127,7 @@ public class MenuItemVariantResource {
         return ResponseEntity.ok()
             .headers(
                 PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                    ServletUriComponentsBuilder.fromRequest(request),
                     new PageImpl<>(entities, pageable, count)
                 )
             )
