@@ -12,7 +12,7 @@
             <column name="menu_key" value="restaurant"/>
             <column name="label" value="Restaurant"/>
             <column name="type" value="route"/>
-            <column name="route_path" value="/restaurant"/>
+            <column name="route_path" value="/restaurants"/>
             <column name="sort_order" valueNumeric="1"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="permission_logic" value="ANY"/>
@@ -52,7 +52,7 @@
             <column name="menu_key" value="menu_category"/>
             <column name="label" value="Menu Categories"/>
             <column name="type" value="route"/>
-            <column name="route_path" value="/menu/categories"/>
+            <column name="route_path" value="/menu-categories"/>
             <column name="sort_order" valueNumeric="5"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="permission_logic" value="ANY"/>
@@ -62,7 +62,7 @@
             <column name="menu_key" value="menu_item"/>
             <column name="label" value="Menu Items"/>
             <column name="type" value="route"/>
-            <column name="route_path" value="/menu/items"/>
+            <column name="route_path" value="/menu-items"/>
             <column name="sort_order" valueNumeric="6"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="permission_logic" value="ANY"/>

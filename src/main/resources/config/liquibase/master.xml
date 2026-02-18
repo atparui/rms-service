@@ -42,6 +42,7 @@
     <include file="config/liquibase/changelog/20251228051113_added_entity_Payment.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260123090000_added_entity_AppMenuPermission.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260123093000_seed_app_menu_permissions.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260214000000_fix_app_menu_route_paths.xml" relativeToChangelogFile="false"/>
     
     <!-- RESTAURANT ROLE: Define valid roles for restaurant staff (MUST be before constraints) -->
     <include file="config/liquibase/changelog/20260205120000_added_entity_RestaurantRole.xml" relativeToChangelogFile="false"/>

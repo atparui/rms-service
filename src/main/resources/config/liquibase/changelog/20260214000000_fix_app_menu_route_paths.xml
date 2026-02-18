@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Align app_menu route_path with frontend routes (plural and hyphenated) to avoid 404 -->
+    <changeSet id="20260214000000-fix-app-menu-route-paths" author="system">
+        <comment>Update app_menu route_path to match RMS web app routes</comment>
+        <update tableName="app_menu">
+            <column name="route_path" value="/restaurants"/>
+            <where>menu_key = 'restaurant' AND route_path = '/restaurant'</where>
+        </update>
+        <update tableName="app_menu">
+            <column name="route_path" value="/menu-categories"/>
+            <where>menu_key = 'menu_category' AND route_path = '/menu/categories'</where>
+        </update>
+        <update tableName="app_menu">
+            <column name="route_path" value="/menu-items"/>
+            <where>menu_key = 'menu_item' AND route_path = '/menu/items'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
